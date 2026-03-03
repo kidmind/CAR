@@ -1,0 +1,549 @@
+ARM GAS  /tmp/cco99q4Q.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"usart.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.file 1 "MyHardWare/Src/usart.c"
+  20              		.section	.text.USART_GPIO_Config,"ax",%progbits
+  21              		.align	1
+  22              		.global	USART_GPIO_Config
+  23              		.syntax unified
+  24              		.thumb
+  25              		.thumb_func
+  27              	USART_GPIO_Config:
+  28              	.LFB126:
+   1:MyHardWare/Src/usart.c **** /***
+   2:MyHardWare/Src/usart.c **** 	*************************************************************************************************
+   3:MyHardWare/Src/usart.c **** 	*	@version V1.0
+   4:MyHardWare/Src/usart.c **** 	*  @date    2023-3-13
+   5:MyHardWare/Src/usart.c **** 	*	@author  反客科技	
+   6:MyHardWare/Src/usart.c **** 	*	@brief   usart 接口相关函数
+   7:MyHardWare/Src/usart.c ****    ************************************************************************************************
+   8:MyHardWare/Src/usart.c ****    *  @description
+   9:MyHardWare/Src/usart.c **** 	*
+  10:MyHardWare/Src/usart.c **** 	*	实验平台：反客STM32F407ZGT6核心板 （型号：FK407M2）
+  11:MyHardWare/Src/usart.c **** 	*	淘宝地址：https://shop212360197.taobao.com
+  12:MyHardWare/Src/usart.c **** 	*	QQ交流群：536665479
+  13:MyHardWare/Src/usart.c **** 	*
+  14:MyHardWare/Src/usart.c **** >>>>> 文件说明：
+  15:MyHardWare/Src/usart.c **** 	*
+  16:MyHardWare/Src/usart.c **** 	*  1.初始化USART1的引脚 PA9/PA10，
+  17:MyHardWare/Src/usart.c **** 	*  2.配置USART1工作在收发模式、数位8位、停止位1位、无校验、不使用硬件�
+  18:MyHardWare/Src/usart.c **** 	*    串口的波特率设置为115200，若需要更改波特率直接修改usart.h里的宏定�
+  19:MyHardWare/Src/usart.c **** 	*  3.重定义fputc函数,用以支持使用printf函数打印数据
+  20:MyHardWare/Src/usart.c **** 	*
+  21:MyHardWare/Src/usart.c **** 	************************************************************************************************
+  22:MyHardWare/Src/usart.c **** ***/
+  23:MyHardWare/Src/usart.c **** 
+  24:MyHardWare/Src/usart.c **** 
+  25:MyHardWare/Src/usart.c **** #include "usart.h"  
+  26:MyHardWare/Src/usart.c **** #include <stdio.h>
+  27:MyHardWare/Src/usart.c **** 
+  28:MyHardWare/Src/usart.c **** // 函数：usart IO口初始化
+  29:MyHardWare/Src/usart.c **** //
+  30:MyHardWare/Src/usart.c **** void  USART_GPIO_Config	(void)
+ARM GAS  /tmp/cco99q4Q.s 			page 2
+
+
+  31:MyHardWare/Src/usart.c **** {
+  29              		.loc 1 31 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 8
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33 0000 10B5     		push	{r4, lr}
+  34              	.LCFI0:
+  35              		.cfi_def_cfa_offset 8
+  36              		.cfi_offset 4, -8
+  37              		.cfi_offset 14, -4
+  38 0002 82B0     		sub	sp, sp, #8
+  39              	.LCFI1:
+  40              		.cfi_def_cfa_offset 16
+  32:MyHardWare/Src/usart.c **** 	GPIO_InitTypeDef GPIO_InitStructure;
+  41              		.loc 1 32 2 view .LVU1
+  33:MyHardWare/Src/usart.c **** 	RCC_AHB1PeriphClockCmd ( USART1_TX_CLK|USART1_RX_CLK, ENABLE); 	//IO口时钟配置
+  42              		.loc 1 33 2 view .LVU2
+  43 0004 0121     		movs	r1, #1
+  44 0006 0846     		mov	r0, r1
+  45 0008 FFF7FEFF 		bl	RCC_AHB1PeriphClockCmd
+  46              	.LVL0:
+  34:MyHardWare/Src/usart.c **** 
+  35:MyHardWare/Src/usart.c **** 	//IO配置
+  36:MyHardWare/Src/usart.c **** 	GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AF;   	 //复用模式
+  47              		.loc 1 36 2 view .LVU3
+  48              		.loc 1 36 32 is_stmt 0 view .LVU4
+  49 000c 0223     		movs	r3, #2
+  50 000e 8DF80430 		strb	r3, [sp, #4]
+  37:MyHardWare/Src/usart.c **** 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;   //推挽
+  51              		.loc 1 37 2 is_stmt 1 view .LVU5
+  52              		.loc 1 37 32 is_stmt 0 view .LVU6
+  53 0012 0023     		movs	r3, #0
+  54 0014 8DF80630 		strb	r3, [sp, #6]
+  38:MyHardWare/Src/usart.c **** 	GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_UP;		 //上拉
+  55              		.loc 1 38 2 is_stmt 1 view .LVU7
+  56              		.loc 1 38 32 is_stmt 0 view .LVU8
+  57 0018 0122     		movs	r2, #1
+  58 001a 8DF80720 		strb	r2, [sp, #7]
+  39:MyHardWare/Src/usart.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz; //速度等级
+  59              		.loc 1 39 2 is_stmt 1 view .LVU9
+  60              		.loc 1 39 32 is_stmt 0 view .LVU10
+  61 001e 8DF80530 		strb	r3, [sp, #5]
+  40:MyHardWare/Src/usart.c **** 
+  41:MyHardWare/Src/usart.c **** 	//初始化 TX	引脚
+  42:MyHardWare/Src/usart.c **** 	GPIO_InitStructure.GPIO_Pin = USART1_TX_PIN;	 
+  62              		.loc 1 42 2 is_stmt 1 view .LVU11
+  63              		.loc 1 42 30 is_stmt 0 view .LVU12
+  64 0022 4FF40073 		mov	r3, #512
+  65 0026 0093     		str	r3, [sp]
+  43:MyHardWare/Src/usart.c **** 	GPIO_Init(USART1_TX_PORT, &GPIO_InitStructure);	
+  66              		.loc 1 43 2 is_stmt 1 view .LVU13
+  67 0028 0B4C     		ldr	r4, .L3
+  68 002a 6946     		mov	r1, sp
+  69 002c 2046     		mov	r0, r4
+  70 002e FFF7FEFF 		bl	GPIO_Init
+  71              	.LVL1:
+  44:MyHardWare/Src/usart.c **** 	//初始化 RX 引脚													   
+ARM GAS  /tmp/cco99q4Q.s 			page 3
+
+
+  45:MyHardWare/Src/usart.c **** 	GPIO_InitStructure.GPIO_Pin = USART1_RX_PIN;	
+  72              		.loc 1 45 2 view .LVU14
+  73              		.loc 1 45 30 is_stmt 0 view .LVU15
+  74 0032 4FF48063 		mov	r3, #1024
+  75 0036 0093     		str	r3, [sp]
+  46:MyHardWare/Src/usart.c **** 	GPIO_Init(USART1_RX_PORT, &GPIO_InitStructure);		
+  76              		.loc 1 46 2 is_stmt 1 view .LVU16
+  77 0038 6946     		mov	r1, sp
+  78 003a 2046     		mov	r0, r4
+  79 003c FFF7FEFF 		bl	GPIO_Init
+  80              	.LVL2:
+  47:MyHardWare/Src/usart.c **** 	
+  48:MyHardWare/Src/usart.c **** 	//IO复用，复用到USART1
+  49:MyHardWare/Src/usart.c **** 	GPIO_PinAFConfig(USART1_TX_PORT,USART1_TX_PinSource,GPIO_AF_USART1); 
+  81              		.loc 1 49 2 view .LVU17
+  82 0040 0722     		movs	r2, #7
+  83 0042 0921     		movs	r1, #9
+  84 0044 2046     		mov	r0, r4
+  85 0046 FFF7FEFF 		bl	GPIO_PinAFConfig
+  86              	.LVL3:
+  50:MyHardWare/Src/usart.c **** 	GPIO_PinAFConfig(USART1_RX_PORT,USART1_RX_PinSource,GPIO_AF_USART1);	
+  87              		.loc 1 50 2 view .LVU18
+  88 004a 0722     		movs	r2, #7
+  89 004c 0A21     		movs	r1, #10
+  90 004e 2046     		mov	r0, r4
+  91 0050 FFF7FEFF 		bl	GPIO_PinAFConfig
+  92              	.LVL4:
+  51:MyHardWare/Src/usart.c **** }
+  93              		.loc 1 51 1 is_stmt 0 view .LVU19
+  94 0054 02B0     		add	sp, sp, #8
+  95              	.LCFI2:
+  96              		.cfi_def_cfa_offset 8
+  97              		@ sp needed
+  98 0056 10BD     		pop	{r4, pc}
+  99              	.L4:
+ 100              		.align	2
+ 101              	.L3:
+ 102 0058 00000240 		.word	1073872896
+ 103              		.cfi_endproc
+ 104              	.LFE126:
+ 106              		.section	.text.Usart_Config,"ax",%progbits
+ 107              		.align	1
+ 108              		.global	Usart_Config
+ 109              		.syntax unified
+ 110              		.thumb
+ 111              		.thumb_func
+ 113              	Usart_Config:
+ 114              	.LFB127:
+  52:MyHardWare/Src/usart.c **** 
+  53:MyHardWare/Src/usart.c **** // 函数：USART 口初始化
+  54:MyHardWare/Src/usart.c **** //
+  55:MyHardWare/Src/usart.c **** void Usart_Config(void)
+  56:MyHardWare/Src/usart.c **** {		
+ 115              		.loc 1 56 1 is_stmt 1 view -0
+ 116              		.cfi_startproc
+ 117              		@ args = 0, pretend = 0, frame = 16
+ 118              		@ frame_needed = 0, uses_anonymous_args = 0
+ARM GAS  /tmp/cco99q4Q.s 			page 4
+
+
+ 119 0000 10B5     		push	{r4, lr}
+ 120              	.LCFI3:
+ 121              		.cfi_def_cfa_offset 8
+ 122              		.cfi_offset 4, -8
+ 123              		.cfi_offset 14, -4
+ 124 0002 84B0     		sub	sp, sp, #16
+ 125              	.LCFI4:
+ 126              		.cfi_def_cfa_offset 24
+  57:MyHardWare/Src/usart.c **** 	USART_InitTypeDef USART_InitStructure;
+ 127              		.loc 1 57 2 view .LVU21
+  58:MyHardWare/Src/usart.c **** 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
+ 128              		.loc 1 58 2 view .LVU22
+ 129 0004 0121     		movs	r1, #1
+ 130 0006 1020     		movs	r0, #16
+ 131 0008 FFF7FEFF 		bl	RCC_APB2PeriphClockCmd
+ 132              	.LVL5:
+  59:MyHardWare/Src/usart.c **** 	
+  60:MyHardWare/Src/usart.c **** 	// IO口初始化
+  61:MyHardWare/Src/usart.c **** 	USART_GPIO_Config();
+ 133              		.loc 1 61 2 view .LVU23
+ 134 000c FFF7FEFF 		bl	USART_GPIO_Config
+ 135              	.LVL6:
+  62:MyHardWare/Src/usart.c **** 		 
+  63:MyHardWare/Src/usart.c **** 	// 配置串口各项参数
+  64:MyHardWare/Src/usart.c **** 	USART_InitStructure.USART_BaudRate 	 = USART1_BaudRate; //波特率
+ 136              		.loc 1 64 2 view .LVU24
+ 137              		.loc 1 64 39 is_stmt 0 view .LVU25
+ 138 0010 4FF4E133 		mov	r3, #115200
+ 139 0014 0093     		str	r3, [sp]
+  65:MyHardWare/Src/usart.c **** 	USART_InitStructure.USART_WordLength = USART_WordLength_8b; //数据位8位
+ 140              		.loc 1 65 2 is_stmt 1 view .LVU26
+ 141              		.loc 1 65 39 is_stmt 0 view .LVU27
+ 142 0016 0023     		movs	r3, #0
+ 143 0018 ADF80430 		strh	r3, [sp, #4]	@ movhi
+  66:MyHardWare/Src/usart.c **** 	USART_InitStructure.USART_StopBits   = USART_StopBits_1; //停止位1位
+ 144              		.loc 1 66 2 is_stmt 1 view .LVU28
+ 145              		.loc 1 66 39 is_stmt 0 view .LVU29
+ 146 001c ADF80630 		strh	r3, [sp, #6]	@ movhi
+  67:MyHardWare/Src/usart.c **** 	USART_InitStructure.USART_Parity     = USART_Parity_No ; //无校验
+ 147              		.loc 1 67 2 is_stmt 1 view .LVU30
+ 148              		.loc 1 67 39 is_stmt 0 view .LVU31
+ 149 0020 ADF80830 		strh	r3, [sp, #8]	@ movhi
+  68:MyHardWare/Src/usart.c **** 	USART_InitStructure.USART_Mode 	    = USART_Mode_Rx | USART_Mode_Tx; //发送和接收模式
+ 150              		.loc 1 68 2 is_stmt 1 view .LVU32
+ 151              		.loc 1 68 38 is_stmt 0 view .LVU33
+ 152 0024 0C22     		movs	r2, #12
+ 153 0026 ADF80A20 		strh	r2, [sp, #10]	@ movhi
+  69:MyHardWare/Src/usart.c **** 	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None; // 不使用硬件
+ 154              		.loc 1 69 2 is_stmt 1 view .LVU34
+ 155              		.loc 1 69 48 is_stmt 0 view .LVU35
+ 156 002a ADF80C30 		strh	r3, [sp, #12]	@ movhi
+  70:MyHardWare/Src/usart.c **** 	
+  71:MyHardWare/Src/usart.c **** 	USART_Init(USART1,&USART_InitStructure); //初始化串口1
+ 157              		.loc 1 71 2 is_stmt 1 view .LVU36
+ 158 002e 054C     		ldr	r4, .L7
+ 159 0030 6946     		mov	r1, sp
+ 160 0032 2046     		mov	r0, r4
+ARM GAS  /tmp/cco99q4Q.s 			page 5
+
+
+ 161 0034 FFF7FEFF 		bl	USART_Init
+ 162              	.LVL7:
+  72:MyHardWare/Src/usart.c **** 	USART_Cmd(USART1,ENABLE);	//使能串口1
+ 163              		.loc 1 72 2 view .LVU37
+ 164 0038 0121     		movs	r1, #1
+ 165 003a 2046     		mov	r0, r4
+ 166 003c FFF7FEFF 		bl	USART_Cmd
+ 167              	.LVL8:
+  73:MyHardWare/Src/usart.c **** }
+ 168              		.loc 1 73 1 is_stmt 0 view .LVU38
+ 169 0040 04B0     		add	sp, sp, #16
+ 170              	.LCFI5:
+ 171              		.cfi_def_cfa_offset 8
+ 172              		@ sp needed
+ 173 0042 10BD     		pop	{r4, pc}
+ 174              	.L8:
+ 175              		.align	2
+ 176              	.L7:
+ 177 0044 00100140 		.word	1073811456
+ 178              		.cfi_endproc
+ 179              	.LFE127:
+ 181              		.section	.text.UART1_SendByte,"ax",%progbits
+ 182              		.align	1
+ 183              		.global	UART1_SendByte
+ 184              		.syntax unified
+ 185              		.thumb
+ 186              		.thumb_func
+ 188              	UART1_SendByte:
+ 189              	.LVL9:
+ 190              	.LFB128:
+  74:MyHardWare/Src/usart.c **** /**
+  75:MyHardWare/Src/usart.c ****  * @brief  UART1发送一个字节
+  76:MyHardWare/Src/usart.c ****  * @param  data: 要发送的数据
+  77:MyHardWare/Src/usart.c ****  * @retval None
+  78:MyHardWare/Src/usart.c ****  */
+  79:MyHardWare/Src/usart.c **** void UART1_SendByte(uint8_t data) {
+ 191              		.loc 1 79 35 is_stmt 1 view -0
+ 192              		.cfi_startproc
+ 193              		@ args = 0, pretend = 0, frame = 0
+ 194              		@ frame_needed = 0, uses_anonymous_args = 0
+ 195              		.loc 1 79 35 is_stmt 0 view .LVU40
+ 196 0000 10B5     		push	{r4, lr}
+ 197              	.LCFI6:
+ 198              		.cfi_def_cfa_offset 8
+ 199              		.cfi_offset 4, -8
+ 200              		.cfi_offset 14, -4
+ 201 0002 0446     		mov	r4, r0
+  80:MyHardWare/Src/usart.c ****   /* 等待发送缓冲区为空 */
+  81:MyHardWare/Src/usart.c ****   while (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET)
+ 202              		.loc 1 81 3 is_stmt 1 view .LVU41
+ 203              	.LVL10:
+ 204              	.L10:
+ 205              		.loc 1 81 54 discriminator 1 view .LVU42
+ 206              		.loc 1 81 10 is_stmt 0 discriminator 1 view .LVU43
+ 207 0004 8021     		movs	r1, #128
+ 208 0006 0548     		ldr	r0, .L12
+ 209 0008 FFF7FEFF 		bl	USART_GetFlagStatus
+ARM GAS  /tmp/cco99q4Q.s 			page 6
+
+
+ 210              	.LVL11:
+ 211              		.loc 1 81 54 discriminator 1 view .LVU44
+ 212 000c 0028     		cmp	r0, #0
+ 213 000e F9D0     		beq	.L10
+  82:MyHardWare/Src/usart.c ****     ;
+  83:MyHardWare/Src/usart.c **** 
+  84:MyHardWare/Src/usart.c ****   /* 强制转换为16位并发送数据，确保正确的数据位传输 */
+  85:MyHardWare/Src/usart.c ****   USART_SendData(USART1, (uint16_t)data);
+ 214              		.loc 1 85 3 is_stmt 1 view .LVU45
+ 215 0010 2146     		mov	r1, r4
+ 216 0012 0248     		ldr	r0, .L12
+ 217 0014 FFF7FEFF 		bl	USART_SendData
+ 218              	.LVL12:
+  86:MyHardWare/Src/usart.c **** }
+ 219              		.loc 1 86 1 is_stmt 0 view .LVU46
+ 220 0018 10BD     		pop	{r4, pc}
+ 221              	.LVL13:
+ 222              	.L13:
+ 223              		.loc 1 86 1 view .LVU47
+ 224 001a 00BF     		.align	2
+ 225              	.L12:
+ 226 001c 00100140 		.word	1073811456
+ 227              		.cfi_endproc
+ 228              	.LFE128:
+ 230              		.section	.text.__io_putchar,"ax",%progbits
+ 231              		.align	1
+ 232              		.global	__io_putchar
+ 233              		.syntax unified
+ 234              		.thumb
+ 235              		.thumb_func
+ 237              	__io_putchar:
+ 238              	.LVL14:
+ 239              	.LFB129:
+  87:MyHardWare/Src/usart.c **** 
+  88:MyHardWare/Src/usart.c **** // 函数：重定义fputc函数
+  89:MyHardWare/Src/usart.c **** //
+  90:MyHardWare/Src/usart.c **** int __io_putchar(int ch)
+  91:MyHardWare/Src/usart.c **** {
+ 240              		.loc 1 91 1 is_stmt 1 view -0
+ 241              		.cfi_startproc
+ 242              		@ args = 0, pretend = 0, frame = 0
+ 243              		@ frame_needed = 0, uses_anonymous_args = 0
+ 244              		.loc 1 91 1 is_stmt 0 view .LVU49
+ 245 0000 10B5     		push	{r4, lr}
+ 246              	.LCFI7:
+ 247              		.cfi_def_cfa_offset 8
+ 248              		.cfi_offset 4, -8
+ 249              		.cfi_offset 14, -4
+ 250 0002 0446     		mov	r4, r0
+  92:MyHardWare/Src/usart.c **** 
+  93:MyHardWare/Src/usart.c **** 
+  94:MyHardWare/Src/usart.c **** 	USART_SendData( USART1,(u8)ch );	// 发送单字节数据
+ 251              		.loc 1 94 2 is_stmt 1 view .LVU50
+ 252 0004 C1B2     		uxtb	r1, r0
+ 253 0006 0548     		ldr	r0, .L17
+ 254              	.LVL15:
+ 255              		.loc 1 94 2 is_stmt 0 view .LVU51
+ARM GAS  /tmp/cco99q4Q.s 			page 7
+
+
+ 256 0008 FFF7FEFF 		bl	USART_SendData
+ 257              	.LVL16:
+  95:MyHardWare/Src/usart.c **** 	while (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET);	//等待发送完毕 
+ 258              		.loc 1 95 2 is_stmt 1 view .LVU52
+ 259              	.L15:
+ 260              		.loc 1 95 53 discriminator 1 view .LVU53
+ 261              		.loc 1 95 9 is_stmt 0 discriminator 1 view .LVU54
+ 262 000c 8021     		movs	r1, #128
+ 263 000e 0348     		ldr	r0, .L17
+ 264 0010 FFF7FEFF 		bl	USART_GetFlagStatus
+ 265              	.LVL17:
+ 266              		.loc 1 95 53 discriminator 1 view .LVU55
+ 267 0014 0028     		cmp	r0, #0
+ 268 0016 F9D0     		beq	.L15
+  96:MyHardWare/Src/usart.c **** 
+  97:MyHardWare/Src/usart.c **** 	return (ch); //返回字符
+ 269              		.loc 1 97 2 is_stmt 1 view .LVU56
+  98:MyHardWare/Src/usart.c **** }
+ 270              		.loc 1 98 1 is_stmt 0 view .LVU57
+ 271 0018 2046     		mov	r0, r4
+ 272 001a 10BD     		pop	{r4, pc}
+ 273              	.LVL18:
+ 274              	.L18:
+ 275              		.loc 1 98 1 view .LVU58
+ 276              		.align	2
+ 277              	.L17:
+ 278 001c 00100140 		.word	1073811456
+ 279              		.cfi_endproc
+ 280              	.LFE129:
+ 282              		.section	.text.UART1_SendData,"ax",%progbits
+ 283              		.align	1
+ 284              		.global	UART1_SendData
+ 285              		.syntax unified
+ 286              		.thumb
+ 287              		.thumb_func
+ 289              	UART1_SendData:
+ 290              	.LVL19:
+ 291              	.LFB130:
+  99:MyHardWare/Src/usart.c **** 
+ 100:MyHardWare/Src/usart.c **** 
+ 101:MyHardWare/Src/usart.c **** void UART1_SendData(uint16_t *buffer, uint16_t size)
+ 102:MyHardWare/Src/usart.c **** {
+ 292              		.loc 1 102 1 is_stmt 1 view -0
+ 293              		.cfi_startproc
+ 294              		@ args = 0, pretend = 0, frame = 0
+ 295              		@ frame_needed = 0, uses_anonymous_args = 0
+ 296              		.loc 1 102 1 is_stmt 0 view .LVU60
+ 297 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 298              	.LCFI8:
+ 299              		.cfi_def_cfa_offset 24
+ 300              		.cfi_offset 3, -24
+ 301              		.cfi_offset 4, -20
+ 302              		.cfi_offset 5, -16
+ 303              		.cfi_offset 6, -12
+ 304              		.cfi_offset 7, -8
+ 305              		.cfi_offset 14, -4
+ 306 0002 0746     		mov	r7, r0
+ARM GAS  /tmp/cco99q4Q.s 			page 8
+
+
+ 307 0004 0E46     		mov	r6, r1
+ 103:MyHardWare/Src/usart.c ****     for (uint16_t i = 0; i < size; i++)
+ 308              		.loc 1 103 5 is_stmt 1 view .LVU61
+ 309              	.LBB2:
+ 310              		.loc 1 103 10 view .LVU62
+ 311              	.LVL20:
+ 312              		.loc 1 103 19 is_stmt 0 view .LVU63
+ 313 0006 0024     		movs	r4, #0
+ 314              		.loc 1 103 5 view .LVU64
+ 315 0008 17E0     		b	.L20
+ 316              	.LVL21:
+ 317              	.L23:
+ 318              	.LBB3:
+ 104:MyHardWare/Src/usart.c ****     {
+ 105:MyHardWare/Src/usart.c ****         uint16_t data = buffer[i];  // 获取当前 16 位数据
+ 319              		.loc 1 105 9 is_stmt 1 view .LVU65
+ 320              		.loc 1 105 18 is_stmt 0 view .LVU66
+ 321 000a 37F81450 		ldrh	r5, [r7, r4, lsl #1]
+ 322              	.LVL22:
+ 106:MyHardWare/Src/usart.c **** 
+ 107:MyHardWare/Src/usart.c ****         // 发送高字节（高位在前）
+ 108:MyHardWare/Src/usart.c ****         USART_SendData(USART1, (data >> 8) & 0xFF);
+ 323              		.loc 1 108 9 is_stmt 1 view .LVU67
+ 324 000e 290A     		lsrs	r1, r5, #8
+ 325 0010 0B48     		ldr	r0, .L25
+ 326 0012 FFF7FEFF 		bl	USART_SendData
+ 327              	.LVL23:
+ 109:MyHardWare/Src/usart.c ****         while (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET);  // 等待发送完成
+ 328              		.loc 1 109 9 view .LVU68
+ 329              	.L21:
+ 330              		.loc 1 109 60 discriminator 1 view .LVU69
+ 331              		.loc 1 109 16 is_stmt 0 discriminator 1 view .LVU70
+ 332 0016 8021     		movs	r1, #128
+ 333 0018 0948     		ldr	r0, .L25
+ 334 001a FFF7FEFF 		bl	USART_GetFlagStatus
+ 335              	.LVL24:
+ 336              		.loc 1 109 60 discriminator 1 view .LVU71
+ 337 001e 0028     		cmp	r0, #0
+ 338 0020 F9D0     		beq	.L21
+ 110:MyHardWare/Src/usart.c **** 
+ 111:MyHardWare/Src/usart.c ****         // 发送低字节
+ 112:MyHardWare/Src/usart.c ****         USART_SendData(USART1, data & 0xFF);
+ 339              		.loc 1 112 9 is_stmt 1 view .LVU72
+ 340 0022 E9B2     		uxtb	r1, r5
+ 341 0024 0648     		ldr	r0, .L25
+ 342 0026 FFF7FEFF 		bl	USART_SendData
+ 343              	.LVL25:
+ 113:MyHardWare/Src/usart.c ****         while (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET);  // 等待发送完成
+ 344              		.loc 1 113 9 view .LVU73
+ 345              	.L22:
+ 346              		.loc 1 113 60 discriminator 1 view .LVU74
+ 347              		.loc 1 113 16 is_stmt 0 discriminator 1 view .LVU75
+ 348 002a 8021     		movs	r1, #128
+ 349 002c 0448     		ldr	r0, .L25
+ 350 002e FFF7FEFF 		bl	USART_GetFlagStatus
+ 351              	.LVL26:
+ 352              		.loc 1 113 60 discriminator 1 view .LVU76
+ARM GAS  /tmp/cco99q4Q.s 			page 9
+
+
+ 353 0032 0028     		cmp	r0, #0
+ 354 0034 F9D0     		beq	.L22
+ 355              	.LBE3:
+ 103:MyHardWare/Src/usart.c ****     {
+ 356              		.loc 1 103 37 is_stmt 1 discriminator 2 view .LVU77
+ 357 0036 0134     		adds	r4, r4, #1
+ 358              	.LVL27:
+ 103:MyHardWare/Src/usart.c ****     {
+ 359              		.loc 1 103 37 is_stmt 0 discriminator 2 view .LVU78
+ 360 0038 A4B2     		uxth	r4, r4
+ 361              	.LVL28:
+ 362              	.L20:
+ 103:MyHardWare/Src/usart.c ****     {
+ 363              		.loc 1 103 28 is_stmt 1 discriminator 1 view .LVU79
+ 364 003a B442     		cmp	r4, r6
+ 365 003c E5D3     		bcc	.L23
+ 366              	.LBE2:
+ 114:MyHardWare/Src/usart.c ****     }
+ 115:MyHardWare/Src/usart.c **** }...
+ 367              		.loc 1 115 1 is_stmt 0 view .LVU80
+ 368 003e F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 369              	.LVL29:
+ 370              	.L26:
+ 371              		.loc 1 115 1 view .LVU81
+ 372              		.align	2
+ 373              	.L25:
+ 374 0040 00100140 		.word	1073811456
+ 375              		.cfi_endproc
+ 376              	.LFE130:
+ 378              		.text
+ 379              	.Letext0:
+ 380              		.file 2 "/usr/lib/gcc/arm-none-eabi/13.2.1/include/stdint.h"
+ 381              		.file 3 "CMSIS/stm32f4xx.h"
+ 382              		.file 4 "Lib/StdPeriphs/inc/stm32f4xx_gpio.h"
+ 383              		.file 5 "Lib/StdPeriphs/inc/stm32f4xx_usart.h"
+ 384              		.file 6 "Lib/StdPeriphs/inc/stm32f4xx_rcc.h"
+ARM GAS  /tmp/cco99q4Q.s 			page 10
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 usart.c
+     /tmp/cco99q4Q.s:21     .text.USART_GPIO_Config:00000000 $t
+     /tmp/cco99q4Q.s:27     .text.USART_GPIO_Config:00000000 USART_GPIO_Config
+     /tmp/cco99q4Q.s:102    .text.USART_GPIO_Config:00000058 $d
+     /tmp/cco99q4Q.s:107    .text.Usart_Config:00000000 $t
+     /tmp/cco99q4Q.s:113    .text.Usart_Config:00000000 Usart_Config
+     /tmp/cco99q4Q.s:177    .text.Usart_Config:00000044 $d
+     /tmp/cco99q4Q.s:182    .text.UART1_SendByte:00000000 $t
+     /tmp/cco99q4Q.s:188    .text.UART1_SendByte:00000000 UART1_SendByte
+     /tmp/cco99q4Q.s:226    .text.UART1_SendByte:0000001c $d
+     /tmp/cco99q4Q.s:231    .text.__io_putchar:00000000 $t
+     /tmp/cco99q4Q.s:237    .text.__io_putchar:00000000 __io_putchar
+     /tmp/cco99q4Q.s:278    .text.__io_putchar:0000001c $d
+     /tmp/cco99q4Q.s:283    .text.UART1_SendData:00000000 $t
+     /tmp/cco99q4Q.s:289    .text.UART1_SendData:00000000 UART1_SendData
+     /tmp/cco99q4Q.s:374    .text.UART1_SendData:00000040 $d
+
+UNDEFINED SYMBOLS
+RCC_AHB1PeriphClockCmd
+GPIO_Init
+GPIO_PinAFConfig
+RCC_APB2PeriphClockCmd
+USART_Init
+USART_Cmd
+USART_GetFlagStatus
+USART_SendData

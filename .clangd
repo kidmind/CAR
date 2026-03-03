@@ -1,0 +1,13 @@
+  CompileFlags:
+    # 指定交叉编译目标和头文件路径
+    Add: [
+      --target=arm-none-eabi,
+      -I/usr/lib/arm-none-eabi/include,
+      -I/usr/lib/arm-none-eabi/newlib
+      # 如果有其他项目特定的头文件路径，也可以在这里添加
+      # -I./include, -I./Drivers/CMSIS/Include
+    ]
+  
+  # （可选）禁用某些不必要的诊断
+  Diagnostics:
+    Suppress: [unused-variable, missing-field-initializers]

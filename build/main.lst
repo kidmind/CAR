@@ -1,0 +1,244 @@
+ARM GAS  /tmp/ccbz9UAK.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"main.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.file 1 "USER/Src/main.c"
+  20              		.section	.text.USART1_Pro,"ax",%progbits
+  21              		.align	1
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	USART1_Pro:
+  27              	.LFB127:
+   1:USER/Src/main.c **** #include "delay.h"
+   2:USER/Src/main.c **** #include "led.h"
+   3:USER/Src/main.c **** #include "mpu6050.h"
+   4:USER/Src/main.c **** #include "oled.h"
+   5:USER/Src/main.c **** #include "task.h"
+   6:USER/Src/main.c **** #include "usart.h"
+   7:USER/Src/main.c **** #include <stdint.h>
+   8:USER/Src/main.c **** #include <stdio.h>
+   9:USER/Src/main.c **** #include <stm32f4xx.h>
+  10:USER/Src/main.c **** 
+  11:USER/Src/main.c **** /**
+  12:USER/Src/main.c ****  * @brief 系统初始化函数
+  13:USER/Src/main.c ****  */
+  14:USER/Src/main.c **** void System_Init(void) {
+  15:USER/Src/main.c **** 
+  16:USER/Src/main.c ****   // 初始化延时函数
+  17:USER/Src/main.c **** 
+  18:USER/Src/main.c ****   delay_init();
+  19:USER/Src/main.c ****   // 初始化串口
+  20:USER/Src/main.c ****   Usart_Config();
+  21:USER/Src/main.c ****   printf("Start MPU Init\r\n");
+  22:USER/Src/main.c **** 
+  23:USER/Src/main.c ****   MPU_Init();
+  24:USER/Src/main.c ****   Task_Init();
+  25:USER/Src/main.c **** }
+  26:USER/Src/main.c **** static void USART1_Pro(void) {
+  28              		.loc 1 26 30 view -0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32 0000 08B5     		push	{r3, lr}
+ARM GAS  /tmp/ccbz9UAK.s 			page 2
+
+
+  33              	.LCFI0:
+  34              		.cfi_def_cfa_offset 8
+  35              		.cfi_offset 3, -8
+  36              		.cfi_offset 14, -4
+  27:USER/Src/main.c ****   // printf("%6.2f,%6.2f,%6.2f\r\n", MPU_Attitude.pitch, MPU_Attitude.roll,
+  28:USER/Src/main.c ****   //        MPU_Attitude.yaw);
+  29:USER/Src/main.c ****   Get_RawData();
+  37              		.loc 1 29 3 view .LVU1
+  38 0002 FFF7FEFF 		bl	Get_RawData
+  39              	.LVL0:
+  30:USER/Src/main.c **** }
+  40              		.loc 1 30 1 is_stmt 0 view .LVU2
+  41 0006 08BD     		pop	{r3, pc}
+  42              		.cfi_endproc
+  43              	.LFE127:
+  45              		.section	.rodata.System_Init.str1.4,"aMS",%progbits,1
+  46              		.align	2
+  47              	.LC0:
+  48 0000 53746172 		.ascii	"Start MPU Init\015\000"
+  48      74204D50 
+  48      5520496E 
+  48      69740D00 
+  49              		.section	.text.System_Init,"ax",%progbits
+  50              		.align	1
+  51              		.global	System_Init
+  52              		.syntax unified
+  53              		.thumb
+  54              		.thumb_func
+  56              	System_Init:
+  57              	.LFB126:
+  14:USER/Src/main.c **** 
+  58              		.loc 1 14 24 is_stmt 1 view -0
+  59              		.cfi_startproc
+  60              		@ args = 0, pretend = 0, frame = 0
+  61              		@ frame_needed = 0, uses_anonymous_args = 0
+  62 0000 08B5     		push	{r3, lr}
+  63              	.LCFI1:
+  64              		.cfi_def_cfa_offset 8
+  65              		.cfi_offset 3, -8
+  66              		.cfi_offset 14, -4
+  18:USER/Src/main.c ****   // 初始化串口
+  67              		.loc 1 18 3 view .LVU4
+  68 0002 FFF7FEFF 		bl	delay_init
+  69              	.LVL1:
+  20:USER/Src/main.c ****   printf("Start MPU Init\r\n");
+  70              		.loc 1 20 3 view .LVU5
+  71 0006 FFF7FEFF 		bl	Usart_Config
+  72              	.LVL2:
+  21:USER/Src/main.c **** 
+  73              		.loc 1 21 3 view .LVU6
+  74 000a 0448     		ldr	r0, .L5
+  75 000c FFF7FEFF 		bl	puts
+  76              	.LVL3:
+  23:USER/Src/main.c ****   Task_Init();
+  77              		.loc 1 23 3 view .LVU7
+  78 0010 FFF7FEFF 		bl	MPU_Init
+  79              	.LVL4:
+ARM GAS  /tmp/ccbz9UAK.s 			page 3
+
+
+  24:USER/Src/main.c **** }
+  80              		.loc 1 24 3 view .LVU8
+  81 0014 FFF7FEFF 		bl	Task_Init
+  82              	.LVL5:
+  25:USER/Src/main.c **** static void USART1_Pro(void) {
+  83              		.loc 1 25 1 is_stmt 0 view .LVU9
+  84 0018 08BD     		pop	{r3, pc}
+  85              	.L6:
+  86 001a 00BF     		.align	2
+  87              	.L5:
+  88 001c 00000000 		.word	.LC0
+  89              		.cfi_endproc
+  90              	.LFE126:
+  92              		.section	.rodata.main.str1.4,"aMS",%progbits,1
+  93              		.align	2
+  94              	.LC1:
+  95 0000 53746D33 		.ascii	"Stm32 is ready\015\000"
+  95      32206973 
+  95      20726561 
+  95      64790D00 
+  96              		.section	.text.main,"ax",%progbits
+  97              		.align	1
+  98              		.global	main
+  99              		.syntax unified
+ 100              		.thumb
+ 101              		.thumb_func
+ 103              	main:
+ 104              	.LFB128:
+  31:USER/Src/main.c **** /**
+  32:USER/Src/main.c ****  * @brief 主函数
+  33:USER/Src/main.c ****  */
+  34:USER/Src/main.c **** int main(void) {
+ 105              		.loc 1 34 16 is_stmt 1 view -0
+ 106              		.cfi_startproc
+ 107              		@ args = 0, pretend = 0, frame = 0
+ 108              		@ frame_needed = 0, uses_anonymous_args = 0
+ 109 0000 08B5     		push	{r3, lr}
+ 110              	.LCFI2:
+ 111              		.cfi_def_cfa_offset 8
+ 112              		.cfi_offset 3, -8
+ 113              		.cfi_offset 14, -4
+  35:USER/Src/main.c ****   System_Init();
+ 114              		.loc 1 35 3 view .LVU11
+ 115 0002 FFF7FEFF 		bl	System_Init
+ 116              	.LVL6:
+  36:USER/Src/main.c ****   printf("Stm32 is ready\r\n");
+ 117              		.loc 1 36 3 view .LVU12
+ 118 0006 0748     		ldr	r0, .L10
+ 119 0008 FFF7FEFF 		bl	puts
+ 120              	.LVL7:
+  37:USER/Src/main.c ****   u8 usart_id = add_task(USART1_Pro, 10);
+ 121              		.loc 1 37 3 view .LVU13
+ 122              		.loc 1 37 17 is_stmt 0 view .LVU14
+ 123 000c 0A21     		movs	r1, #10
+ 124 000e 0648     		ldr	r0, .L10+4
+ 125 0010 FFF7FEFF 		bl	add_task
+ 126              	.LVL8:
+ARM GAS  /tmp/ccbz9UAK.s 			page 4
+
+
+  38:USER/Src/main.c ****   u8 MPU_id = add_task(MPU_Proc, 5);
+ 127              		.loc 1 38 3 is_stmt 1 view .LVU15
+ 128              		.loc 1 38 15 is_stmt 0 view .LVU16
+ 129 0014 0521     		movs	r1, #5
+ 130 0016 0548     		ldr	r0, .L10+8
+ 131 0018 FFF7FEFF 		bl	add_task
+ 132              	.LVL9:
+  39:USER/Src/main.c ****   MPU_Proc();
+ 133              		.loc 1 39 3 is_stmt 1 view .LVU17
+ 134 001c FFF7FEFF 		bl	MPU_Proc
+ 135              	.LVL10:
+ 136              	.L8:
+  40:USER/Src/main.c ****   while (1) {
+ 137              		.loc 1 40 3 view .LVU18
+  41:USER/Src/main.c ****   }
+ 138              		.loc 1 41 3 view .LVU19
+  40:USER/Src/main.c ****   while (1) {
+ 139              		.loc 1 40 9 view .LVU20
+ 140 0020 FEE7     		b	.L8
+ 141              	.L11:
+ 142 0022 00BF     		.align	2
+ 143              	.L10:
+ 144 0024 00000000 		.word	.LC1
+ 145 0028 00000000 		.word	USART1_Pro
+ 146 002c 00000000 		.word	MPU_Proc
+ 147              		.cfi_endproc
+ 148              	.LFE128:
+ 150              		.text
+ 151              	.Letext0:
+ 152              		.file 2 "/usr/lib/gcc/arm-none-eabi/13.2.1/include/stdint.h"
+ 153              		.file 3 "MyHardWare/Inc/mpu6050.h"
+ 154              		.file 4 "MyHardWare/Inc/task.h"
+ 155              		.file 5 "MyHardWare/Inc/usart.h"
+ 156              		.file 6 "MyHardWare/Inc/delay.h"
+ 157              		.file 7 "CMSIS/stm32f4xx.h"
+ 158              		.file 8 "<built-in>"
+ARM GAS  /tmp/ccbz9UAK.s 			page 5
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 main.c
+     /tmp/ccbz9UAK.s:21     .text.USART1_Pro:00000000 $t
+     /tmp/ccbz9UAK.s:26     .text.USART1_Pro:00000000 USART1_Pro
+     /tmp/ccbz9UAK.s:46     .rodata.System_Init.str1.4:00000000 $d
+     /tmp/ccbz9UAK.s:50     .text.System_Init:00000000 $t
+     /tmp/ccbz9UAK.s:56     .text.System_Init:00000000 System_Init
+     /tmp/ccbz9UAK.s:88     .text.System_Init:0000001c $d
+     /tmp/ccbz9UAK.s:93     .rodata.main.str1.4:00000000 $d
+     /tmp/ccbz9UAK.s:97     .text.main:00000000 $t
+     /tmp/ccbz9UAK.s:103    .text.main:00000000 main
+     /tmp/ccbz9UAK.s:144    .text.main:00000024 $d
+
+UNDEFINED SYMBOLS
+Get_RawData
+delay_init
+Usart_Config
+puts
+MPU_Init
+Task_Init
+add_task
+MPU_Proc
