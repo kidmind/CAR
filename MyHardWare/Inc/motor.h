@@ -58,7 +58,7 @@ typedef enum {
 #define MOTOR_PWM_PERIOD          8399    // 自动重装载值 (ARR)
 #define MOTOR_PWM_MAX_DUTY        8399    // 最大占空比值
 
-/* ==================== 前右电机 (MOTOR_FR) - TIM1_CH1 ==================== */
+/* ==================== 前右电机 (MOTOR_FR)同时也是双驱的左电机 - TIM1_CH1 ==================== */
 #define MOTOR_FR_PWM_PORT         GPIOE
 #define MOTOR_FR_PWM_PIN          GPIO_Pin_9
 #define MOTOR_FR_PWM_CLK          RCC_AHB1Periph_GPIOE
@@ -73,7 +73,7 @@ typedef enum {
 #define MOTOR_FR_DIR2_PIN         GPIO_Pin_11  // IN2
 #define MOTOR_FR_DIR_CLK          RCC_AHB1Periph_GPIOE
 
-/* ==================== 前左电机 (MOTOR_FL) - TIM1_CH2 ==================== */
+/* ==================== 前左电机 (MOTOR_FL)同时也是双驱的左电机 - TIM1_CH2 ==================== */
 #define MOTOR_FL_PWM_PORT         GPIOE
 #define MOTOR_FL_PWM_PIN          GPIO_Pin_11
 #define MOTOR_FL_PWM_CLK          RCC_AHB1Periph_GPIOE
@@ -135,45 +135,66 @@ typedef struct {
     Motor_Id_e id;                // 电机ID
     TIM_TypeDef *tim;             // 定时器指针
     uint16_t channel;             // PWM通道
-    uint8_t initialized;          // 初始化标志
+
 
     // 构造/析构函数（无参数，直接操作实例）
-    void (*Init)(void);
-    void (*DeInit)(void);
+    // void (*Init)(void);
+    // void (*DeInit)(void);
 
-    // 成员方法（无参数，直接操作实例）
-    void (*SetSpeed)(int16_t speed);      // 设置速度（带符号）
-    void (*SetDirection)(Motor_Direction_e dir); // 设置方向
-    void (*SetDuty)(uint16_t duty);       // 设置占空比
-    void (*Stop)(void);                         // 停止电机
-    void (*Brake)(void);                        // 刹车
+    // // 成员方法（无参数，直接操作实例）
+    // void (*SetSpeed)(int16_t speed);      // 设置速度（带符号）
+    // void (*SetDirection)(Motor_Direction_e dir); // 设置方向
+    // void (*SetDuty)(uint16_t duty);       // 设置占空比
+    // void (*Stop)(void);                         // 停止电机
+    // void (*Brake)(void);                        // 刹车
 } Motor_Class_t;
 
+
+//不许直接修改，得通过函数来获得
 /* ==================== 全局电机实例声明 ==================== */
-#ifdef QUAD_MOTOR_DRIVE
-// 四驱模式 - 四个独立电机实例
-extern Motor_Class_t Motor_FR;   // 前右电机实例
-extern Motor_Class_t Motor_FL;   // 前左电机实例
-extern Motor_Class_t Motor_BR;   // 后右电机实例
-extern Motor_Class_t Motor_BL;   // 后左电机实例
-#else
-// 双驱模式 - 两个独立电机实例
-extern Motor_Class_t Motor_Right; // 右电机实例（对应前右硬件）
-extern Motor_Class_t Motor_Left;  // 左电机实例（对应前左硬件）
-#endif
+// #ifdef QUAD_MOTOR_DRIVE
+// // 四驱模式 - 四个独立电机实例
+// extern Motor_Class_t Motor_FR;   // 前右电机实例
+// extern Motor_Class_t Motor_FL;   // 前左电机实例
+// extern Motor_Class_t Motor_BR;   // 后右电机实例
+// extern Motor_Class_t Motor_BL;   // 后左电机实例
+// #else
+// // 双驱模式 - 两个独立电机实例
+// extern Motor_Class_t Motor_Right; // 右电机实例（对应前右硬件）
+// extern Motor_Class_t Motor_Left;  // 左电机实例（对应前左硬件）
+// #endif
 
 /* ==================== 全局函数声明 ==================== */
+
+
+
+/**
+ * @brief 设置电机速度（仅更新软件状态）
+ * @param motor 电机 ID
+ * @param speed 速度值 (-MOTOR_PWM_MAX_DUTY ~ +MOTOR_PWM_MAX_DUTY)
+ */
+void Motor_SetSpeed(Motor_Id_e motor, int16_t speed);
+
+/**
+ * @brief 设置电机方向（仅更新软件状态）
+ * @param motor 电机 ID
+ * @param dir 方向 (FORWARD/BACKWARD/STOP/BRAKE)
+ */
+void Motor_SetDirection(Motor_Id_e motor, Motor_Direction_e dir);
+
+/**
+ * @brief 更新电机硬件状态
+ * @param motor 电机 ID
+ * @note 根据 _speed 和 _direction 更新硬件，需配合上述函数使用
+ */
+void Motor_Update(Motor_Id_e motor);
+
 
 /**
  * @brief 电机驱动初始化
  * @note  初始化所有电机的PWM和方向控制GPIO
  */
 void Motor_Driver_Init(void);
-
-/**
- * @brief 电机驱动去初始化
- */
-void Motor_Driver_DeInit(void);
 
 /**
  * @brief 停止所有电机
