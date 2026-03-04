@@ -22,17 +22,24 @@
 #define __MOTOR_H
 
 #include "stm32f4xx.h"
+#include "HardwareConfig.h"
 
 /* ==================== 电机枚举定义 ==================== */
 /**
- * @brief 电机编号枚举
+ * @brief 电机编号枚举（根据硬件模式自动调整）
  */
 typedef enum {
+#ifdef QUAD_MOTOR_DRIVE
     MOTOR_FR = 0,    // 前右电机 (Front Right)
     MOTOR_FL = 1,    // 前左电机 (Front Left)
     MOTOR_BR = 2,    // 后右电机 (Back Right)
     MOTOR_BL = 3,    // 后左电机 (Back Left)
     MOTOR_MAX = 4    // 电机总数
+#else
+    MOTOR_RIGHT = 0,  // 右电机 (对应前右)
+    MOTOR_LEFT = 1,   // 左电机 (对应前左)
+    MOTOR_MAX = 2     // 电机总数
+#endif
 } Motor_Id_e;
 
 /**
@@ -82,6 +89,7 @@ typedef enum {
 #define MOTOR_FL_DIR_CLK          RCC_AHB1Periph_GPIOE
 
 /* ==================== 后右电机 (MOTOR_BR) - TIM8_CH1 ==================== */
+#ifdef QUAD_MOTOR_DRIVE
 #define MOTOR_BR_PWM_PORT         GPIOC
 #define MOTOR_BR_PWM_PIN          GPIO_Pin_6
 #define MOTOR_BR_PWM_CLK          RCC_AHB1Periph_GPIOC
@@ -95,8 +103,10 @@ typedef enum {
 #define MOTOR_BR_DIR1_PIN         GPIO_Pin_7   // IN1
 #define MOTOR_BR_DIR2_PIN         GPIO_Pin_8   // IN2
 #define MOTOR_BR_DIR_CLK          RCC_AHB1Periph_GPIOC
+#endif
 
 /* ==================== 后左电机 (MOTOR_BL) - TIM8_CH2 ==================== */
+#ifdef QUAD_MOTOR_DRIVE
 #define MOTOR_BL_PWM_PORT         GPIOC
 #define MOTOR_BL_PWM_PIN          GPIO_Pin_7
 #define MOTOR_BL_PWM_CLK          RCC_AHB1Periph_GPIOC
@@ -110,10 +120,11 @@ typedef enum {
 #define MOTOR_BL_DIR1_PIN         GPIO_Pin_9   // IN1
 #define MOTOR_BL_DIR2_PIN         GPIO_Pin_10  // IN2
 #define MOTOR_BL_DIR_CLK          RCC_AHB1Periph_GPIOC
+#endif
 
 /* ==================== 电机控制类结构体 ==================== */
 /**
- * @brief 电机控制类结构体（面向对象风格）
+ * @brief 电机控制类结构体（面向对象风格，代表单个电机实例）
  */
 typedef struct {
     // 私有变量（带下划线前缀）
@@ -124,24 +135,38 @@ typedef struct {
     Motor_Id_e id;                // 电机ID
     TIM_TypeDef *tim;             // 定时器指针
     uint16_t channel;             // PWM通道
+    uint8_t initialized;          // 初始化标志
 
-    // 构造/析构函数
-    void (*Init)(Motor_Id_e motor);
-    void (*DeInit)(Motor_Id_e motor);
+    // 构造/析构函数（无参数，直接操作实例）
+    void (*Init)(void);
+    void (*DeInit)(void);
 
-    // 成员方法
-    void (*SetSpeed)(Motor_Id_e motor, int16_t speed);      // 设置速度（带符号）
-    void (*SetDirection)(Motor_Id_e motor, Motor_Direction_e dir); // 设置方向
-    void (*SetDuty)(Motor_Id_e motor, uint16_t duty);       // 设置占空比
-    void (*Stop)(Motor_Id_e motor);                         // 停止电机
-    void (*Brake)(Motor_Id_e motor);                        // 刹车
+    // 成员方法（无参数，直接操作实例）
+    void (*SetSpeed)(int16_t speed);      // 设置速度（带符号）
+    void (*SetDirection)(Motor_Direction_e dir); // 设置方向
+    void (*SetDuty)(uint16_t duty);       // 设置占空比
+    void (*Stop)(void);                         // 停止电机
+    void (*Brake)(void);                        // 刹车
 } Motor_Class_t;
+
+/* ==================== 全局电机实例声明 ==================== */
+#ifdef QUAD_MOTOR_DRIVE
+// 四驱模式 - 四个独立电机实例
+extern Motor_Class_t Motor_FR;   // 前右电机实例
+extern Motor_Class_t Motor_FL;   // 前左电机实例
+extern Motor_Class_t Motor_BR;   // 后右电机实例
+extern Motor_Class_t Motor_BL;   // 后左电机实例
+#else
+// 双驱模式 - 两个独立电机实例
+extern Motor_Class_t Motor_Right; // 右电机实例（对应前右硬件）
+extern Motor_Class_t Motor_Left;  // 左电机实例（对应前左硬件）
+#endif
 
 /* ==================== 全局函数声明 ==================== */
 
 /**
  * @brief 电机驱动初始化
- * @note  初始化所有四路电机的PWM和方向控制GPIO
+ * @note  初始化所有电机的PWM和方向控制GPIO
  */
 void Motor_Driver_Init(void);
 
@@ -149,40 +174,6 @@ void Motor_Driver_Init(void);
  * @brief 电机驱动去初始化
  */
 void Motor_Driver_DeInit(void);
-
-/**
- * @brief 设置电机速度（带符号）
- * @param motor 电机ID
- * @param speed 速度值 (-MOTOR_PWM_MAX_DUTY ~ +MOTOR_PWM_MAX_DUTY)
- *              正值=正转, 负值=反转, 0=停止
- */
-void Motor_SetSpeed(Motor_Id_e motor, int16_t speed);
-
-/**
- * @brief 设置电机方向
- * @param motor 电机ID
- * @param dir 方向 (FORWARD/BACKWARD/STOP/BRAKE)
- */
-void Motor_SetDirection(Motor_Id_e motor, Motor_Direction_e dir);
-
-/**
- * @brief 设置电机PWM占空比
- * @param motor 电机ID
- * @param duty 占空比 (0 ~ MOTOR_PWM_MAX_DUTY)
- */
-void Motor_SetDuty(Motor_Id_e motor, uint16_t duty);
-
-/**
- * @brief 停止指定电机
- * @param motor 电机ID
- */
-void Motor_Stop(Motor_Id_e motor);
-
-/**
- * @brief 刹车指定电机
- * @param motor 电机ID
- */
-void Motor_Brake(Motor_Id_e motor);
 
 /**
  * @brief 停止所有电机
@@ -203,16 +194,5 @@ void Motor_StartTimers(void);
  * @brief 停止所有电机定时器
  */
 void Motor_StopTimers(void);
-
-/* ==================== 宏定义快捷函数 ==================== */
-
-// 设置前右电机速度
-#define Motor_FR_SetSpeed(speed)    Motor_SetSpeed(MOTOR_FR, speed)
-// 设置前左电机速度
-#define Motor_FL_SetSpeed(speed)    Motor_SetSpeed(MOTOR_FL, speed)
-// 设置后右电机速度
-#define Motor_BR_SetSpeed(speed)    Motor_SetSpeed(MOTOR_BR, speed)
-// 设置后左电机速度
-#define Motor_BL_SetSpeed(speed)    Motor_SetSpeed(MOTOR_BL, speed)
 
 #endif /* __MOTOR_H */

@@ -14,7 +14,7 @@ build/motor.o: MyHardWare/Src/motor.c MyHardWare/Inc/motor.h \
  Lib/StdPeriphs/inc/stm32f4xx_cryp.h Lib/StdPeriphs/inc/stm32f4xx_hash.h \
  Lib/StdPeriphs/inc/stm32f4xx_rng.h Lib/StdPeriphs/inc/stm32f4xx_can.h \
  Lib/StdPeriphs/inc/stm32f4xx_dac.h Lib/StdPeriphs/inc/stm32f4xx_dcmi.h \
- Lib/StdPeriphs/inc/stm32f4xx_fsmc.h
+ Lib/StdPeriphs/inc/stm32f4xx_fsmc.h MyHardWare/Inc/HardwareConfig.h
 MyHardWare/Inc/motor.h:
 CMSIS/stm32f4xx.h:
 CMSIS/core_cm4.h:
@@ -49,3 +49,4 @@ Lib/StdPeriphs/inc/stm32f4xx_can.h:
 Lib/StdPeriphs/inc/stm32f4xx_dac.h:
 Lib/StdPeriphs/inc/stm32f4xx_dcmi.h:
 Lib/StdPeriphs/inc/stm32f4xx_fsmc.h:
+MyHardWare/Inc/HardwareConfig.h:

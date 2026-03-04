@@ -1294,46 +1294,68 @@ Discarded input sections
  .text          0x00000000        0x0 build/motor.o
  .data          0x00000000        0x0 build/motor.o
  .bss           0x00000000        0x0 build/motor.o
+ .text.Motor_Instance_SetSpeed
+                0x00000000       0x4c build/motor.o
+ .text.Motor_Right_DeInit
+                0x00000000        0xc build/motor.o
+ .text.Motor_Right_SetSpeed
+                0x00000000       0x10 build/motor.o
+ .text.Motor_Left_DeInit
+                0x00000000        0xc build/motor.o
+ .text.Motor_Left_SetSpeed
+                0x00000000       0x10 build/motor.o
+ .text.Motor_Left_SetDuty
+                0x00000000       0x1c build/motor.o
+ .text.Motor_Left_SetDirection
+                0x00000000       0x5c build/motor.o
+ .text.Motor_Left_Brake
+                0x00000000       0x10 build/motor.o
+ .text.Motor_Left_Stop
+                0x00000000       0x10 build/motor.o
+ .text.Motor_Right_SetDirection
+                0x00000000       0x5c build/motor.o
+ .text.Motor_GPIO_Init
+                0x00000000       0xf0 build/motor.o
+ .text.Motor_Left_Init
+                0x00000000       0x14 build/motor.o
+ .text.Motor_Right_Init
+                0x00000000       0x14 build/motor.o
+ .text.Motor_Right_SetDuty
+                0x00000000       0x1c build/motor.o
+ .text.Motor_Right_Brake
+                0x00000000       0x10 build/motor.o
+ .text.Motor_Right_Stop
+                0x00000000       0x10 build/motor.o
  .text.Motor_TIM_Init
                 0x00000000       0x36 build/motor.o
  .text.Motor_TIM_Channel_Init
                 0x00000000       0x84 build/motor.o
- .text.Motor_GPIO_Init
-                0x00000000      0x1cc build/motor.o
  .text.Motor_Driver_Init
-                0x00000000       0xb8 build/motor.o
- .text.Motor_SetDirection
-                0x00000000      0x164 build/motor.o
- .text.Motor_SetDuty
-                0x00000000       0x40 build/motor.o
- .text.Motor_Stop
-                0x00000000       0x14 build/motor.o
- .text.Motor_SetSpeed
-                0x00000000       0x58 build/motor.o
- .text.Motor_Brake
-                0x00000000       0x14 build/motor.o
+                0x00000000       0xc8 build/motor.o
  .text.Motor_StopAll
-                0x00000000       0x1c build/motor.o
+                0x00000000       0x18 build/motor.o
  .text.Motor_Driver_DeInit
-                0x00000000       0x34 build/motor.o
+                0x00000000       0x20 build/motor.o
  .text.Motor_BrakeAll
-                0x00000000       0x1c build/motor.o
+                0x00000000       0x18 build/motor.o
  .text.Motor_StartTimers
-                0x00000000       0x30 build/motor.o
+                0x00000000       0x1c build/motor.o
  .text.Motor_StopTimers
-                0x00000000       0x30 build/motor.o
- .bss.Motor_Class
+                0x00000000       0x1c build/motor.o
+ .bss.Motor_Left
                 0x00000000       0x28 build/motor.o
- .debug_info    0x00000000     0x16bf build/motor.o
- .debug_abbrev  0x00000000      0x21c build/motor.o
- .debug_loc     0x00000000      0xa1b build/motor.o
+ .bss.Motor_Right
+                0x00000000       0x28 build/motor.o
+ .debug_info    0x00000000     0x1388 build/motor.o
+ .debug_abbrev  0x00000000      0x2bf build/motor.o
+ .debug_loc     0x00000000      0x743 build/motor.o
  .debug_aranges
-                0x00000000       0x88 build/motor.o
- .debug_ranges  0x00000000       0x78 build/motor.o
- .debug_line    0x00000000      0x5a6 build/motor.o
- .debug_str     0x00000000      0x854 build/motor.o
+                0x00000000       0xd8 build/motor.o
+ .debug_ranges  0x00000000       0xc8 build/motor.o
+ .debug_line    0x00000000      0x65e build/motor.o
+ .debug_str     0x00000000      0x93f build/motor.o
  .comment       0x00000000       0x27 build/motor.o
- .debug_frame   0x00000000      0x194 build/motor.o
+ .debug_frame   0x00000000      0x268 build/motor.o
  .ARM.attributes
                 0x00000000       0x34 build/motor.o
  .text          0x00000000        0x0 build/mpu6050.o
@@ -4408,15 +4430,12 @@ MPU_Write_Len                                     build/mpu6050.o
                                                   build/inv_mpu.o
 MSR_MSP                                           build/sys.o
 MemManage_Handler                                 build/stm32f4xx_it.o
-Motor_Brake                                       build/motor.o
 Motor_BrakeAll                                    build/motor.o
 Motor_Driver_DeInit                               build/motor.o
 Motor_Driver_Init                                 build/motor.o
-Motor_SetDirection                                build/motor.o
-Motor_SetDuty                                     build/motor.o
-Motor_SetSpeed                                    build/motor.o
+Motor_Left                                        build/motor.o
+Motor_Right                                       build/motor.o
 Motor_StartTimers                                 build/motor.o
-Motor_Stop                                        build/motor.o
 Motor_StopAll                                     build/motor.o
 Motor_StopTimers                                  build/motor.o
 NMI_Handler                                       build/stm32f4xx_it.o

@@ -1,10 +1,10 @@
 /**
  * @file encoder.h
- * @brief 四路编码器驱动头文件 - 智能车专用
- * @version 1.0
- * @date 2025-02-25
+ * @brief 编码器驱动头文件 - 智能车专用（面向对象风格）
+ * @version 2.0
+ * @date 2026-03-04
  *
- * @details 本驱动实现四路正交编码器接口功能
+ * @details 本驱动实现正交编码器接口功能
  *          - 编码器模式：TIM2/TIM3/TIM4/TIM5 正交解码模式
  *          - 编码器类型：11线编码器，减速比1:30
  *          - 计数范围：0-65535（16位定时器）
@@ -20,26 +20,33 @@
 #define __ENCODER_H
 
 #include "stm32f4xx.h"
+#include "HardwareConfig.h"
 
 /* ==================== 编码器枚举定义 ==================== */
 /**
- * @brief 编码器编号枚举（对应四路电机）
+ * @brief 编码器编号枚举（根据硬件模式自动调整）
  */
 typedef enum {
-  ENCODER_FR = 0, // 前右电机编码器 (Front Right) - TIM2
-  ENCODER_FL = 1, // 前左电机编码器 (Front Left) - TIM3
-  ENCODER_BR = 2, // 后右电机编码器 (Back Right) - TIM4
-  ENCODER_BL = 3, // 后左电机编码器 (Back Left) - TIM5
-  ENCODER_MAX = 4 // 编码器总数
+#ifdef QUAD_MOTOR_DRIVE
+    ENCODER_FR = 0, // 前右电机编码器 (Front Right) - TIM2
+    ENCODER_FL = 1, // 前左电机编码器 (Front Left) - TIM3
+    ENCODER_BR = 2, // 后右电机编码器 (Back Right) - TIM4
+    ENCODER_BL = 3, // 后左电机编码器 (Back Left) - TIM5
+    ENCODER_MAX = 4 // 编码器总数
+#else
+    ENCODER_RIGHT = 0, // 右电机编码器 (对应前右) - TIM2
+    ENCODER_LEFT = 1,  // 左电机编码器 (对应前左) - TIM3
+    ENCODER_MAX = 2    // 编码器总数
+#endif
 } Encoder_Id_e;
 
 /**
  * @brief 编码器方向枚举
  */
 typedef enum {
-  ENCODER_DIR_STOPPED = 0, // 停止
-  ENCODER_DIR_FORWARD = 1, // 正转（计数增加）
-  ENCODER_DIR_BACKWARD = 2 // 反转（计数减少）
+    ENCODER_DIR_STOPPED = 0, // 停止
+    ENCODER_DIR_FORWARD = 1, // 正转（计数增加）
+    ENCODER_DIR_BACKWARD = 2 // 反转（计数减少）
 } Encoder_Direction_e;
 
 /* ==================== 编码器参数配置 ==================== */
@@ -47,11 +54,11 @@ typedef enum {
 #define ENCODER_LINES 11           // 编码器线数
 #define ENCODER_REDUCTION_RATIO 30 // 减速比
 #define ENCODER_PPR                                                            \
-  (ENCODER_LINES * 4 * ENCODER_REDUCTION_RATIO) // 每转脉冲数 (11*4*30=1320)
+    (ENCODER_LINES * 4 * ENCODER_REDUCTION_RATIO) // 每转脉冲数 (11*4*30=1320)
 
 // 测速相关参数
 #define ENCODER_SAMPLE_PERIOD_MS 10 // 采样周期 (ms)
-#define ENCODER_SAMPLE_FREQ_HZ 100  // 采样频率 (Hz)
+#define ENCODER_SAMPLE_FREQ_HZ 100  // 采样频率 (Hz) (Hz)
 
 // 速度计算相关
 #define RPM_TO_RPS (1.0f / 60.0f)             // RPM转RPS
@@ -78,6 +85,7 @@ typedef enum {
 #define ENCODER_FL_AF GPIO_AF_TIM3
 
 /* ==================== 后右编码器 (ENCODER_BR) - TIM4 ==================== */
+#ifdef QUAD_MOTOR_DRIVE
 #define ENCODER_BR_TIM TIM4
 #define ENCODER_BR_TIM_CLK RCC_APB1Periph_TIM4
 #define ENCODER_BR_CH1_PORT GPIOD
@@ -86,8 +94,10 @@ typedef enum {
 #define ENCODER_BR_CH2_PIN GPIO_Pin_13 // TIM4_CH2
 #define ENCODER_BR_GPIO_CLK RCC_AHB1Periph_GPIOD
 #define ENCODER_BR_AF GPIO_AF_TIM4
+#endif
 
 /* ==================== 后左编码器 (ENCODER_BL) - TIM5 ==================== */
+#ifdef QUAD_MOTOR_DRIVE
 #define ENCODER_BL_TIM TIM5
 #define ENCODER_BL_TIM_CLK RCC_APB1Periph_TIM5
 #define ENCODER_BL_CH1_PORT GPIOA
@@ -96,203 +106,88 @@ typedef enum {
 #define ENCODER_BL_CH2_PIN GPIO_Pin_1 // TIM5_CH2
 #define ENCODER_BL_GPIO_CLK RCC_AHB1Periph_GPIOA
 #define ENCODER_BL_AF GPIO_AF_TIM5
+#endif
 
 /* ==================== 编码器数据结构体 ==================== */
 /**
- * @brief 编码器数据结构体
+ * @brief 编码器数据结构体（单个编码器的数据）
  */
 typedef struct {
-  // 当前状态
-  int16_t count;       // 当前计数值
-  int16_t last_count;  // 上次计数值
-  int16_t delta_count; // 计数增量
+    // 当前状态
+    int16_t count;       // 当前计数值
+    int16_t last_count;  // 上次计数值
+    int16_t delta_count; // 计数增量
 
-  // 速度相关
-  float speed_rpm;   // 转速 (RPM)
-  float speed_rps;   // 转速 (RPS)
-  float speed_rad_s; // 角速度 (rad/s)
-  float speed_m_s;   // 线速度 (m/s)
+    // 速度相关
+    float speed_rpm;   // 转速 (RPM)
+    float speed_rps;   // 转速 (RPS)
+    float speed_rad_s; // 角速度 (rad/s)
+    float speed_m_s;   // 线速度 (m/s)
 
-  // 里程相关
-  int32_t total_count;  // 总计数值（累计）
-  float total_distance; // 总里程 (m)
+    // 里程相关
+    int32_t total_count;  // 总计数值（累计）
+    float total_distance; // 总里程 (m)
 
-  // 方向
-  Encoder_Direction_e direction; // 当前方向
+    // 方向
+    Encoder_Direction_e direction; // 当前方向
 
-  // 参数
-  float wheel_diameter; // 轮子直径 (m)
-  float gear_ratio;     // 齿轮比
+    // 参数
+    float wheel_diameter; // 轮子直径 (m)
+    float gear_ratio;     // 齿轮比
 
-  // 时间戳
-  uint32_t last_update_time; // 上次更新时间
+    // 时间戳
+    uint32_t last_update_time; // 上次更新时间
 } Encoder_Data_t;
 
 /* ==================== 编码器类结构体 ==================== */
 /**
- * @brief 编码器控制类结构体（面向对象风格）
+ * @brief 编码器控制类结构体（面向对象风格，代表单个编码器实例）
  */
 typedef struct {
-  // 私有变量（带下划线前缀）
-  Encoder_Data_t _data[ENCODER_MAX]; // 四路编码器数据
-  uint8_t _initialized;              // 初始化标志
+    // 私有变量（带下划线前缀）
+    Encoder_Data_t _data;        // 编码器数据
+    uint8_t _initialized;         // 初始化标志
 
-  // 公有变量
+    // 公有变量
+    Encoder_Id_e id;                // 编码器ID
+    TIM_TypeDef *tim;             // 定时器指针
 
-  // 构造/析构函数
-  void (*Init)(Encoder_Id_e encoder);
-  void (*DeInit)(Encoder_Id_e encoder);
+    // 构造/析构函数（无参数，直接操作实例）
+    void (*Init)(void);
+    void (*DeInit)(void);
 
-  // 成员方法
-  void (*Reset)(Encoder_Id_e encoder);            // 复位计数值
-  int16_t (*GetCount)(Encoder_Id_e encoder);      // 获取计数值
-  int32_t (*GetTotalCount)(Encoder_Id_e encoder); // 获取总计数值
-  float (*GetSpeedRPM)(Encoder_Id_e encoder);     // 获取转速(RPM)
-  float (*GetSpeedRPS)(Encoder_Id_e encoder);     // 获取转速(RPS)
-  float (*GetSpeedRadS)(Encoder_Id_e encoder);    // 获取角速度(rad/s)
-  float (*GetSpeedMS)(Encoder_Id_e encoder);      // 获取线速度(m/s)
-  float (*GetDistance)(Encoder_Id_e encoder);     // 获取里程(m)
-  Encoder_Direction_e (*GetDirection)(Encoder_Id_e encoder); // 获取方向
-  void (*Update)(Encoder_Id_e encoder);                      // 更新数据（测速）
-  void (*UpdateAll)(void);                                   // 更新所有编码器
+    // 成员方法（无参数，直接操作实例）
+    void (*Reset)(void);            // 复位计数值
+    int16_t (*GetCount)(void);      // 获取计数值
+    int32_t (*GetTotalCount)(void); // 获取总计数值（累计，处理溢出）
+    float (*GetSpeedRPM)(void);    // 获取转速(RPM)
+    float (*GetSpeedRPS)(void);    // 获取转速(RPS)
+    float (*GetSpeedRadS)(void);   // 获取角速度(rad/s)
+    float (*GetSpeedMS)(void);     // 获取线速度(m/s)
+    float (*GetDistance)(void);     // 获取里程(m)
+    Encoder_Direction_e (*GetDirection)(void); // 获取方向
+    void (*Update)(void);         // 更新数据（测速计算）
 } Encoder_Class_t;
 
-/* ==================== 全局变量声明 ==================== */
-extern Encoder_Class_t Encoder;
+/* ==================== 全局编码器实例声明 ==================== */
+#ifdef QUAD_MOTOR_DRIVE
+// 四驱模式 - 四个独立编码器实例
+extern Encoder_Class_t Encoder_FR;   // 前右编码器实例
+extern Encoder_Class_t Encoder_FL;   // 前左编码器实例
+extern Encoder_Class_t Encoder_BR;   // 后右编码器实例
+extern Encoder_Class_t Encoder_BL;   // 后左编码器实例
+#else
+// 双驱模式 - 两个独立编码器实例
+extern Encoder_Class_t Encoder_Right; // 右编码器实例（对应前右硬件）
+extern Encoder_Class_t Encoder_Left;  // 左编码器实例（对应前左硬件）
+#endif
 
 /* ==================== 全局函数声明 ==================== */
 
 /**
  * @brief 编码器驱动初始化
- * @param encoder 编码器ID
- * @note  初始化指定编码器的GPIO和定时器为正交解码模式
+ * @note  初始化所有编码器实例的函数指针
  */
-void Encoder_Init(Encoder_Id_e encoder);
-
-/**
- * @brief 编码器驱动初始化（所有编码器）
- */
-void Encoder_InitAll(void);
-
-/**
- * @brief 编码器驱动去初始化
- * @param encoder 编码器ID
- */
-void Encoder_DeInit(Encoder_Id_e encoder);
-
-/**
- * @brief 复位编码器计数值
- * @param encoder 编码器ID
- */
-void Encoder_Reset(Encoder_Id_e encoder);
-
-/**
- * @brief 复位所有编码器计数值
- */
-void Encoder_ResetAll(void);
-
-/**
- * @brief 获取编码器当前计数值
- * @param encoder 编码器ID
- * @return 当前计数值
- */
-int16_t Encoder_GetCount(Encoder_Id_e encoder);
-
-/**
- * @brief 获取编码器总计数值
- * @param encoder 编码器ID
- * @return 总计数值（累计，处理溢出）
- */
-int32_t Encoder_GetTotalCount(Encoder_Id_e encoder);
-
-/**
- * @brief 获取编码器转速
- * @param encoder 编码器ID
- * @return 转速 (RPM)
- */
-float Encoder_GetSpeedRPM(Encoder_Id_e encoder);
-
-/**
- * @brief 获取编码器转速
- * @param encoder 编码器ID
- * @return 转速 (RPS - Revolutions Per Second)
- */
-float Encoder_GetSpeedRPS(Encoder_Id_e encoder);
-
-/**
- * @brief 获取编码器角速度
- * @param encoder 编码器ID
- * @return 角速度 (rad/s)
- */
-float Encoder_GetSpeedRadS(Encoder_Id_e encoder);
-
-/**
- * @brief 获取编码器线速度
- * @param encoder 编码器ID
- * @return 线速度 (m/s)
- */
-float Encoder_GetSpeedMS(Encoder_Id_e encoder);
-
-/**
- * @brief 获取编码器里程
- * @param encoder 编码器ID
- * @return 里程 (m)
- */
-float Encoder_GetDistance(Encoder_Id_e encoder);
-
-/**
- * @brief 获取编码器方向
- * @param encoder 编码器ID
- * @return 方向 (FORWARD/BACKWARD/STOPPED)
- */
-Encoder_Direction_e Encoder_GetDirection(Encoder_Id_e encoder);
-
-/**
- * @brief 更新编码器数据（测速计算）
- * @param encoder 编码器ID
- * @note  需要定期调用（如10ms周期）
- */
-void Encoder_Update(Encoder_Id_e encoder);
-
-/**
- * @brief 更新所有编码器数据
- */
-void Encoder_UpdateAll(void);
-
-/**
- * @brief 设置轮子直径
- * @param encoder 编码器ID
- * @param diameter 直径 (m)
- */
-void Encoder_SetWheelDiameter(Encoder_Id_e encoder, float diameter);
-
-/**
- * @brief 设置齿轮比
- * @param encoder 编码器ID
- * @param ratio 齿轮比
- */
-void Encoder_SetGearRatio(Encoder_Id_e encoder, float ratio);
-
-/* ==================== 宏定义快捷函数 ==================== */
-
-// 前右编码器
-#define Encoder_FR_GetCount() Encoder_GetCount(ENCODER_FR)
-#define Encoder_FR_GetSpeedRPM() Encoder_GetSpeedRPM(ENCODER_FR)
-#define Encoder_FR_GetSpeedMS() Encoder_GetSpeedMS(ENCODER_FR)
-
-// 前左编码器
-#define Encoder_FL_GetCount() Encoder_GetCount(ENCODER_FL)
-#define Encoder_FL_GetSpeedRPM() Encoder_GetSpeedRPM(ENCODER_FL)
-#define Encoder_FL_GetSpeedMS() Encoder_GetSpeedMS(ENCODER_FL)
-
-// 后右编码器
-#define Encoder_BR_GetCount() Encoder_GetCount(ENCODER_BR)
-#define Encoder_BR_GetSpeedRPM() Encoder_GetSpeedRPM(ENCODER_BR)
-#define Encoder_BR_GetSpeedMS() Encoder_GetSpeedMS(ENCODER_BR)
-
-// 后左编码器
-#define Encoder_BL_GetCount() Encoder_GetCount(ENCODER_BL)
-#define Encoder_BL_GetSpeedRPM() Encoder_GetSpeedRPM(ENCODER_BL)
-#define Encoder_BL_GetSpeedMS() Encoder_GetSpeedMS(ENCODER_BL)
+void Encoder_Driver_Init(void);
 
 #endif /* __ENCODER_H */
