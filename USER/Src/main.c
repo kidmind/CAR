@@ -7,8 +7,8 @@
 #include "stm32f4xx_gpio.h"
 #include "stm32f4xx_usart.h"
 #include "task.h" // 任务调度模块
-#include "uart.h"
 #include "ulog.h"
+#include "usart.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stm32f4xx.h>
@@ -80,7 +80,7 @@ int main() {
     add_task(speed_control_task, SPEED_PID_SAMPLE_PERIOD_MS);
     */
 
-  UART1_Init();
+  USART1_Init();
   printf("hello world\r\n");
 
   delay_init();

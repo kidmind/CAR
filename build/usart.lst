@@ -1,4 +1,4 @@
-ARM GAS  /tmp/cc4p3ByD.s 			page 1
+ARM GAS  /tmp/ccYmkDEK.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -50,43 +50,46 @@ ARM GAS  /tmp/cc4p3ByD.s 			page 1
   21:MyHardWare/Src/usart.c **** ***/
   22:MyHardWare/Src/usart.c **** 
   23:MyHardWare/Src/usart.c **** #include "usart.h"
-  24:MyHardWare/Src/usart.c **** #include "led.h"
-  25:MyHardWare/Src/usart.c **** #include "oled.h"
-  26:MyHardWare/Src/usart.c **** #include "stm32f4xx.h"
-  27:MyHardWare/Src/usart.c **** #include "stm32f4xx_dma.h"
-  28:MyHardWare/Src/usart.c **** #include <stdio.h>
-  29:MyHardWare/Src/usart.c **** 
-  30:MyHardWare/Src/usart.c **** // DMA 发送缓冲区，大小为 256 字节
-  31:MyHardWare/Src/usart.c **** static uint8_t dma_tx_buffer[USART_DMA_TX_BUFFER_SIZE];
-ARM GAS  /tmp/cc4p3ByD.s 			page 2
+  24:MyHardWare/Src/usart.c **** #include "delay.h"
+  25:MyHardWare/Src/usart.c **** #include "led.h"
+  26:MyHardWare/Src/usart.c **** #include "oled.h"
+  27:MyHardWare/Src/usart.c **** #include "stm32f4xx.h"
+  28:MyHardWare/Src/usart.c **** #include "stm32f4xx_dma.h"
+  29:MyHardWare/Src/usart.c **** #include <stdint.h>
+  30:MyHardWare/Src/usart.c **** #include <stdio.h>
+  31:MyHardWare/Src/usart.c **** 
+ARM GAS  /tmp/ccYmkDEK.s 			page 2
 
 
-  32:MyHardWare/Src/usart.c **** // DMA 接收缓冲区，大小为 256 字节
-  33:MyHardWare/Src/usart.c **** static uint8_t dma_rx_buffer[USART_DMA_RX_BUFFER_SIZE];
-  34:MyHardWare/Src/usart.c **** // 发送环形缓冲区，用于存储待发送的数据
-  35:MyHardWare/Src/usart.c **** RingBuffer tx_queue;
-  36:MyHardWare/Src/usart.c **** // 接收环形缓冲区，用于存储接收到的数据
-  37:MyHardWare/Src/usart.c **** RingBuffer rx_queue;
-  38:MyHardWare/Src/usart.c **** 
-  39:MyHardWare/Src/usart.c **** // DMA 发送完成标志位
-  40:MyHardWare/Src/usart.c **** volatile uint8_t dma_tx_transfer_complete = 0;
-  41:MyHardWare/Src/usart.c **** // DMA 接收完成标志位
-  42:MyHardWare/Src/usart.c **** volatile uint8_t dma_rx_transfer_complete = 0;
-  43:MyHardWare/Src/usart.c **** // 记录上次 DMA 传输的数据量
-  44:MyHardWare/Src/usart.c **** static uint16_t last_dma_tx_count = 0;
-  45:MyHardWare/Src/usart.c **** // 函数声明
-  46:MyHardWare/Src/usart.c **** static void USART1_DMA_Init(void);
-  47:MyHardWare/Src/usart.c **** static void TIM7_Config(void);
-  48:MyHardWare/Src/usart.c **** static void TIM7_EnableIRQ(void);
-  49:MyHardWare/Src/usart.c **** static void TIM7_DisableIRQ(void);
-  50:MyHardWare/Src/usart.c **** 
-  51:MyHardWare/Src/usart.c **** /**
-  52:MyHardWare/Src/usart.c ****  * @brief  USART1 DMA 初始化配置
-  53:MyHardWare/Src/usart.c ****  *         配置 DMA2 Stream7 用于 USART1 TX，DMA2 Stream2 用于 USART1 RX
-  54:MyHardWare/Src/usart.c ****  *         使用 DMA Channel4，字节传输模式，使能中断
-  55:MyHardWare/Src/usart.c ****  */
-  56:MyHardWare/Src/usart.c **** static void USART1_DMA_Init(void) {
-  28              		.loc 1 56 35 view -0
+  32:MyHardWare/Src/usart.c **** // DMA 发送缓冲区，大小为 256 字节
+  33:MyHardWare/Src/usart.c **** static uint8_t dma_tx_buffer[USART_DMA_TX_BUFFER_SIZE];
+  34:MyHardWare/Src/usart.c **** // DMA 接收缓冲区，大小为 256 字节
+  35:MyHardWare/Src/usart.c **** static uint8_t dma_rx_buffer[USART_DMA_RX_BUFFER_SIZE];
+  36:MyHardWare/Src/usart.c **** // 发送环形缓冲区，用于存储待发送的数据
+  37:MyHardWare/Src/usart.c **** RingBuffer tx_queue;
+  38:MyHardWare/Src/usart.c **** // 接收环形缓冲区，用于存储接收到的数据
+  39:MyHardWare/Src/usart.c **** RingBuffer rx_queue;
+  40:MyHardWare/Src/usart.c **** 
+  41:MyHardWare/Src/usart.c **** // DMA 发送完成标志位
+  42:MyHardWare/Src/usart.c **** volatile uint8_t dma_tx_transfer_complete = 0;
+  43:MyHardWare/Src/usart.c **** // DMA 接收完成标志位
+  44:MyHardWare/Src/usart.c **** volatile uint8_t dma_rx_transfer_complete = 0;
+  45:MyHardWare/Src/usart.c **** // 记录上次 DMA 传输的数据量
+  46:MyHardWare/Src/usart.c **** static uint16_t last_dma_tx_count = 0;
+  47:MyHardWare/Src/usart.c **** // 函数声明
+  48:MyHardWare/Src/usart.c **** static void USART1_DMA_Init(void);
+  49:MyHardWare/Src/usart.c **** static void TIM7_Config(void);
+  50:MyHardWare/Src/usart.c **** static void TIM7_EnableIRQ(void);
+  51:MyHardWare/Src/usart.c **** static void TIM7_DisableIRQ(void);
+  52:MyHardWare/Src/usart.c **** 
+  53:MyHardWare/Src/usart.c **** static void USART_StartDMA_TX(void);
+  54:MyHardWare/Src/usart.c **** /**
+  55:MyHardWare/Src/usart.c ****  * @brief  USART1 DMA 初始化配置
+  56:MyHardWare/Src/usart.c ****  *         配置 DMA2 Stream7 用于 USART1 TX，DMA2 Stream2 用于 USART1 RX
+  57:MyHardWare/Src/usart.c ****  *         使用 DMA Channel4，字节传输模式，使能中断
+  58:MyHardWare/Src/usart.c ****  */
+  59:MyHardWare/Src/usart.c **** static void USART1_DMA_Init(void) {
+  28              		.loc 1 59 35 view -0
   29              		.cfi_startproc
   30              		@ args = 0, pretend = 0, frame = 64
   31              		@ frame_needed = 0, uses_anonymous_args = 0
@@ -101,300 +104,300 @@ ARM GAS  /tmp/cc4p3ByD.s 			page 1
   40 0002 91B0     		sub	sp, sp, #68
   41              	.LCFI1:
   42              		.cfi_def_cfa_offset 88
-  57:MyHardWare/Src/usart.c ****   DMA_InitTypeDef DMA_InitStructure;
-  43              		.loc 1 57 3 view .LVU1
-  58:MyHardWare/Src/usart.c ****   NVIC_InitTypeDef NVIC_InitStructure;
-  44              		.loc 1 58 3 view .LVU2
-  59:MyHardWare/Src/usart.c **** 
-  60:MyHardWare/Src/usart.c ****   // 使能 DMA2 时钟
-  61:MyHardWare/Src/usart.c ****   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2, ENABLE);
-  45              		.loc 1 61 3 view .LVU3
+  60:MyHardWare/Src/usart.c ****   DMA_InitTypeDef DMA_InitStructure;
+  43              		.loc 1 60 3 view .LVU1
+  61:MyHardWare/Src/usart.c ****   NVIC_InitTypeDef NVIC_InitStructure;
+  44              		.loc 1 61 3 view .LVU2
+  62:MyHardWare/Src/usart.c **** 
+  63:MyHardWare/Src/usart.c ****   // 使能 DMA2 时钟
+  64:MyHardWare/Src/usart.c ****   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2, ENABLE);
+  45              		.loc 1 64 3 view .LVU3
   46 0004 0121     		movs	r1, #1
   47 0006 4FF48000 		mov	r0, #4194304
   48 000a FFF7FEFF 		bl	RCC_AHB1PeriphClockCmd
   49              	.LVL0:
-  62:MyHardWare/Src/usart.c **** 
-  63:MyHardWare/Src/usart.c ****   // 配置 DMA2 Stream2 (RX) 的中断优先级
-  64:MyHardWare/Src/usart.c ****   NVIC_InitStructure.NVIC_IRQChannel = DMA2_Stream2_IRQn;
-  50              		.loc 1 64 3 view .LVU4
-  51              		.loc 1 64 38 is_stmt 0 view .LVU5
-ARM GAS  /tmp/cc4p3ByD.s 			page 3
+  65:MyHardWare/Src/usart.c **** 
+  66:MyHardWare/Src/usart.c ****   // 配置 DMA2 Stream2 (RX) 的中断优先级
+ARM GAS  /tmp/ccYmkDEK.s 			page 3
 
 
+  67:MyHardWare/Src/usart.c ****   NVIC_InitStructure.NVIC_IRQChannel = DMA2_Stream2_IRQn;
+  50              		.loc 1 67 3 view .LVU4
+  51              		.loc 1 67 38 is_stmt 0 view .LVU5
   52 000e 3A23     		movs	r3, #58
   53 0010 8DF80030 		strb	r3, [sp]
-  65:MyHardWare/Src/usart.c ****   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-  54              		.loc 1 65 3 is_stmt 1 view .LVU6
-  55              		.loc 1 65 56 is_stmt 0 view .LVU7
+  68:MyHardWare/Src/usart.c ****   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+  54              		.loc 1 68 3 is_stmt 1 view .LVU6
+  55              		.loc 1 68 56 is_stmt 0 view .LVU7
   56 0014 0025     		movs	r5, #0
   57 0016 8DF80150 		strb	r5, [sp, #1]
-  66:MyHardWare/Src/usart.c ****   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
-  58              		.loc 1 66 3 is_stmt 1 view .LVU8
-  59              		.loc 1 66 49 is_stmt 0 view .LVU9
+  69:MyHardWare/Src/usart.c ****   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+  58              		.loc 1 69 3 is_stmt 1 view .LVU8
+  59              		.loc 1 69 49 is_stmt 0 view .LVU9
   60 001a 0124     		movs	r4, #1
   61 001c 8DF80240 		strb	r4, [sp, #2]
-  67:MyHardWare/Src/usart.c ****   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  62              		.loc 1 67 3 is_stmt 1 view .LVU10
-  63              		.loc 1 67 41 is_stmt 0 view .LVU11
+  70:MyHardWare/Src/usart.c ****   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  62              		.loc 1 70 3 is_stmt 1 view .LVU10
+  63              		.loc 1 70 41 is_stmt 0 view .LVU11
   64 0020 8DF80340 		strb	r4, [sp, #3]
-  68:MyHardWare/Src/usart.c ****   NVIC_Init(&NVIC_InitStructure);
-  65              		.loc 1 68 3 is_stmt 1 view .LVU12
+  71:MyHardWare/Src/usart.c ****   NVIC_Init(&NVIC_InitStructure);
+  65              		.loc 1 71 3 is_stmt 1 view .LVU12
   66 0024 6846     		mov	r0, sp
   67 0026 FFF7FEFF 		bl	NVIC_Init
   68              	.LVL1:
-  69:MyHardWare/Src/usart.c ****   // 配置 DMA2 Stream7 (TX) 的中断优先级
-  70:MyHardWare/Src/usart.c ****   NVIC_InitStructure.NVIC_IRQChannel = DMA2_Stream7_IRQn;
-  69              		.loc 1 70 3 view .LVU13
-  70              		.loc 1 70 38 is_stmt 0 view .LVU14
+  72:MyHardWare/Src/usart.c ****   // 配置 DMA2 Stream7 (TX) 的中断优先级
+  73:MyHardWare/Src/usart.c ****   NVIC_InitStructure.NVIC_IRQChannel = DMA2_Stream7_IRQn;
+  69              		.loc 1 73 3 view .LVU13
+  70              		.loc 1 73 38 is_stmt 0 view .LVU14
   71 002a 4623     		movs	r3, #70
   72 002c 8DF80030 		strb	r3, [sp]
-  71:MyHardWare/Src/usart.c ****   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-  73              		.loc 1 71 3 is_stmt 1 view .LVU15
-  74              		.loc 1 71 56 is_stmt 0 view .LVU16
+  74:MyHardWare/Src/usart.c ****   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+  73              		.loc 1 74 3 is_stmt 1 view .LVU15
+  74              		.loc 1 74 56 is_stmt 0 view .LVU16
   75 0030 8DF80150 		strb	r5, [sp, #1]
-  72:MyHardWare/Src/usart.c ****   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
-  76              		.loc 1 72 3 is_stmt 1 view .LVU17
-  77              		.loc 1 72 49 is_stmt 0 view .LVU18
+  75:MyHardWare/Src/usart.c ****   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+  76              		.loc 1 75 3 is_stmt 1 view .LVU17
+  77              		.loc 1 75 49 is_stmt 0 view .LVU18
   78 0034 8DF80240 		strb	r4, [sp, #2]
-  73:MyHardWare/Src/usart.c ****   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  79              		.loc 1 73 3 is_stmt 1 view .LVU19
-  80              		.loc 1 73 41 is_stmt 0 view .LVU20
+  76:MyHardWare/Src/usart.c ****   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  79              		.loc 1 76 3 is_stmt 1 view .LVU19
+  80              		.loc 1 76 41 is_stmt 0 view .LVU20
   81 0038 8DF80340 		strb	r4, [sp, #3]
-  74:MyHardWare/Src/usart.c ****   NVIC_Init(&NVIC_InitStructure);
-  82              		.loc 1 74 3 is_stmt 1 view .LVU21
+  77:MyHardWare/Src/usart.c ****   NVIC_Init(&NVIC_InitStructure);
+  82              		.loc 1 77 3 is_stmt 1 view .LVU21
   83 003c 6846     		mov	r0, sp
   84 003e FFF7FEFF 		bl	NVIC_Init
   85              	.LVL2:
-  75:MyHardWare/Src/usart.c ****   // DMA TX 配置 (DMA2 Stream7, Channel4) - 内存到外设
-  76:MyHardWare/Src/usart.c ****   DMA_DeInit(DMA2_Stream7);
-  86              		.loc 1 76 3 view .LVU22
+  78:MyHardWare/Src/usart.c ****   // DMA TX 配置 (DMA2 Stream7, Channel4) - 内存到外设
+  79:MyHardWare/Src/usart.c ****   DMA_DeInit(DMA2_Stream7);
+  86              		.loc 1 79 3 view .LVU22
   87 0042 2F48     		ldr	r0, .L5
   88 0044 FFF7FEFF 		bl	DMA_DeInit
   89              	.LVL3:
-  77:MyHardWare/Src/usart.c ****   while (DMA_GetCmdStatus(DMA2_Stream7) != DISABLE)
-  90              		.loc 1 77 3 view .LVU23
+  80:MyHardWare/Src/usart.c ****   while (DMA_GetCmdStatus(DMA2_Stream7) != DISABLE)
+  90              		.loc 1 80 3 view .LVU23
   91              	.L2:
-  92              		.loc 1 77 41 discriminator 1 view .LVU24
-  93              		.loc 1 77 10 is_stmt 0 discriminator 1 view .LVU25
+  92              		.loc 1 80 41 discriminator 1 view .LVU24
+ARM GAS  /tmp/ccYmkDEK.s 			page 4
+
+
+  93              		.loc 1 80 10 is_stmt 0 discriminator 1 view .LVU25
   94 0048 2D48     		ldr	r0, .L5
   95 004a FFF7FEFF 		bl	DMA_GetCmdStatus
-ARM GAS  /tmp/cc4p3ByD.s 			page 4
-
-
   96              	.LVL4:
-  97              		.loc 1 77 41 discriminator 1 view .LVU26
+  97              		.loc 1 80 41 discriminator 1 view .LVU26
   98 004e 0028     		cmp	r0, #0
   99 0050 FAD1     		bne	.L2
-  78:MyHardWare/Src/usart.c ****     ;
-  79:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_Channel = DMA_Channel_4;
- 100              		.loc 1 79 3 is_stmt 1 view .LVU27
- 101              		.loc 1 79 33 is_stmt 0 view .LVU28
+  81:MyHardWare/Src/usart.c ****     ;
+  82:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_Channel = DMA_Channel_4;
+ 100              		.loc 1 82 3 is_stmt 1 view .LVU27
+ 101              		.loc 1 82 33 is_stmt 0 view .LVU28
  102 0052 4FF00063 		mov	r3, #134217728
  103 0056 0193     		str	r3, [sp, #4]
-  80:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t) & (USART1->DR);
- 104              		.loc 1 80 3 is_stmt 1 view .LVU29
- 105              		.loc 1 80 44 is_stmt 0 view .LVU30
+  83:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t) & (USART1->DR);
+ 104              		.loc 1 83 3 is_stmt 1 view .LVU29
+ 105              		.loc 1 83 44 is_stmt 0 view .LVU30
  106 0058 2A4B     		ldr	r3, .L5+4
  107 005a 0293     		str	r3, [sp, #8]
-  81:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_Memory0BaseAddr = 0;
- 108              		.loc 1 81 3 is_stmt 1 view .LVU31
- 109              		.loc 1 81 41 is_stmt 0 view .LVU32
+  84:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_Memory0BaseAddr = 0;
+ 108              		.loc 1 84 3 is_stmt 1 view .LVU31
+ 109              		.loc 1 84 41 is_stmt 0 view .LVU32
  110 005c 0023     		movs	r3, #0
  111 005e 0393     		str	r3, [sp, #12]
-  82:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_DIR = DMA_DIR_MemoryToPeripheral;
- 112              		.loc 1 82 3 is_stmt 1 view .LVU33
- 113              		.loc 1 82 29 is_stmt 0 view .LVU34
+  85:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_DIR = DMA_DIR_MemoryToPeripheral;
+ 112              		.loc 1 85 3 is_stmt 1 view .LVU33
+ 113              		.loc 1 85 29 is_stmt 0 view .LVU34
  114 0060 4022     		movs	r2, #64
  115 0062 0492     		str	r2, [sp, #16]
-  83:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_BufferSize = 0;
- 116              		.loc 1 83 3 is_stmt 1 view .LVU35
- 117              		.loc 1 83 36 is_stmt 0 view .LVU36
+  86:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_BufferSize = 0;
+ 116              		.loc 1 86 3 is_stmt 1 view .LVU35
+ 117              		.loc 1 86 36 is_stmt 0 view .LVU36
  118 0064 0593     		str	r3, [sp, #20]
-  84:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
- 119              		.loc 1 84 3 is_stmt 1 view .LVU37
- 120              		.loc 1 84 39 is_stmt 0 view .LVU38
+  87:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
+ 119              		.loc 1 87 3 is_stmt 1 view .LVU37
+ 120              		.loc 1 87 39 is_stmt 0 view .LVU38
  121 0066 0693     		str	r3, [sp, #24]
-  85:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
- 122              		.loc 1 85 3 is_stmt 1 view .LVU39
- 123              		.loc 1 85 35 is_stmt 0 view .LVU40
+  88:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
+ 122              		.loc 1 88 3 is_stmt 1 view .LVU39
+ 123              		.loc 1 88 35 is_stmt 0 view .LVU40
  124 0068 4FF48062 		mov	r2, #1024
  125 006c 0792     		str	r2, [sp, #28]
-  86:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
- 126              		.loc 1 86 3 is_stmt 1 view .LVU41
- 127              		.loc 1 86 44 is_stmt 0 view .LVU42
+  89:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
+ 126              		.loc 1 89 3 is_stmt 1 view .LVU41
+ 127              		.loc 1 89 44 is_stmt 0 view .LVU42
  128 006e 0893     		str	r3, [sp, #32]
-  87:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
- 129              		.loc 1 87 3 is_stmt 1 view .LVU43
- 130              		.loc 1 87 40 is_stmt 0 view .LVU44
+  90:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
+ 129              		.loc 1 90 3 is_stmt 1 view .LVU43
+ 130              		.loc 1 90 40 is_stmt 0 view .LVU44
  131 0070 0993     		str	r3, [sp, #36]
-  88:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_Mode = DMA_Mode_Normal;
- 132              		.loc 1 88 3 is_stmt 1 view .LVU45
- 133              		.loc 1 88 30 is_stmt 0 view .LVU46
+  91:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_Mode = DMA_Mode_Normal;
+ 132              		.loc 1 91 3 is_stmt 1 view .LVU45
+ 133              		.loc 1 91 30 is_stmt 0 view .LVU46
  134 0072 0A93     		str	r3, [sp, #40]
-  89:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_Priority = DMA_Priority_High;
- 135              		.loc 1 89 3 is_stmt 1 view .LVU47
- 136              		.loc 1 89 34 is_stmt 0 view .LVU48
+  92:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_Priority = DMA_Priority_High;
+ 135              		.loc 1 92 3 is_stmt 1 view .LVU47
+ 136              		.loc 1 92 34 is_stmt 0 view .LVU48
  137 0074 4FF40032 		mov	r2, #131072
+ARM GAS  /tmp/ccYmkDEK.s 			page 5
+
+
  138 0078 0B92     		str	r2, [sp, #44]
-  90:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_FIFOMode = DMA_FIFOMode_Disable;
- 139              		.loc 1 90 3 is_stmt 1 view .LVU49
-ARM GAS  /tmp/cc4p3ByD.s 			page 5
-
-
- 140              		.loc 1 90 34 is_stmt 0 view .LVU50
+  93:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_FIFOMode = DMA_FIFOMode_Disable;
+ 139              		.loc 1 93 3 is_stmt 1 view .LVU49
+ 140              		.loc 1 93 34 is_stmt 0 view .LVU50
  141 007a 0C93     		str	r3, [sp, #48]
-  91:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_FIFOThreshold = DMA_FIFOThreshold_HalfFull;
- 142              		.loc 1 91 3 is_stmt 1 view .LVU51
- 143              		.loc 1 91 39 is_stmt 0 view .LVU52
+  94:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_FIFOThreshold = DMA_FIFOThreshold_HalfFull;
+ 142              		.loc 1 94 3 is_stmt 1 view .LVU51
+ 143              		.loc 1 94 39 is_stmt 0 view .LVU52
  144 007c 0122     		movs	r2, #1
  145 007e 0D92     		str	r2, [sp, #52]
-  92:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_MemoryBurst = DMA_MemoryBurst_Single;
- 146              		.loc 1 92 3 is_stmt 1 view .LVU53
- 147              		.loc 1 92 37 is_stmt 0 view .LVU54
+  95:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_MemoryBurst = DMA_MemoryBurst_Single;
+ 146              		.loc 1 95 3 is_stmt 1 view .LVU53
+ 147              		.loc 1 95 37 is_stmt 0 view .LVU54
  148 0080 0E93     		str	r3, [sp, #56]
-  93:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
- 149              		.loc 1 93 3 is_stmt 1 view .LVU55
- 150              		.loc 1 93 41 is_stmt 0 view .LVU56
+  96:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
+ 149              		.loc 1 96 3 is_stmt 1 view .LVU55
+ 150              		.loc 1 96 41 is_stmt 0 view .LVU56
  151 0082 0F93     		str	r3, [sp, #60]
-  94:MyHardWare/Src/usart.c ****   DMA_Init(DMA2_Stream7, &DMA_InitStructure);
- 152              		.loc 1 94 3 is_stmt 1 view .LVU57
+  97:MyHardWare/Src/usart.c ****   DMA_Init(DMA2_Stream7, &DMA_InitStructure);
+ 152              		.loc 1 97 3 is_stmt 1 view .LVU57
  153 0084 01A9     		add	r1, sp, #4
  154 0086 1E48     		ldr	r0, .L5
  155 0088 FFF7FEFF 		bl	DMA_Init
  156              	.LVL5:
-  95:MyHardWare/Src/usart.c **** 
-  96:MyHardWare/Src/usart.c ****   // DMA RX 配置 (DMA2 Stream2, Channel4) - 外设为内存
-  97:MyHardWare/Src/usart.c ****   DMA_DeInit(DMA2_Stream2);
- 157              		.loc 1 97 3 view .LVU58
+  98:MyHardWare/Src/usart.c **** 
+  99:MyHardWare/Src/usart.c ****   // DMA RX 配置 (DMA2 Stream2, Channel4) - 外设为内存
+ 100:MyHardWare/Src/usart.c ****   DMA_DeInit(DMA2_Stream2);
+ 157              		.loc 1 100 3 view .LVU58
  158 008c 1E48     		ldr	r0, .L5+8
  159 008e FFF7FEFF 		bl	DMA_DeInit
  160              	.LVL6:
-  98:MyHardWare/Src/usart.c ****   while (DMA_GetCmdStatus(DMA2_Stream7) != DISABLE)
- 161              		.loc 1 98 3 view .LVU59
+ 101:MyHardWare/Src/usart.c ****   while (DMA_GetCmdStatus(DMA2_Stream7) != DISABLE)
+ 161              		.loc 1 101 3 view .LVU59
  162              	.L3:
- 163              		.loc 1 98 41 discriminator 1 view .LVU60
- 164              		.loc 1 98 10 is_stmt 0 discriminator 1 view .LVU61
+ 163              		.loc 1 101 41 discriminator 1 view .LVU60
+ 164              		.loc 1 101 10 is_stmt 0 discriminator 1 view .LVU61
  165 0092 1B48     		ldr	r0, .L5
  166 0094 FFF7FEFF 		bl	DMA_GetCmdStatus
  167              	.LVL7:
- 168              		.loc 1 98 41 discriminator 1 view .LVU62
+ 168              		.loc 1 101 41 discriminator 1 view .LVU62
  169 0098 0028     		cmp	r0, #0
  170 009a FAD1     		bne	.L3
-  99:MyHardWare/Src/usart.c ****     ;
- 100:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_Channel = DMA_Channel_4;
- 171              		.loc 1 100 3 is_stmt 1 view .LVU63
- 172              		.loc 1 100 33 is_stmt 0 view .LVU64
+ 102:MyHardWare/Src/usart.c ****     ;
+ 103:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_Channel = DMA_Channel_4;
+ 171              		.loc 1 103 3 is_stmt 1 view .LVU63
+ 172              		.loc 1 103 33 is_stmt 0 view .LVU64
  173 009c 4FF00063 		mov	r3, #134217728
  174 00a0 0193     		str	r3, [sp, #4]
- 101:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t) & (USART1->DR);
- 175              		.loc 1 101 3 is_stmt 1 view .LVU65
- 176              		.loc 1 101 44 is_stmt 0 view .LVU66
+ 104:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t) & (USART1->DR);
+ 175              		.loc 1 104 3 is_stmt 1 view .LVU65
+ 176              		.loc 1 104 44 is_stmt 0 view .LVU66
  177 00a2 184B     		ldr	r3, .L5+4
  178 00a4 0293     		str	r3, [sp, #8]
- 102:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_Memory0BaseAddr = 0;
- 179              		.loc 1 102 3 is_stmt 1 view .LVU67
- 180              		.loc 1 102 41 is_stmt 0 view .LVU68
+ 105:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_Memory0BaseAddr = 0;
+ 179              		.loc 1 105 3 is_stmt 1 view .LVU67
+ 180              		.loc 1 105 41 is_stmt 0 view .LVU68
  181 00a6 0024     		movs	r4, #0
+ARM GAS  /tmp/ccYmkDEK.s 			page 6
+
+
  182 00a8 0394     		str	r4, [sp, #12]
- 103:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralToMemory;
- 183              		.loc 1 103 3 is_stmt 1 view .LVU69
-ARM GAS  /tmp/cc4p3ByD.s 			page 6
-
-
- 184              		.loc 1 103 29 is_stmt 0 view .LVU70
+ 106:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralToMemory;
+ 183              		.loc 1 106 3 is_stmt 1 view .LVU69
+ 184              		.loc 1 106 29 is_stmt 0 view .LVU70
  185 00aa 0494     		str	r4, [sp, #16]
- 104:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_BufferSize = 0;
- 186              		.loc 1 104 3 is_stmt 1 view .LVU71
- 187              		.loc 1 104 36 is_stmt 0 view .LVU72
+ 107:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_BufferSize = 0;
+ 186              		.loc 1 107 3 is_stmt 1 view .LVU71
+ 187              		.loc 1 107 36 is_stmt 0 view .LVU72
  188 00ac 0594     		str	r4, [sp, #20]
- 105:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
- 189              		.loc 1 105 3 is_stmt 1 view .LVU73
- 190              		.loc 1 105 39 is_stmt 0 view .LVU74
+ 108:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
+ 189              		.loc 1 108 3 is_stmt 1 view .LVU73
+ 190              		.loc 1 108 39 is_stmt 0 view .LVU74
  191 00ae 0694     		str	r4, [sp, #24]
- 106:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
- 192              		.loc 1 106 3 is_stmt 1 view .LVU75
- 193              		.loc 1 106 35 is_stmt 0 view .LVU76
+ 109:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
+ 192              		.loc 1 109 3 is_stmt 1 view .LVU75
+ 193              		.loc 1 109 35 is_stmt 0 view .LVU76
  194 00b0 4FF48063 		mov	r3, #1024
  195 00b4 0793     		str	r3, [sp, #28]
- 107:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
- 196              		.loc 1 107 3 is_stmt 1 view .LVU77
- 197              		.loc 1 107 44 is_stmt 0 view .LVU78
+ 110:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
+ 196              		.loc 1 110 3 is_stmt 1 view .LVU77
+ 197              		.loc 1 110 44 is_stmt 0 view .LVU78
  198 00b6 0894     		str	r4, [sp, #32]
- 108:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
- 199              		.loc 1 108 3 is_stmt 1 view .LVU79
- 200              		.loc 1 108 40 is_stmt 0 view .LVU80
+ 111:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
+ 199              		.loc 1 111 3 is_stmt 1 view .LVU79
+ 200              		.loc 1 111 40 is_stmt 0 view .LVU80
  201 00b8 0994     		str	r4, [sp, #36]
- 109:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_Mode = DMA_Mode_Normal;
- 202              		.loc 1 109 3 is_stmt 1 view .LVU81
- 203              		.loc 1 109 30 is_stmt 0 view .LVU82
+ 112:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_Mode = DMA_Mode_Normal;
+ 202              		.loc 1 112 3 is_stmt 1 view .LVU81
+ 203              		.loc 1 112 30 is_stmt 0 view .LVU82
  204 00ba 0A94     		str	r4, [sp, #40]
- 110:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_Priority = DMA_Priority_High;
- 205              		.loc 1 110 3 is_stmt 1 view .LVU83
- 206              		.loc 1 110 34 is_stmt 0 view .LVU84
+ 113:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_Priority = DMA_Priority_High;
+ 205              		.loc 1 113 3 is_stmt 1 view .LVU83
+ 206              		.loc 1 113 34 is_stmt 0 view .LVU84
  207 00bc 4FF40033 		mov	r3, #131072
  208 00c0 0B93     		str	r3, [sp, #44]
- 111:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_FIFOMode = DMA_FIFOMode_Disable;
- 209              		.loc 1 111 3 is_stmt 1 view .LVU85
- 210              		.loc 1 111 34 is_stmt 0 view .LVU86
+ 114:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_FIFOMode = DMA_FIFOMode_Disable;
+ 209              		.loc 1 114 3 is_stmt 1 view .LVU85
+ 210              		.loc 1 114 34 is_stmt 0 view .LVU86
  211 00c2 0C94     		str	r4, [sp, #48]
- 112:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_FIFOThreshold = DMA_FIFOThreshold_HalfFull;
- 212              		.loc 1 112 3 is_stmt 1 view .LVU87
- 213              		.loc 1 112 39 is_stmt 0 view .LVU88
+ 115:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_FIFOThreshold = DMA_FIFOThreshold_HalfFull;
+ 212              		.loc 1 115 3 is_stmt 1 view .LVU87
+ 213              		.loc 1 115 39 is_stmt 0 view .LVU88
  214 00c4 0126     		movs	r6, #1
  215 00c6 0D96     		str	r6, [sp, #52]
- 113:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_MemoryBurst = DMA_MemoryBurst_Single;
- 216              		.loc 1 113 3 is_stmt 1 view .LVU89
- 217              		.loc 1 113 37 is_stmt 0 view .LVU90
+ 116:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_MemoryBurst = DMA_MemoryBurst_Single;
+ 216              		.loc 1 116 3 is_stmt 1 view .LVU89
+ 217              		.loc 1 116 37 is_stmt 0 view .LVU90
  218 00c8 0E94     		str	r4, [sp, #56]
- 114:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
- 219              		.loc 1 114 3 is_stmt 1 view .LVU91
- 220              		.loc 1 114 41 is_stmt 0 view .LVU92
+ 117:MyHardWare/Src/usart.c ****   DMA_InitStructure.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
+ 219              		.loc 1 117 3 is_stmt 1 view .LVU91
+ 220              		.loc 1 117 41 is_stmt 0 view .LVU92
  221 00ca 0F94     		str	r4, [sp, #60]
- 115:MyHardWare/Src/usart.c ****   DMA_Init(DMA2_Stream2, &DMA_InitStructure);
- 222              		.loc 1 115 3 is_stmt 1 view .LVU93
+ 118:MyHardWare/Src/usart.c ****   DMA_Init(DMA2_Stream2, &DMA_InitStructure);
+ 222              		.loc 1 118 3 is_stmt 1 view .LVU93
  223 00cc 0E4D     		ldr	r5, .L5+8
  224 00ce 01A9     		add	r1, sp, #4
  225 00d0 2846     		mov	r0, r5
+ARM GAS  /tmp/ccYmkDEK.s 			page 7
+
+
  226 00d2 FFF7FEFF 		bl	DMA_Init
  227              	.LVL8:
- 116:MyHardWare/Src/usart.c **** 
-ARM GAS  /tmp/cc4p3ByD.s 			page 7
-
-
- 117:MyHardWare/Src/usart.c ****   // 使能 DMA2 Stream2 (RX) 的传输完成中断
- 118:MyHardWare/Src/usart.c ****   DMA_ITConfig(DMA2_Stream2, DMA_IT_TC, ENABLE);
- 228              		.loc 1 118 3 view .LVU94
+ 119:MyHardWare/Src/usart.c **** 
+ 120:MyHardWare/Src/usart.c ****   // 使能 DMA2 Stream2 (RX) 的传输完成中断
+ 121:MyHardWare/Src/usart.c ****   DMA_ITConfig(DMA2_Stream2, DMA_IT_TC, ENABLE);
+ 228              		.loc 1 121 3 view .LVU94
  229 00d6 3246     		mov	r2, r6
  230 00d8 1021     		movs	r1, #16
  231 00da 2846     		mov	r0, r5
  232 00dc FFF7FEFF 		bl	DMA_ITConfig
  233              	.LVL9:
- 119:MyHardWare/Src/usart.c ****   DMA_ITConfig(DMA2_Stream7, DMA_IT_TC, ENABLE);
- 234              		.loc 1 119 3 view .LVU95
+ 122:MyHardWare/Src/usart.c ****   DMA_ITConfig(DMA2_Stream7, DMA_IT_TC, ENABLE);
+ 234              		.loc 1 122 3 view .LVU95
  235 00e0 074F     		ldr	r7, .L5
  236 00e2 3246     		mov	r2, r6
  237 00e4 1021     		movs	r1, #16
  238 00e6 3846     		mov	r0, r7
  239 00e8 FFF7FEFF 		bl	DMA_ITConfig
  240              	.LVL10:
- 120:MyHardWare/Src/usart.c **** 
- 121:MyHardWare/Src/usart.c ****   // 使能 DMA 通道
- 122:MyHardWare/Src/usart.c ****   DMA_Cmd(DMA2_Stream7, DISABLE);
- 241              		.loc 1 122 3 view .LVU96
+ 123:MyHardWare/Src/usart.c **** 
+ 124:MyHardWare/Src/usart.c ****   // 使能 DMA 通道
+ 125:MyHardWare/Src/usart.c ****   DMA_Cmd(DMA2_Stream7, DISABLE);
+ 241              		.loc 1 125 3 view .LVU96
  242 00ec 2146     		mov	r1, r4
  243 00ee 3846     		mov	r0, r7
  244 00f0 FFF7FEFF 		bl	DMA_Cmd
  245              	.LVL11:
- 123:MyHardWare/Src/usart.c ****   DMA_Cmd(DMA2_Stream2, DISABLE);
- 246              		.loc 1 123 3 view .LVU97
+ 126:MyHardWare/Src/usart.c ****   DMA_Cmd(DMA2_Stream2, DISABLE);
+ 246              		.loc 1 126 3 view .LVU97
  247 00f4 2146     		mov	r1, r4
  248 00f6 2846     		mov	r0, r5
  249 00f8 FFF7FEFF 		bl	DMA_Cmd
  250              	.LVL12:
- 124:MyHardWare/Src/usart.c ****   // DMA_Cmd(DMA2_Stream7, ENABLE);
- 125:MyHardWare/Src/usart.c ****   // DMA_Cmd(DMA2_Stream2, ENABLE);
- 126:MyHardWare/Src/usart.c **** }
- 251              		.loc 1 126 1 is_stmt 0 view .LVU98
+ 127:MyHardWare/Src/usart.c ****   // DMA_Cmd(DMA2_Stream7, ENABLE);
+ 128:MyHardWare/Src/usart.c ****   // DMA_Cmd(DMA2_Stream2, ENABLE);
+ 129:MyHardWare/Src/usart.c **** }
+ 251              		.loc 1 129 1 is_stmt 0 view .LVU98
  252 00fc 11B0     		add	sp, sp, #68
  253              	.LCFI2:
  254              		.cfi_def_cfa_offset 20
@@ -415,19 +418,19 @@ ARM GAS  /tmp/cc4p3ByD.s 			page 1
  270              		.thumb_func
  272              	TIM7_Config:
  273              	.LFB127:
- 127:MyHardWare/Src/usart.c **** 
- 128:MyHardWare/Src/usart.c **** /**
- 129:MyHardWare/Src/usart.c ****  * @brief  TIM7 定时器配置，定时 100us
-ARM GAS  /tmp/cc4p3ByD.s 			page 8
+ARM GAS  /tmp/ccYmkDEK.s 			page 8
 
 
- 130:MyHardWare/Src/usart.c ****  *         STM32F407 系统时钟为 168MHz，APB1 时钟为 42MHz
- 131:MyHardWare/Src/usart.c ****  *         prescaler = 4200 - 1, 则计数器频率 = 42MHz / 4200 = 10kHz (周期 0.1ms
- 132:MyHardWare/Src/usart.c ****  * = 100us) period = 1 - 1, 则溢出时间 = 10kHz / 1 = 10kHz，即 100us
- 133:MyHardWare/Src/usart.c ****  *         用于定期检查环形缓冲队列，有数据时启动 DMA 传输
- 134:MyHardWare/Src/usart.c ****  */
- 135:MyHardWare/Src/usart.c **** static void TIM7_Config(void) {
- 274              		.loc 1 135 31 is_stmt 1 view -0
+ 130:MyHardWare/Src/usart.c **** 
+ 131:MyHardWare/Src/usart.c **** /**
+ 132:MyHardWare/Src/usart.c ****  * @brief  TIM7 定时器配置，定时 100us
+ 133:MyHardWare/Src/usart.c ****  *         STM32F407 系统时钟为 168MHz，APB1 时钟为 42MHz
+ 134:MyHardWare/Src/usart.c ****  *         prescaler = 4200 - 1, 则计数器频率 = 42MHz / 4200 = 10kHz (周期 0.1ms
+ 135:MyHardWare/Src/usart.c ****  * = 100us) period = 1 - 1, 则溢出时间 = 10kHz / 1 = 10kHz，即 100us
+ 136:MyHardWare/Src/usart.c ****  *         用于定期检查环形缓冲队列，有数据时启动 DMA 传输
+ 137:MyHardWare/Src/usart.c ****  */
+ 138:MyHardWare/Src/usart.c **** static void TIM7_Config(void) {
+ 274              		.loc 1 138 31 is_stmt 1 view -0
  275              		.cfi_startproc
  276              		@ args = 0, pretend = 0, frame = 16
  277              		@ frame_needed = 0, uses_anonymous_args = 0
@@ -440,107 +443,107 @@ ARM GAS  /tmp/cc4p3ByD.s 			page 1
  284 0002 85B0     		sub	sp, sp, #20
  285              	.LCFI4:
  286              		.cfi_def_cfa_offset 32
- 136:MyHardWare/Src/usart.c ****   TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStruct;
- 287              		.loc 1 136 3 view .LVU100
- 137:MyHardWare/Src/usart.c ****   NVIC_InitTypeDef NVIC_InitStructure;
- 288              		.loc 1 137 3 view .LVU101
- 138:MyHardWare/Src/usart.c **** 
- 139:MyHardWare/Src/usart.c ****   // 使能 TIM7 时钟
- 140:MyHardWare/Src/usart.c ****   RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM7, ENABLE);
- 289              		.loc 1 140 3 view .LVU102
+ 139:MyHardWare/Src/usart.c ****   TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStruct;
+ 287              		.loc 1 139 3 view .LVU100
+ 140:MyHardWare/Src/usart.c ****   NVIC_InitTypeDef NVIC_InitStructure;
+ 288              		.loc 1 140 3 view .LVU101
+ 141:MyHardWare/Src/usart.c **** 
+ 142:MyHardWare/Src/usart.c ****   // 使能 TIM7 时钟
+ 143:MyHardWare/Src/usart.c ****   RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM7, ENABLE);
+ 289              		.loc 1 143 3 view .LVU102
  290 0004 0121     		movs	r1, #1
  291 0006 2020     		movs	r0, #32
  292 0008 FFF7FEFF 		bl	RCC_APB1PeriphClockCmd
  293              	.LVL13:
- 141:MyHardWare/Src/usart.c **** 
- 142:MyHardWare/Src/usart.c ****   // 配置 TIM7 时基参数
- 143:MyHardWare/Src/usart.c ****   TIM_TimeBaseInitStruct.TIM_Prescaler =
- 294              		.loc 1 143 3 view .LVU103
- 295              		.loc 1 143 40 is_stmt 0 view .LVU104
+ 144:MyHardWare/Src/usart.c **** 
+ 145:MyHardWare/Src/usart.c ****   // 配置 TIM7 时基参数
+ 146:MyHardWare/Src/usart.c ****   TIM_TimeBaseInitStruct.TIM_Prescaler =
+ 294              		.loc 1 146 3 view .LVU103
+ 295              		.loc 1 146 40 is_stmt 0 view .LVU104
  296 000c 40F2A313 		movw	r3, #419
  297 0010 ADF80430 		strh	r3, [sp, #4]	@ movhi
- 144:MyHardWare/Src/usart.c ****       420 - 1; // 预分频器，42MHz / 4200 = 10kHz
- 145:MyHardWare/Src/usart.c ****   TIM_TimeBaseInitStruct.TIM_CounterMode = TIM_CounterMode_Up;
- 298              		.loc 1 145 3 is_stmt 1 view .LVU105
- 299              		.loc 1 145 42 is_stmt 0 view .LVU106
+ 147:MyHardWare/Src/usart.c ****       420 - 1; // 预分频器，42MHz / 4200 = 10kHz
+ 148:MyHardWare/Src/usart.c ****   TIM_TimeBaseInitStruct.TIM_CounterMode = TIM_CounterMode_Up;
+ 298              		.loc 1 148 3 is_stmt 1 view .LVU105
+ 299              		.loc 1 148 42 is_stmt 0 view .LVU106
  300 0014 0024     		movs	r4, #0
  301 0016 ADF80640 		strh	r4, [sp, #6]	@ movhi
- 146:MyHardWare/Src/usart.c ****   TIM_TimeBaseInitStruct.TIM_Period =
- 302              		.loc 1 146 3 is_stmt 1 view .LVU107
- 303              		.loc 1 146 37 is_stmt 0 view .LVU108
+ 149:MyHardWare/Src/usart.c ****   TIM_TimeBaseInitStruct.TIM_Period =
+ 302              		.loc 1 149 3 is_stmt 1 view .LVU107
+ 303              		.loc 1 149 37 is_stmt 0 view .LVU108
  304 001a 0923     		movs	r3, #9
  305 001c 0293     		str	r3, [sp, #8]
- 147:MyHardWare/Src/usart.c ****       10 - 1; // 自动重装载值，10kHz / 1 = 10kHz (100us)
- 148:MyHardWare/Src/usart.c ****   TIM_TimeBaseInitStruct.TIM_ClockDivision = TIM_CKD_DIV1;
- 306              		.loc 1 148 3 is_stmt 1 view .LVU109
- 307              		.loc 1 148 44 is_stmt 0 view .LVU110
+ 150:MyHardWare/Src/usart.c ****       10 - 1; // 自动重装载值，10kHz / 1 = 10kHz (100us)
+ 151:MyHardWare/Src/usart.c ****   TIM_TimeBaseInitStruct.TIM_ClockDivision = TIM_CKD_DIV1;
+ 306              		.loc 1 151 3 is_stmt 1 view .LVU109
+ 307              		.loc 1 151 44 is_stmt 0 view .LVU110
  308 001e ADF80C40 		strh	r4, [sp, #12]	@ movhi
- 149:MyHardWare/Src/usart.c ****   TIM_TimeBaseInit(TIM7, &TIM_TimeBaseInitStruct);
- 309              		.loc 1 149 3 is_stmt 1 view .LVU111
+ARM GAS  /tmp/ccYmkDEK.s 			page 9
+
+
+ 152:MyHardWare/Src/usart.c ****   TIM_TimeBaseInit(TIM7, &TIM_TimeBaseInitStruct);
+ 309              		.loc 1 152 3 is_stmt 1 view .LVU111
  310 0022 0F4D     		ldr	r5, .L9
-ARM GAS  /tmp/cc4p3ByD.s 			page 9
-
-
  311 0024 01A9     		add	r1, sp, #4
  312 0026 2846     		mov	r0, r5
  313 0028 FFF7FEFF 		bl	TIM_TimeBaseInit
  314              	.LVL14:
- 150:MyHardWare/Src/usart.c **** 
- 151:MyHardWare/Src/usart.c ****   // 清除更新中断标志，防止立即触发中断
- 152:MyHardWare/Src/usart.c ****   TIM_ClearFlag(TIM7, TIM_FLAG_Update);
- 315              		.loc 1 152 3 view .LVU112
+ 153:MyHardWare/Src/usart.c **** 
+ 154:MyHardWare/Src/usart.c ****   // 清除更新中断标志，防止立即触发中断
+ 155:MyHardWare/Src/usart.c ****   TIM_ClearFlag(TIM7, TIM_FLAG_Update);
+ 315              		.loc 1 155 3 view .LVU112
  316 002c 0121     		movs	r1, #1
  317 002e 2846     		mov	r0, r5
  318 0030 FFF7FEFF 		bl	TIM_ClearFlag
  319              	.LVL15:
- 153:MyHardWare/Src/usart.c **** 
- 154:MyHardWare/Src/usart.c ****   // 使能更新中断
- 155:MyHardWare/Src/usart.c ****   TIM_ITConfig(TIM7, TIM_IT_Update, ENABLE);
- 320              		.loc 1 155 3 view .LVU113
+ 156:MyHardWare/Src/usart.c **** 
+ 157:MyHardWare/Src/usart.c ****   // 使能更新中断
+ 158:MyHardWare/Src/usart.c ****   TIM_ITConfig(TIM7, TIM_IT_Update, ENABLE);
+ 320              		.loc 1 158 3 view .LVU113
  321 0034 0122     		movs	r2, #1
  322 0036 1146     		mov	r1, r2
  323 0038 2846     		mov	r0, r5
  324 003a FFF7FEFF 		bl	TIM_ITConfig
  325              	.LVL16:
- 156:MyHardWare/Src/usart.c **** 
- 157:MyHardWare/Src/usart.c ****   // 配置 NVIC 中断优先级
- 158:MyHardWare/Src/usart.c ****   NVIC_InitStructure.NVIC_IRQChannel = TIM7_IRQn;
- 326              		.loc 1 158 3 view .LVU114
- 327              		.loc 1 158 38 is_stmt 0 view .LVU115
+ 159:MyHardWare/Src/usart.c **** 
+ 160:MyHardWare/Src/usart.c ****   // 配置 NVIC 中断优先级
+ 161:MyHardWare/Src/usart.c ****   NVIC_InitStructure.NVIC_IRQChannel = TIM7_IRQn;
+ 326              		.loc 1 161 3 view .LVU114
+ 327              		.loc 1 161 38 is_stmt 0 view .LVU115
  328 003e 3723     		movs	r3, #55
  329 0040 8DF80030 		strb	r3, [sp]
- 159:MyHardWare/Src/usart.c ****   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
- 330              		.loc 1 159 3 is_stmt 1 view .LVU116
- 331              		.loc 1 159 56 is_stmt 0 view .LVU117
+ 162:MyHardWare/Src/usart.c ****   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+ 330              		.loc 1 162 3 is_stmt 1 view .LVU116
+ 331              		.loc 1 162 56 is_stmt 0 view .LVU117
  332 0044 8DF80140 		strb	r4, [sp, #1]
- 160:MyHardWare/Src/usart.c ****   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2;
- 333              		.loc 1 160 3 is_stmt 1 view .LVU118
- 334              		.loc 1 160 49 is_stmt 0 view .LVU119
+ 163:MyHardWare/Src/usart.c ****   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2;
+ 333              		.loc 1 163 3 is_stmt 1 view .LVU118
+ 334              		.loc 1 163 49 is_stmt 0 view .LVU119
  335 0048 0223     		movs	r3, #2
  336 004a 8DF80230 		strb	r3, [sp, #2]
- 161:MyHardWare/Src/usart.c ****   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
- 337              		.loc 1 161 3 is_stmt 1 view .LVU120
- 338              		.loc 1 161 41 is_stmt 0 view .LVU121
+ 164:MyHardWare/Src/usart.c ****   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+ 337              		.loc 1 164 3 is_stmt 1 view .LVU120
+ 338              		.loc 1 164 41 is_stmt 0 view .LVU121
  339 004e 0123     		movs	r3, #1
  340 0050 8DF80330 		strb	r3, [sp, #3]
- 162:MyHardWare/Src/usart.c ****   NVIC_Init(&NVIC_InitStructure);
- 341              		.loc 1 162 3 is_stmt 1 view .LVU122
+ 165:MyHardWare/Src/usart.c ****   NVIC_Init(&NVIC_InitStructure);
+ 341              		.loc 1 165 3 is_stmt 1 view .LVU122
  342 0054 6846     		mov	r0, sp
  343 0056 FFF7FEFF 		bl	NVIC_Init
  344              	.LVL17:
- 163:MyHardWare/Src/usart.c **** }
- 345              		.loc 1 163 1 is_stmt 0 view .LVU123
+ 166:MyHardWare/Src/usart.c **** }
+ 345              		.loc 1 166 1 is_stmt 0 view .LVU123
  346 005a 05B0     		add	sp, sp, #20
  347              	.LCFI5:
  348              		.cfi_def_cfa_offset 12
  349              		@ sp needed
  350 005c 30BD     		pop	{r4, r5, pc}
+ARM GAS  /tmp/ccYmkDEK.s 			page 10
+
+
  351              	.L10:
  352 005e 00BF     		.align	2
  353              	.L9:
-ARM GAS  /tmp/cc4p3ByD.s 			page 10
-
-
  354 0060 00140040 		.word	1073746944
  355              		.cfi_endproc
  356              	.LFE127:
@@ -550,213 +553,216 @@ ARM GAS  /tmp/cc4p3ByD.s 			page 1
  361              		.thumb
  362              		.thumb_func
  364              	USART_StartDMA_TX:
- 365              	.LFB136:
- 164:MyHardWare/Src/usart.c **** /**
- 165:MyHardWare/Src/usart.c ****  * @brief  使能 TIM7 中断
- 166:MyHardWare/Src/usart.c ****  *         使能 TIM7 更新中断并开始计时
- 167:MyHardWare/Src/usart.c ****  */
- 168:MyHardWare/Src/usart.c **** static void TIM7_EnableIRQ(void) {
- 169:MyHardWare/Src/usart.c ****   TIM_ITConfig(TIM7, TIM_IT_Update, ENABLE);
- 170:MyHardWare/Src/usart.c ****   TIM_Cmd(TIM7, ENABLE);
- 171:MyHardWare/Src/usart.c **** }
- 172:MyHardWare/Src/usart.c **** 
- 173:MyHardWare/Src/usart.c **** /**
- 174:MyHardWare/Src/usart.c ****  * @brief  禁用 TIM7 中断
- 175:MyHardWare/Src/usart.c ****  *         禁用 TIM7 更新中断并停止计时
- 176:MyHardWare/Src/usart.c ****  */
- 177:MyHardWare/Src/usart.c **** static void TIM7_DisableIRQ(void) {
- 178:MyHardWare/Src/usart.c ****   TIM_ITConfig(TIM7, TIM_IT_Update, DISABLE);
- 179:MyHardWare/Src/usart.c ****   TIM_Cmd(TIM7, DISABLE);
- 180:MyHardWare/Src/usart.c **** }
- 181:MyHardWare/Src/usart.c **** 
- 182:MyHardWare/Src/usart.c **** /**
- 183:MyHardWare/Src/usart.c ****  * @brief  USART1 GPIO 引脚配置
- 184:MyHardWare/Src/usart.c ****  *         配置 PA9 为 TX，PA10 为 RX，复用模式，推挽输出，上拉输入
- 185:MyHardWare/Src/usart.c ****  */
- 186:MyHardWare/Src/usart.c **** void USART_GPIO_Config(void) {
- 187:MyHardWare/Src/usart.c ****   GPIO_InitTypeDef GPIO_InitStructure;
- 188:MyHardWare/Src/usart.c **** 
- 189:MyHardWare/Src/usart.c ****   // 使能 GPIOA 时钟
- 190:MyHardWare/Src/usart.c ****   RCC_AHB1PeriphClockCmd(USART1_TX_CLK | USART1_RX_CLK, ENABLE);
+ 365              	.LFB137:
+ 167:MyHardWare/Src/usart.c **** /**
+ 168:MyHardWare/Src/usart.c ****  * @brief  使能 TIM7 中断
+ 169:MyHardWare/Src/usart.c ****  *         使能 TIM7 更新中断并开始计时
+ 170:MyHardWare/Src/usart.c ****  */
+ 171:MyHardWare/Src/usart.c **** static void TIM7_EnableIRQ(void) {
+ 172:MyHardWare/Src/usart.c ****   TIM_ITConfig(TIM7, TIM_IT_Update, ENABLE);
+ 173:MyHardWare/Src/usart.c ****   TIM_Cmd(TIM7, ENABLE);
+ 174:MyHardWare/Src/usart.c **** }
+ 175:MyHardWare/Src/usart.c **** 
+ 176:MyHardWare/Src/usart.c **** /**
+ 177:MyHardWare/Src/usart.c ****  * @brief  禁用 TIM7 中断
+ 178:MyHardWare/Src/usart.c ****  *         禁用 TIM7 更新中断并停止计时
+ 179:MyHardWare/Src/usart.c ****  */
+ 180:MyHardWare/Src/usart.c **** static void TIM7_DisableIRQ(void) {
+ 181:MyHardWare/Src/usart.c ****   TIM_ITConfig(TIM7, TIM_IT_Update, DISABLE);
+ 182:MyHardWare/Src/usart.c ****   TIM_Cmd(TIM7, DISABLE);
+ 183:MyHardWare/Src/usart.c **** }
+ 184:MyHardWare/Src/usart.c **** 
+ 185:MyHardWare/Src/usart.c **** /**
+ 186:MyHardWare/Src/usart.c ****  * @brief  USART1 GPIO 引脚配置
+ 187:MyHardWare/Src/usart.c ****  *         配置 PA9 为 TX，PA10 为 RX，复用模式，推挽输出，上拉输入
+ 188:MyHardWare/Src/usart.c ****  */
+ 189:MyHardWare/Src/usart.c **** void USART_GPIO_Config(void) {
+ 190:MyHardWare/Src/usart.c ****   GPIO_InitTypeDef GPIO_InitStructure;
  191:MyHardWare/Src/usart.c **** 
- 192:MyHardWare/Src/usart.c ****   // IO 配置参数
- 193:MyHardWare/Src/usart.c ****   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;     // 复用模式
- 194:MyHardWare/Src/usart.c ****   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;   // 推挽输出
- 195:MyHardWare/Src/usart.c ****   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;     // 上拉输入
- 196:MyHardWare/Src/usart.c ****   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz; // 速度等级 2MHz
- 197:MyHardWare/Src/usart.c **** 
- 198:MyHardWare/Src/usart.c ****   // 初始化 TX 引脚 (PA9)
- 199:MyHardWare/Src/usart.c ****   GPIO_InitStructure.GPIO_Pin = USART1_TX_PIN;
- 200:MyHardWare/Src/usart.c ****   GPIO_Init(USART1_TX_PORT, &GPIO_InitStructure);
- 201:MyHardWare/Src/usart.c **** 
- 202:MyHardWare/Src/usart.c ****   // 初始化 RX 引脚 (PA10)
- 203:MyHardWare/Src/usart.c ****   GPIO_InitStructure.GPIO_Pin = USART1_RX_PIN;
- 204:MyHardWare/Src/usart.c ****   GPIO_Init(USART1_RX_PORT, &GPIO_InitStructure);
- 205:MyHardWare/Src/usart.c **** 
- 206:MyHardWare/Src/usart.c ****   // IO 复用，将 PA9/PA10 复用到 USART1
- 207:MyHardWare/Src/usart.c ****   GPIO_PinAFConfig(USART1_TX_PORT, USART1_TX_PinSource, GPIO_AF_USART1);
- 208:MyHardWare/Src/usart.c ****   GPIO_PinAFConfig(USART1_RX_PORT, USART1_RX_PinSource, GPIO_AF_USART1);
- 209:MyHardWare/Src/usart.c **** }
- 210:MyHardWare/Src/usart.c **** 
-ARM GAS  /tmp/cc4p3ByD.s 			page 11
+ 192:MyHardWare/Src/usart.c ****   // 使能 GPIOA 时钟
+ 193:MyHardWare/Src/usart.c ****   RCC_AHB1PeriphClockCmd(USART1_TX_CLK | USART1_RX_CLK, ENABLE);
+ 194:MyHardWare/Src/usart.c **** 
+ 195:MyHardWare/Src/usart.c ****   // IO 配置参数
+ 196:MyHardWare/Src/usart.c ****   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;     // 复用模式
+ 197:MyHardWare/Src/usart.c ****   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;   // 推挽输出
+ 198:MyHardWare/Src/usart.c ****   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;     // 上拉输入
+ 199:MyHardWare/Src/usart.c ****   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz; // 速度等级 2MHz
+ 200:MyHardWare/Src/usart.c **** 
+ 201:MyHardWare/Src/usart.c ****   // 初始化 TX 引脚 (PA9)
+ 202:MyHardWare/Src/usart.c ****   GPIO_InitStructure.GPIO_Pin = USART1_TX_PIN;
+ 203:MyHardWare/Src/usart.c ****   GPIO_Init(USART1_TX_PORT, &GPIO_InitStructure);
+ 204:MyHardWare/Src/usart.c **** 
+ 205:MyHardWare/Src/usart.c ****   // 初始化 RX 引脚 (PA10)
+ 206:MyHardWare/Src/usart.c ****   GPIO_InitStructure.GPIO_Pin = USART1_RX_PIN;
+ 207:MyHardWare/Src/usart.c ****   GPIO_Init(USART1_RX_PORT, &GPIO_InitStructure);
+ 208:MyHardWare/Src/usart.c **** 
+ 209:MyHardWare/Src/usart.c ****   // IO 复用，将 PA9/PA10 复用到 USART1
+ 210:MyHardWare/Src/usart.c ****   GPIO_PinAFConfig(USART1_TX_PORT, USART1_TX_PinSource, GPIO_AF_USART1);
+ARM GAS  /tmp/ccYmkDEK.s 			page 11
 
 
- 211:MyHardWare/Src/usart.c **** /**
- 212:MyHardWare/Src/usart.c ****  * @brief  USART1 串口参数配置
- 213:MyHardWare/Src/usart.c ****  *         波特率 115200，8 位数据位，1 位停止位，无校验，无硬件流控制
- 214:MyHardWare/Src/usart.c ****  */
- 215:MyHardWare/Src/usart.c **** void Usart_Config(void) {
- 216:MyHardWare/Src/usart.c ****   USART_InitTypeDef USART_InitStructure;
- 217:MyHardWare/Src/usart.c **** 
- 218:MyHardWare/Src/usart.c ****   // 使能 USART1 时钟
- 219:MyHardWare/Src/usart.c ****   RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
+ 211:MyHardWare/Src/usart.c ****   GPIO_PinAFConfig(USART1_RX_PORT, USART1_RX_PinSource, GPIO_AF_USART1);
+ 212:MyHardWare/Src/usart.c **** }
+ 213:MyHardWare/Src/usart.c **** 
+ 214:MyHardWare/Src/usart.c **** /**
+ 215:MyHardWare/Src/usart.c ****  * @brief  USART1 串口参数配置
+ 216:MyHardWare/Src/usart.c ****  *         波特率 115200，8 位数据位，1 位停止位，无校验，无硬件流控制
+ 217:MyHardWare/Src/usart.c ****  */
+ 218:MyHardWare/Src/usart.c **** void Usart_Config(void) {
+ 219:MyHardWare/Src/usart.c ****   USART_InitTypeDef USART_InitStructure;
  220:MyHardWare/Src/usart.c **** 
- 221:MyHardWare/Src/usart.c ****   // IO 口初始化
- 222:MyHardWare/Src/usart.c ****   USART_GPIO_Config();
+ 221:MyHardWare/Src/usart.c ****   // 使能 USART1 时钟
+ 222:MyHardWare/Src/usart.c ****   RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
  223:MyHardWare/Src/usart.c **** 
- 224:MyHardWare/Src/usart.c ****   // 配置串口各项参数
- 225:MyHardWare/Src/usart.c ****   USART_InitStructure.USART_BaudRate = USART1_BaudRate; // 波特率 115200
- 226:MyHardWare/Src/usart.c ****   USART_InitStructure.USART_WordLength = USART_WordLength_8b; // 数据位 8 位
- 227:MyHardWare/Src/usart.c ****   USART_InitStructure.USART_StopBits = USART_StopBits_1;      // 停止位 1 位
- 228:MyHardWare/Src/usart.c ****   USART_InitStructure.USART_Parity = USART_Parity_No;         // 无校验
- 229:MyHardWare/Src/usart.c ****   USART_InitStructure.USART_Mode =
- 230:MyHardWare/Src/usart.c ****       USART_Mode_Rx | USART_Mode_Tx; // 发送和接收模式
- 231:MyHardWare/Src/usart.c ****   USART_InitStructure.USART_HardwareFlowControl =
- 232:MyHardWare/Src/usart.c ****       USART_HardwareFlowControl_None; // 不使用硬件流控制
- 233:MyHardWare/Src/usart.c ****   // 配置 USART1 使用 DMA
- 234:MyHardWare/Src/usart.c ****   USART_DMACmd(USART1, USART_DMAReq_Tx, ENABLE);
- 235:MyHardWare/Src/usart.c ****   USART_DMACmd(USART1, USART_DMAReq_Rx, ENABLE);
- 236:MyHardWare/Src/usart.c **** 
- 237:MyHardWare/Src/usart.c ****   USART_Init(USART1, &USART_InitStructure); // 初始化串口 1
- 238:MyHardWare/Src/usart.c ****   USART_Cmd(USART1, ENABLE);                // 使能串口 1
- 239:MyHardWare/Src/usart.c **** }
- 240:MyHardWare/Src/usart.c **** 
- 241:MyHardWare/Src/usart.c **** /**
- 242:MyHardWare/Src/usart.c ****  * @brief  初始化 USART1 及 TIM7
- 243:MyHardWare/Src/usart.c ****  *         需要在 main 函数中调用此函数来完成 USART1 和 TIM7 的初始化
- 244:MyHardWare/Src/usart.c ****  *         包括：DMA 初始化、串口配置、TIM7 配置、启动 DMA 接收、使能 TIM7 �
- 245:MyHardWare/Src/usart.c ****  */
- 246:MyHardWare/Src/usart.c **** void USART1_Init(void) {
- 247:MyHardWare/Src/usart.c ****   // 初始化发送和接收环形缓冲区
- 248:MyHardWare/Src/usart.c ****   RingBuffer_Init(&tx_queue, dma_tx_buffer, USART_DMA_TX_BUFFER_SIZE);
- 249:MyHardWare/Src/usart.c ****   RingBuffer_Init(&rx_queue, dma_rx_buffer, USART_DMA_RX_BUFFER_SIZE);
- 250:MyHardWare/Src/usart.c **** 
- 251:MyHardWare/Src/usart.c ****   // 初始化 USART1 DMA
- 252:MyHardWare/Src/usart.c ****   USART1_DMA_Init();
+ 224:MyHardWare/Src/usart.c ****   // IO 口初始化
+ 225:MyHardWare/Src/usart.c ****   USART_GPIO_Config();
+ 226:MyHardWare/Src/usart.c **** 
+ 227:MyHardWare/Src/usart.c ****   // 配置串口各项参数
+ 228:MyHardWare/Src/usart.c ****   USART_InitStructure.USART_BaudRate = USART1_BaudRate; // 波特率 115200
+ 229:MyHardWare/Src/usart.c ****   USART_InitStructure.USART_WordLength = USART_WordLength_8b; // 数据位 8 位
+ 230:MyHardWare/Src/usart.c ****   USART_InitStructure.USART_StopBits = USART_StopBits_1;      // 停止位 1 位
+ 231:MyHardWare/Src/usart.c ****   USART_InitStructure.USART_Parity = USART_Parity_No;         // 无校验
+ 232:MyHardWare/Src/usart.c ****   USART_InitStructure.USART_Mode =
+ 233:MyHardWare/Src/usart.c ****       USART_Mode_Rx | USART_Mode_Tx; // 发送和接收模式
+ 234:MyHardWare/Src/usart.c ****   USART_InitStructure.USART_HardwareFlowControl =
+ 235:MyHardWare/Src/usart.c ****       USART_HardwareFlowControl_None; // 不使用硬件流控制
+ 236:MyHardWare/Src/usart.c ****   // 配置 USART1 使用 DMA
+ 237:MyHardWare/Src/usart.c ****   USART_DMACmd(USART1, USART_DMAReq_Tx, ENABLE);
+ 238:MyHardWare/Src/usart.c ****   USART_DMACmd(USART1, USART_DMAReq_Rx, ENABLE);
+ 239:MyHardWare/Src/usart.c **** 
+ 240:MyHardWare/Src/usart.c ****   USART_Init(USART1, &USART_InitStructure); // 初始化串口 1
+ 241:MyHardWare/Src/usart.c ****   USART_Cmd(USART1, ENABLE);                // 使能串口 1
+ 242:MyHardWare/Src/usart.c **** }
+ 243:MyHardWare/Src/usart.c **** 
+ 244:MyHardWare/Src/usart.c **** /**
+ 245:MyHardWare/Src/usart.c ****  * @brief  初始化 USART1 及 TIM7
+ 246:MyHardWare/Src/usart.c ****  *         需要在 main 函数中调用此函数来完成 USART1 和 TIM7 的初始化
+ 247:MyHardWare/Src/usart.c ****  *         包括：DMA 初始化、串口配置、TIM7 配置、启动 DMA 接收、使能 TIM7 �
+ 248:MyHardWare/Src/usart.c ****  */
+ 249:MyHardWare/Src/usart.c **** void USART1_Init(void) {
+ 250:MyHardWare/Src/usart.c ****   // 初始化发送和接收环形缓冲区
+ 251:MyHardWare/Src/usart.c ****   RingBuffer_Init(&tx_queue, dma_tx_buffer, USART_DMA_TX_BUFFER_SIZE);
+ 252:MyHardWare/Src/usart.c ****   RingBuffer_Init(&rx_queue, dma_rx_buffer, USART_DMA_RX_BUFFER_SIZE);
  253:MyHardWare/Src/usart.c **** 
- 254:MyHardWare/Src/usart.c ****   // 配置 USART1 串口参数和 GPIO
- 255:MyHardWare/Src/usart.c ****   Usart_Config();
+ 254:MyHardWare/Src/usart.c ****   // 初始化 USART1 DMA
+ 255:MyHardWare/Src/usart.c ****   USART1_DMA_Init();
  256:MyHardWare/Src/usart.c **** 
- 257:MyHardWare/Src/usart.c ****   // 配置 TIM7 定时器，100us 定时中断
- 258:MyHardWare/Src/usart.c ****   TIM7_Config();
+ 257:MyHardWare/Src/usart.c ****   // 配置 USART1 串口参数和 GPIO
+ 258:MyHardWare/Src/usart.c ****   Usart_Config();
  259:MyHardWare/Src/usart.c **** 
- 260:MyHardWare/Src/usart.c ****   // 启动 DMA 接收
- 261:MyHardWare/Src/usart.c ****   UART1_DMA_Start_RX();
+ 260:MyHardWare/Src/usart.c ****   // 配置 TIM7 定时器，100us 定时中断
+ 261:MyHardWare/Src/usart.c ****   TIM7_Config();
  262:MyHardWare/Src/usart.c **** 
- 263:MyHardWare/Src/usart.c ****   // 使能 TIM7 中断，开始定期检查环形缓冲队列
- 264:MyHardWare/Src/usart.c ****   // TIM7_EnableIRQ();
- 265:MyHardWare/Src/usart.c **** }
- 266:MyHardWare/Src/usart.c **** 
- 267:MyHardWare/Src/usart.c **** /**
-ARM GAS  /tmp/cc4p3ByD.s 			page 12
+ 263:MyHardWare/Src/usart.c ****   // 启动 DMA 接收
+ 264:MyHardWare/Src/usart.c ****   UART1_DMA_Start_RX();
+ 265:MyHardWare/Src/usart.c **** 
+ 266:MyHardWare/Src/usart.c ****   // 使能 TIM7 中断，开始定期检查环形缓冲队列
+ 267:MyHardWare/Src/usart.c ****   // TIM7_EnableIRQ();
+ARM GAS  /tmp/ccYmkDEK.s 			page 12
 
 
- 268:MyHardWare/Src/usart.c ****  * @brief  UART1 发送一个字节（轮询方式）
- 269:MyHardWare/Src/usart.c ****  * @param  data: 要发送的数据
- 270:MyHardWare/Src/usart.c ****  * @retval None
- 271:MyHardWare/Src/usart.c ****  */
- 272:MyHardWare/Src/usart.c **** void UART1_SendByte(uint8_t data) {
- 273:MyHardWare/Src/usart.c ****   /* 等待发送缓冲区为空 */
- 274:MyHardWare/Src/usart.c ****   while (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET)
- 275:MyHardWare/Src/usart.c ****     ;
- 276:MyHardWare/Src/usart.c **** 
- 277:MyHardWare/Src/usart.c ****   /* 强制转换为 16 位并发送数据，确保正确的数据位传输 */
- 278:MyHardWare/Src/usart.c ****   USART_SendData(USART1, (uint16_t)data);
- 279:MyHardWare/Src/usart.c **** }
- 280:MyHardWare/Src/usart.c **** 
- 281:MyHardWare/Src/usart.c **** /**
- 282:MyHardWare/Src/usart.c ****  * @brief  重定义 fputc 函数，支持 printf 打印
- 283:MyHardWare/Src/usart.c ****  *         通过环形缓冲区 + DMA 方式发送字符，无需 CPU 等待
- 284:MyHardWare/Src/usart.c ****  * @param  ch: 要发送的字符
- 285:MyHardWare/Src/usart.c ****  * @retval 返回发送的字符
- 286:MyHardWare/Src/usart.c ****  */
- 287:MyHardWare/Src/usart.c **** /* 
- 288:MyHardWare/Src/usart.c **** int __io_putchar(int ch) {
- 289:MyHardWare/Src/usart.c ****   // 尝试将数据写入环形缓冲区
- 290:MyHardWare/Src/usart.c ****   while (RingBuffer_Push(&tx_queue, (uint8_t)ch) == 0) {
- 291:MyHardWare/Src/usart.c ****     // 缓冲区满，等待有空闲空间
- 292:MyHardWare/Src/usart.c ****     // RingBuffer_Push 会在有空间时自动写入并返回 1
- 293:MyHardWare/Src/usart.c ****   }
- 294:MyHardWare/Src/usart.c **** 
- 295:MyHardWare/Src/usart.c ****   // 如果 DMA 未在工作，触发 TIM7 中断来启动 DMA 传输
- 296:MyHardWare/Src/usart.c ****   if (!tx_queue.is_dma_enabled && !RingBuffer_IsEmpty(&tx_queue)) {
- 297:MyHardWare/Src/usart.c ****     // 手动触发一次 TIM7 中断检查
- 298:MyHardWare/Src/usart.c ****     TIM7_EnableIRQ();
- 299:MyHardWare/Src/usart.c ****   }
- 300:MyHardWare/Src/usart.c **** 
- 301:MyHardWare/Src/usart.c ****   return (ch);
- 302:MyHardWare/Src/usart.c **** }
- 303:MyHardWare/Src/usart.c ****  */
- 304:MyHardWare/Src/usart.c **** 
- 305:MyHardWare/Src/usart.c **** /**
- 306:MyHardWare/Src/usart.c ****  * @brief  UART1 发送多个 16 位数据（轮询方式）
- 307:MyHardWare/Src/usart.c ****  *         每个 16 位数据先发送高字节，再发送低字节
- 308:MyHardWare/Src/usart.c ****  * @param  buffer: 16 位数据缓冲区指针
- 309:MyHardWare/Src/usart.c ****  * @param  size: 数据个数
- 310:MyHardWare/Src/usart.c ****  */
- 311:MyHardWare/Src/usart.c **** void UART1_SendData(uint16_t *buffer, uint16_t size) {
- 312:MyHardWare/Src/usart.c ****   for (uint16_t i = 0; i < size; i++) {
- 313:MyHardWare/Src/usart.c ****     uint16_t data = buffer[i]; // 获取当前 16 位数据
- 314:MyHardWare/Src/usart.c **** 
- 315:MyHardWare/Src/usart.c ****     // 发送高字节（高位在前）
- 316:MyHardWare/Src/usart.c ****     USART_SendData(USART1, (data >> 8) & 0xFF);
- 317:MyHardWare/Src/usart.c ****     while (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET)
- 318:MyHardWare/Src/usart.c ****       ; // 等待发送完成
- 319:MyHardWare/Src/usart.c **** 
- 320:MyHardWare/Src/usart.c ****     // 发送低字节
- 321:MyHardWare/Src/usart.c ****     USART_SendData(USART1, data & 0xFF);
- 322:MyHardWare/Src/usart.c ****     while (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET)
- 323:MyHardWare/Src/usart.c ****       ; // 等待发送完成
- 324:MyHardWare/Src/usart.c ****   }
-ARM GAS  /tmp/cc4p3ByD.s 			page 13
+ 268:MyHardWare/Src/usart.c **** }
+ 269:MyHardWare/Src/usart.c **** 
+ 270:MyHardWare/Src/usart.c **** /**
+ 271:MyHardWare/Src/usart.c ****  * @brief  UART1 发送一个字节（轮询方式）
+ 272:MyHardWare/Src/usart.c ****  * @param  data: 要发送的数据
+ 273:MyHardWare/Src/usart.c ****  * @retval None
+ 274:MyHardWare/Src/usart.c ****  */
+ 275:MyHardWare/Src/usart.c **** void UART1_SendByte(uint8_t data) {
+ 276:MyHardWare/Src/usart.c ****   /* 等待发送缓冲区为空 */
+ 277:MyHardWare/Src/usart.c ****   while (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET)
+ 278:MyHardWare/Src/usart.c ****     ;
+ 279:MyHardWare/Src/usart.c **** 
+ 280:MyHardWare/Src/usart.c ****   /* 强制转换为 16 位并发送数据，确保正确的数据位传输 */
+ 281:MyHardWare/Src/usart.c ****   USART_SendData(USART1, (uint16_t)data);
+ 282:MyHardWare/Src/usart.c **** }
+ 283:MyHardWare/Src/usart.c **** 
+ 284:MyHardWare/Src/usart.c **** /**
+ 285:MyHardWare/Src/usart.c ****  * @brief  重定义 fputc 函数，支持 printf 打印
+ 286:MyHardWare/Src/usart.c ****  *         通过环形缓冲区 + DMA 方式发送字符，无需 CPU 等待
+ 287:MyHardWare/Src/usart.c ****  * @param  ch: 要发送的字符
+ 288:MyHardWare/Src/usart.c ****  * @retval 返回发送的字符
+ 289:MyHardWare/Src/usart.c ****  */
+ 290:MyHardWare/Src/usart.c **** /**/
+ 291:MyHardWare/Src/usart.c **** int __io_putchar(int ch) {
+ 292:MyHardWare/Src/usart.c ****   // 尝试将数据写入环形缓冲区
+ 293:MyHardWare/Src/usart.c ****   uint16_t count = 0;
+ 294:MyHardWare/Src/usart.c ****   while (RingBuffer_Push(&tx_queue, (uint8_t)ch) == 0) {
+ 295:MyHardWare/Src/usart.c ****     // 缓冲区满，等待有空闲空间
+ 296:MyHardWare/Src/usart.c ****     delay_us(1); // 等待 100 微秒
+ 297:MyHardWare/Src/usart.c ****     if ((count++) >= 1000) {
+ 298:MyHardWare/Src/usart.c ****       break; // 等待超过 1ms，放弃发送
+ 299:MyHardWare/Src/usart.c ****     }
+ 300:MyHardWare/Src/usart.c ****     // RingBuffer_Push 会在有空间时自动写入并返回 1
+ 301:MyHardWare/Src/usart.c ****   }
+ 302:MyHardWare/Src/usart.c **** 
+ 303:MyHardWare/Src/usart.c ****   // 如果 DMA 未在工作，触发 TIM7 中断来启动 DMA 传输
+ 304:MyHardWare/Src/usart.c ****   if (!tx_queue.is_dma_enabled && !RingBuffer_IsEmpty(&tx_queue)) {
+ 305:MyHardWare/Src/usart.c ****     USART_StartDMA_TX();
+ 306:MyHardWare/Src/usart.c ****   }
+ 307:MyHardWare/Src/usart.c **** 
+ 308:MyHardWare/Src/usart.c ****   return (ch);
+ 309:MyHardWare/Src/usart.c **** }
+ 310:MyHardWare/Src/usart.c **** 
+ 311:MyHardWare/Src/usart.c **** /**
+ 312:MyHardWare/Src/usart.c ****  * @brief  UART1 发送多个 16 位数据（轮询方式）
+ 313:MyHardWare/Src/usart.c ****  *         每个 16 位数据先发送高字节，再发送低字节
+ 314:MyHardWare/Src/usart.c ****  * @param  buffer: 16 位数据缓冲区指针
+ 315:MyHardWare/Src/usart.c ****  * @param  size: 数据个数
+ 316:MyHardWare/Src/usart.c ****  */
+ 317:MyHardWare/Src/usart.c **** void UART1_SendData(uint16_t *buffer, uint16_t size) {
+ 318:MyHardWare/Src/usart.c ****   for (uint16_t i = 0; i < size; i++) {
+ 319:MyHardWare/Src/usart.c ****     uint16_t data = buffer[i]; // 获取当前 16 位数据
+ 320:MyHardWare/Src/usart.c **** 
+ 321:MyHardWare/Src/usart.c ****     // 发送高字节（高位在前）
+ 322:MyHardWare/Src/usart.c ****     USART_SendData(USART1, (data >> 8) & 0xFF);
+ 323:MyHardWare/Src/usart.c ****     while (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET)
+ 324:MyHardWare/Src/usart.c ****       ; // 等待发送完成
+ARM GAS  /tmp/ccYmkDEK.s 			page 13
 
 
- 325:MyHardWare/Src/usart.c **** }
- 326:MyHardWare/Src/usart.c **** 
- 327:MyHardWare/Src/usart.c **** /**
- 328:MyHardWare/Src/usart.c ****  * @brief  启动 UART1 DMA 接收
- 329:MyHardWare/Src/usart.c ****  *         配置 DMA2 Stream5 将 USART1 DR 寄存器的数据传输到 rx_queue 缓冲区
- 330:MyHardWare/Src/usart.c ****  */
- 331:MyHardWare/Src/usart.c **** void UART1_DMA_Start_RX(void) {
- 332:MyHardWare/Src/usart.c ****   DMA2_Stream5->M0AR = (uint32_t)rx_queue.buffer;
- 333:MyHardWare/Src/usart.c ****   DMA2_Stream5->NDTR = rx_queue.size;
- 334:MyHardWare/Src/usart.c ****   DMA_Cmd(DMA2_Stream5, ENABLE);
- 335:MyHardWare/Src/usart.c ****   rx_queue.is_dma_enabled = 1;
- 336:MyHardWare/Src/usart.c **** }
- 337:MyHardWare/Src/usart.c **** 
- 338:MyHardWare/Src/usart.c **** /**
- 339:MyHardWare/Src/usart.c ****  * @brief  启动 USART DMA 发送
- 340:MyHardWare/Src/usart.c ****  *         从 tx_queue 中读取数据，通过 DMA2 Stream7 发送到 USART1
- 341:MyHardWare/Src/usart.c ****  *         自动计算连续可读数据长度，支持环形缓冲区的循环特性
- 342:MyHardWare/Src/usart.c ****  */
- 343:MyHardWare/Src/usart.c **** static void USART_StartDMA_TX(void) {
- 366              		.loc 1 343 37 is_stmt 1 view -0
+ 325:MyHardWare/Src/usart.c **** 
+ 326:MyHardWare/Src/usart.c ****     // 发送低字节
+ 327:MyHardWare/Src/usart.c ****     USART_SendData(USART1, data & 0xFF);
+ 328:MyHardWare/Src/usart.c ****     while (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET)
+ 329:MyHardWare/Src/usart.c ****       ; // 等待发送完成
+ 330:MyHardWare/Src/usart.c ****   }
+ 331:MyHardWare/Src/usart.c **** }
+ 332:MyHardWare/Src/usart.c **** 
+ 333:MyHardWare/Src/usart.c **** /**
+ 334:MyHardWare/Src/usart.c ****  * @brief  启动 UART1 DMA 接收
+ 335:MyHardWare/Src/usart.c ****  *         配置 DMA2 Stream5 将 USART1 DR 寄存器的数据传输到 rx_queue 缓冲区
+ 336:MyHardWare/Src/usart.c ****  */
+ 337:MyHardWare/Src/usart.c **** void UART1_DMA_Start_RX(void) {
+ 338:MyHardWare/Src/usart.c ****   DMA2_Stream2->M0AR = (uint32_t)rx_queue.buffer;
+ 339:MyHardWare/Src/usart.c ****   DMA2_Stream2->NDTR = rx_queue.size;
+ 340:MyHardWare/Src/usart.c ****   DMA_Cmd(DMA2_Stream2, ENABLE);
+ 341:MyHardWare/Src/usart.c ****   rx_queue.is_dma_enabled = 1;
+ 342:MyHardWare/Src/usart.c **** }
+ 343:MyHardWare/Src/usart.c **** 
+ 344:MyHardWare/Src/usart.c **** /**
+ 345:MyHardWare/Src/usart.c ****  * @brief  启动 USART DMA 发送
+ 346:MyHardWare/Src/usart.c ****  *         从 tx_queue 中读取数据，通过 DMA2 Stream7 发送到 USART1
+ 347:MyHardWare/Src/usart.c ****  *         自动计算连续可读数据长度，支持环形缓冲区的循环特性
+ 348:MyHardWare/Src/usart.c ****  */
+ 349:MyHardWare/Src/usart.c **** static void USART_StartDMA_TX(void) {
+ 366              		.loc 1 349 37 is_stmt 1 view -0
  367              		.cfi_startproc
  368              		@ args = 0, pretend = 0, frame = 0
  369              		@ frame_needed = 0, uses_anonymous_args = 0
- 344:MyHardWare/Src/usart.c ****   // 如果队列为空，不启动 DMA
- 345:MyHardWare/Src/usart.c ****   if (tx_queue.head == tx_queue.tail) {
- 370              		.loc 1 345 3 view .LVU125
- 371              		.loc 1 345 15 is_stmt 0 view .LVU126
+ 350:MyHardWare/Src/usart.c ****   // 如果队列为空，不启动 DMA
+ 351:MyHardWare/Src/usart.c ****   if (tx_queue.head == tx_queue.tail) {
+ 370              		.loc 1 351 3 view .LVU125
+ 371              		.loc 1 351 15 is_stmt 0 view .LVU126
  372 0000 114B     		ldr	r3, .L19
  373 0002 D988     		ldrh	r1, [r3, #6]
- 374              		.loc 1 345 32 view .LVU127
+ 374              		.loc 1 351 32 view .LVU127
  375 0004 1B89     		ldrh	r3, [r3, #8]
- 376              		.loc 1 345 6 view .LVU128
+ 376              		.loc 1 351 6 view .LVU128
  377 0006 9942     		cmp	r1, r3
  378 0008 1CD0     		beq	.L16
- 343:MyHardWare/Src/usart.c ****   // 如果队列为空，不启动 DMA
- 379              		.loc 1 343 37 view .LVU129
+ 349:MyHardWare/Src/usart.c ****   // 如果队列为空，不启动 DMA
+ 379              		.loc 1 349 37 view .LVU129
  380 000a 70B5     		push	{r4, r5, r6, lr}
  381              	.LCFI6:
  382              		.cfi_def_cfa_offset 16
@@ -764,91 +770,91 @@ ARM GAS  /tmp/cc4p3ByD.s 			page 1
  384              		.cfi_offset 5, -12
  385              		.cfi_offset 6, -8
  386              		.cfi_offset 14, -4
- 346:MyHardWare/Src/usart.c ****     return;
- 347:MyHardWare/Src/usart.c ****   }
- 348:MyHardWare/Src/usart.c **** 
- 349:MyHardWare/Src/usart.c ****   uint16_t data_count;
- 387              		.loc 1 349 3 is_stmt 1 view .LVU130
- 350:MyHardWare/Src/usart.c ****   // 计算从 tail 到 head 的连续可读数据长度
- 351:MyHardWare/Src/usart.c ****   if (tx_queue.head > tx_queue.tail) {
- 388              		.loc 1 351 3 view .LVU131
- 389              		.loc 1 351 6 is_stmt 0 view .LVU132
+ 352:MyHardWare/Src/usart.c ****     return;
+ 353:MyHardWare/Src/usart.c ****   }
+ 354:MyHardWare/Src/usart.c **** 
+ 355:MyHardWare/Src/usart.c ****   uint16_t data_count;
+ 387              		.loc 1 355 3 is_stmt 1 view .LVU130
+ 356:MyHardWare/Src/usart.c ****   // 计算从 tail 到 head 的连续可读数据长度
+ 357:MyHardWare/Src/usart.c ****   if (tx_queue.head > tx_queue.tail) {
+ 388              		.loc 1 357 3 view .LVU131
+ARM GAS  /tmp/ccYmkDEK.s 			page 14
+
+
+ 389              		.loc 1 357 6 is_stmt 0 view .LVU132
  390 000c 15D9     		bls	.L13
- 352:MyHardWare/Src/usart.c ****     // 情况 1：数据未跨越末尾，直接传输 tail 到 head
- 353:MyHardWare/Src/usart.c ****     data_count = tx_queue.head - tx_queue.tail;
- 391              		.loc 1 353 5 is_stmt 1 view .LVU133
- 392              		.loc 1 353 16 is_stmt 0 view .LVU134
-ARM GAS  /tmp/cc4p3ByD.s 			page 14
-
-
+ 358:MyHardWare/Src/usart.c ****     // 情况 1：数据未跨越末尾，直接传输 tail 到 head
+ 359:MyHardWare/Src/usart.c ****     data_count = tx_queue.head - tx_queue.tail;
+ 391              		.loc 1 359 5 is_stmt 1 view .LVU133
+ 392              		.loc 1 359 16 is_stmt 0 view .LVU134
  393 000e C91A     		subs	r1, r1, r3
  394 0010 8CB2     		uxth	r4, r1
  395              	.LVL18:
  396              	.L14:
- 354:MyHardWare/Src/usart.c ****   } else {
- 355:MyHardWare/Src/usart.c ****     // 情况 2：数据跨越末尾，只传输从 tail 到缓冲区末尾的部分
- 356:MyHardWare/Src/usart.c ****     // 这是 DMA 能安全访问的连续内存区域
- 357:MyHardWare/Src/usart.c ****     data_count = tx_queue.size - tx_queue.tail;
- 358:MyHardWare/Src/usart.c ****   }
- 359:MyHardWare/Src/usart.c **** 
- 360:MyHardWare/Src/usart.c ****   // 配置 DMA 源地址和数据长度
- 361:MyHardWare/Src/usart.c ****   DMA2_Stream7->M0AR = (uint32_t)&tx_queue.buffer[tx_queue.tail];
- 397              		.loc 1 361 3 is_stmt 1 view .LVU135
- 398              		.loc 1 361 43 is_stmt 0 view .LVU136
+ 360:MyHardWare/Src/usart.c ****   } else {
+ 361:MyHardWare/Src/usart.c ****     // 情况 2：数据跨越末尾，只传输从 tail 到缓冲区末尾的部分
+ 362:MyHardWare/Src/usart.c ****     // 这是 DMA 能安全访问的连续内存区域
+ 363:MyHardWare/Src/usart.c ****     data_count = tx_queue.size - tx_queue.tail;
+ 364:MyHardWare/Src/usart.c ****   }
+ 365:MyHardWare/Src/usart.c **** 
+ 366:MyHardWare/Src/usart.c ****   // 配置 DMA 源地址和数据长度
+ 367:MyHardWare/Src/usart.c ****   DMA2_Stream7->M0AR = (uint32_t)&tx_queue.buffer[tx_queue.tail];
+ 397              		.loc 1 367 3 is_stmt 1 view .LVU135
+ 398              		.loc 1 367 43 is_stmt 0 view .LVU136
  399 0012 0D4D     		ldr	r5, .L19
  400 0014 2A68     		ldr	r2, [r5]
- 401              		.loc 1 361 34 view .LVU137
+ 401              		.loc 1 367 34 view .LVU137
  402 0016 1A44     		add	r2, r2, r3
- 403              		.loc 1 361 22 view .LVU138
+ 403              		.loc 1 367 22 view .LVU138
  404 0018 0C4B     		ldr	r3, .L19+4
  405 001a C3F8C420 		str	r2, [r3, #196]
- 362:MyHardWare/Src/usart.c ****   DMA_SetCurrDataCounter(DMA2_Stream7, data_count);
- 406              		.loc 1 362 3 is_stmt 1 view .LVU139
+ 368:MyHardWare/Src/usart.c ****   DMA_SetCurrDataCounter(DMA2_Stream7, data_count);
+ 406              		.loc 1 368 3 is_stmt 1 view .LVU139
  407 001e 0C4E     		ldr	r6, .L19+8
  408 0020 2146     		mov	r1, r4
  409 0022 3046     		mov	r0, r6
  410 0024 FFF7FEFF 		bl	DMA_SetCurrDataCounter
  411              	.LVL19:
- 363:MyHardWare/Src/usart.c **** 
- 364:MyHardWare/Src/usart.c ****   // 保存本次 DMA 传输的数据量，用于中断中计算
- 365:MyHardWare/Src/usart.c ****   last_dma_tx_count = data_count;
- 412              		.loc 1 365 3 view .LVU140
- 413              		.loc 1 365 21 is_stmt 0 view .LVU141
+ 369:MyHardWare/Src/usart.c **** 
+ 370:MyHardWare/Src/usart.c ****   // 保存本次 DMA 传输的数据量，用于中断中计算
+ 371:MyHardWare/Src/usart.c ****   last_dma_tx_count = data_count;
+ 412              		.loc 1 371 3 view .LVU140
+ 413              		.loc 1 371 21 is_stmt 0 view .LVU141
  414 0028 0A4B     		ldr	r3, .L19+12
  415 002a 1C80     		strh	r4, [r3]	@ movhi
- 366:MyHardWare/Src/usart.c **** 
- 367:MyHardWare/Src/usart.c ****   DMA_Cmd(DMA2_Stream7, ENABLE);
- 416              		.loc 1 367 3 is_stmt 1 view .LVU142
+ 372:MyHardWare/Src/usart.c **** 
+ 373:MyHardWare/Src/usart.c ****   DMA_Cmd(DMA2_Stream7, ENABLE);
+ 416              		.loc 1 373 3 is_stmt 1 view .LVU142
  417 002c 0121     		movs	r1, #1
  418 002e 3046     		mov	r0, r6
  419 0030 FFF7FEFF 		bl	DMA_Cmd
  420              	.LVL20:
- 368:MyHardWare/Src/usart.c ****   tx_queue.is_dma_enabled = 1;
- 421              		.loc 1 368 3 view .LVU143
- 422              		.loc 1 368 27 is_stmt 0 view .LVU144
+ 374:MyHardWare/Src/usart.c ****   tx_queue.is_dma_enabled = 1;
+ 421              		.loc 1 374 3 view .LVU143
+ 422              		.loc 1 374 27 is_stmt 0 view .LVU144
  423 0034 0123     		movs	r3, #1
  424 0036 AB72     		strb	r3, [r5, #10]
- 369:MyHardWare/Src/usart.c **** }
- 425              		.loc 1 369 1 view .LVU145
+ 375:MyHardWare/Src/usart.c **** }
+ 425              		.loc 1 375 1 view .LVU145
  426 0038 70BD     		pop	{r4, r5, r6, pc}
  427              	.LVL21:
+ARM GAS  /tmp/ccYmkDEK.s 			page 15
+
+
  428              	.L13:
- 357:MyHardWare/Src/usart.c ****   }
- 429              		.loc 1 357 5 is_stmt 1 view .LVU146
- 357:MyHardWare/Src/usart.c ****   }
- 430              		.loc 1 357 26 is_stmt 0 view .LVU147
+ 363:MyHardWare/Src/usart.c ****   }
+ 429              		.loc 1 363 5 is_stmt 1 view .LVU146
+ 363:MyHardWare/Src/usart.c ****   }
+ 430              		.loc 1 363 26 is_stmt 0 view .LVU147
  431 003a 034A     		ldr	r2, .L19
-ARM GAS  /tmp/cc4p3ByD.s 			page 15
-
-
  432 003c 9488     		ldrh	r4, [r2, #4]
- 357:MyHardWare/Src/usart.c ****   }
- 433              		.loc 1 357 16 view .LVU148
+ 363:MyHardWare/Src/usart.c ****   }
+ 433              		.loc 1 363 16 view .LVU148
  434 003e E41A     		subs	r4, r4, r3
  435 0040 A4B2     		uxth	r4, r4
  436              	.LVL22:
- 357:MyHardWare/Src/usart.c ****   }
- 437              		.loc 1 357 16 view .LVU149
+ 363:MyHardWare/Src/usart.c ****   }
+ 437              		.loc 1 363 16 view .LVU149
  438 0042 E6E7     		b	.L14
  439              	.LVL23:
  440              	.L16:
@@ -858,8 +864,8 @@ ARM GAS  /tmp/cc4p3ByD.s 			page 1
  444              		.cfi_restore 5
  445              		.cfi_restore 6
  446              		.cfi_restore 14
- 357:MyHardWare/Src/usart.c ****   }
- 447              		.loc 1 357 16 view .LVU150
+ 363:MyHardWare/Src/usart.c ****   }
+ 447              		.loc 1 363 16 view .LVU150
  448 0044 7047     		bx	lr
  449              	.L20:
  450 0046 00BF     		.align	2
@@ -869,7 +875,7 @@ ARM GAS  /tmp/cc4p3ByD.s 			page 1
  454 0050 B8640240 		.word	1073898680
  455 0054 00000000 		.word	last_dma_tx_count
  456              		.cfi_endproc
- 457              	.LFE136:
+ 457              	.LFE137:
  459              		.section	.text.TIM7_DisableIRQ,"ax",%progbits
  460              		.align	1
  461              		.syntax unified
@@ -877,8 +883,8 @@ ARM GAS  /tmp/cc4p3ByD.s 			page 1
  463              		.thumb_func
  465              	TIM7_DisableIRQ:
  466              	.LFB129:
- 177:MyHardWare/Src/usart.c ****   TIM_ITConfig(TIM7, TIM_IT_Update, DISABLE);
- 467              		.loc 1 177 35 is_stmt 1 view -0
+ 180:MyHardWare/Src/usart.c ****   TIM_ITConfig(TIM7, TIM_IT_Update, DISABLE);
+ 467              		.loc 1 180 35 is_stmt 1 view -0
  468              		.cfi_startproc
  469              		@ args = 0, pretend = 0, frame = 0
  470              		@ frame_needed = 0, uses_anonymous_args = 0
@@ -887,25 +893,25 @@ ARM GAS  /tmp/cc4p3ByD.s 			page 1
  473              		.cfi_def_cfa_offset 8
  474              		.cfi_offset 4, -8
  475              		.cfi_offset 14, -4
- 178:MyHardWare/Src/usart.c ****   TIM_Cmd(TIM7, DISABLE);
- 476              		.loc 1 178 3 view .LVU152
+ 181:MyHardWare/Src/usart.c ****   TIM_Cmd(TIM7, DISABLE);
+ 476              		.loc 1 181 3 view .LVU152
  477 0002 054C     		ldr	r4, .L23
  478 0004 0022     		movs	r2, #0
  479 0006 0121     		movs	r1, #1
+ARM GAS  /tmp/ccYmkDEK.s 			page 16
+
+
  480 0008 2046     		mov	r0, r4
  481 000a FFF7FEFF 		bl	TIM_ITConfig
  482              	.LVL24:
- 179:MyHardWare/Src/usart.c **** }
- 483              		.loc 1 179 3 view .LVU153
+ 182:MyHardWare/Src/usart.c **** }
+ 483              		.loc 1 182 3 view .LVU153
  484 000e 0021     		movs	r1, #0
-ARM GAS  /tmp/cc4p3ByD.s 			page 16
-
-
  485 0010 2046     		mov	r0, r4
  486 0012 FFF7FEFF 		bl	TIM_Cmd
  487              	.LVL25:
- 180:MyHardWare/Src/usart.c **** 
- 488              		.loc 1 180 1 is_stmt 0 view .LVU154
+ 183:MyHardWare/Src/usart.c **** 
+ 488              		.loc 1 183 1 is_stmt 0 view .LVU154
  489 0016 10BD     		pop	{r4, pc}
  490              	.L24:
  491              		.align	2
@@ -913,1064 +919,1125 @@ ARM GAS  /tmp/cc4p3ByD.s 			page 1
  493 0018 00140040 		.word	1073746944
  494              		.cfi_endproc
  495              	.LFE129:
- 497              		.section	.text.TIM7_EnableIRQ,"ax",%progbits
+ 497              		.section	.text.USART_GPIO_Config,"ax",%progbits
  498              		.align	1
- 499              		.syntax unified
- 500              		.thumb
- 501              		.thumb_func
- 503              	TIM7_EnableIRQ:
- 504              	.LFB128:
- 168:MyHardWare/Src/usart.c ****   TIM_ITConfig(TIM7, TIM_IT_Update, ENABLE);
- 505              		.loc 1 168 34 is_stmt 1 view -0
- 506              		.cfi_startproc
- 507              		@ args = 0, pretend = 0, frame = 0
- 508              		@ frame_needed = 0, uses_anonymous_args = 0
- 509 0000 10B5     		push	{r4, lr}
- 510              	.LCFI9:
- 511              		.cfi_def_cfa_offset 8
- 512              		.cfi_offset 4, -8
- 513              		.cfi_offset 14, -4
- 169:MyHardWare/Src/usart.c ****   TIM_Cmd(TIM7, ENABLE);
- 514              		.loc 1 169 3 view .LVU156
- 515 0002 054C     		ldr	r4, .L27
- 516 0004 0122     		movs	r2, #1
- 517 0006 1146     		mov	r1, r2
- 518 0008 2046     		mov	r0, r4
- 519 000a FFF7FEFF 		bl	TIM_ITConfig
- 520              	.LVL26:
- 170:MyHardWare/Src/usart.c **** }
- 521              		.loc 1 170 3 view .LVU157
- 522 000e 0121     		movs	r1, #1
- 523 0010 2046     		mov	r0, r4
- 524 0012 FFF7FEFF 		bl	TIM_Cmd
- 525              	.LVL27:
- 171:MyHardWare/Src/usart.c **** 
- 526              		.loc 1 171 1 is_stmt 0 view .LVU158
- 527 0016 10BD     		pop	{r4, pc}
- 528              	.L28:
- 529              		.align	2
- 530              	.L27:
- 531 0018 00140040 		.word	1073746944
- 532              		.cfi_endproc
- 533              	.LFE128:
- 535              		.section	.text.USART_GPIO_Config,"ax",%progbits
- 536              		.align	1
- 537              		.global	USART_GPIO_Config
- 538              		.syntax unified
- 539              		.thumb
-ARM GAS  /tmp/cc4p3ByD.s 			page 17
-
-
- 540              		.thumb_func
- 542              	USART_GPIO_Config:
- 543              	.LFB130:
- 186:MyHardWare/Src/usart.c ****   GPIO_InitTypeDef GPIO_InitStructure;
- 544              		.loc 1 186 30 is_stmt 1 view -0
- 545              		.cfi_startproc
- 546              		@ args = 0, pretend = 0, frame = 8
- 547              		@ frame_needed = 0, uses_anonymous_args = 0
- 548 0000 10B5     		push	{r4, lr}
- 549              	.LCFI10:
- 550              		.cfi_def_cfa_offset 8
- 551              		.cfi_offset 4, -8
- 552              		.cfi_offset 14, -4
- 553 0002 82B0     		sub	sp, sp, #8
- 554              	.LCFI11:
- 555              		.cfi_def_cfa_offset 16
- 187:MyHardWare/Src/usart.c **** 
- 556              		.loc 1 187 3 view .LVU160
+ 499              		.global	USART_GPIO_Config
+ 500              		.syntax unified
+ 501              		.thumb
+ 502              		.thumb_func
+ 504              	USART_GPIO_Config:
+ 505              	.LFB130:
+ 189:MyHardWare/Src/usart.c ****   GPIO_InitTypeDef GPIO_InitStructure;
+ 506              		.loc 1 189 30 is_stmt 1 view -0
+ 507              		.cfi_startproc
+ 508              		@ args = 0, pretend = 0, frame = 8
+ 509              		@ frame_needed = 0, uses_anonymous_args = 0
+ 510 0000 10B5     		push	{r4, lr}
+ 511              	.LCFI9:
+ 512              		.cfi_def_cfa_offset 8
+ 513              		.cfi_offset 4, -8
+ 514              		.cfi_offset 14, -4
+ 515 0002 82B0     		sub	sp, sp, #8
+ 516              	.LCFI10:
+ 517              		.cfi_def_cfa_offset 16
  190:MyHardWare/Src/usart.c **** 
- 557              		.loc 1 190 3 view .LVU161
- 558 0004 0121     		movs	r1, #1
- 559 0006 0846     		mov	r0, r1
- 560 0008 FFF7FEFF 		bl	RCC_AHB1PeriphClockCmd
- 561              	.LVL28:
- 193:MyHardWare/Src/usart.c ****   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;   // 推挽输出
- 562              		.loc 1 193 3 view .LVU162
- 193:MyHardWare/Src/usart.c ****   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;   // 推挽输出
- 563              		.loc 1 193 32 is_stmt 0 view .LVU163
- 564 000c 0223     		movs	r3, #2
- 565 000e 8DF80430 		strb	r3, [sp, #4]
- 194:MyHardWare/Src/usart.c ****   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;     // 上拉输入
- 566              		.loc 1 194 3 is_stmt 1 view .LVU164
- 194:MyHardWare/Src/usart.c ****   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;     // 上拉输入
- 567              		.loc 1 194 33 is_stmt 0 view .LVU165
- 568 0012 0023     		movs	r3, #0
- 569 0014 8DF80630 		strb	r3, [sp, #6]
- 195:MyHardWare/Src/usart.c ****   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz; // 速度等级 2MHz
- 570              		.loc 1 195 3 is_stmt 1 view .LVU166
- 195:MyHardWare/Src/usart.c ****   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz; // 速度等级 2MHz
- 571              		.loc 1 195 32 is_stmt 0 view .LVU167
- 572 0018 0122     		movs	r2, #1
- 573 001a 8DF80720 		strb	r2, [sp, #7]
- 196:MyHardWare/Src/usart.c **** 
- 574              		.loc 1 196 3 is_stmt 1 view .LVU168
- 196:MyHardWare/Src/usart.c **** 
- 575              		.loc 1 196 33 is_stmt 0 view .LVU169
- 576 001e 8DF80530 		strb	r3, [sp, #5]
- 199:MyHardWare/Src/usart.c ****   GPIO_Init(USART1_TX_PORT, &GPIO_InitStructure);
- 577              		.loc 1 199 3 is_stmt 1 view .LVU170
- 199:MyHardWare/Src/usart.c ****   GPIO_Init(USART1_TX_PORT, &GPIO_InitStructure);
- 578              		.loc 1 199 31 is_stmt 0 view .LVU171
- 579 0022 4FF40073 		mov	r3, #512
- 580 0026 0093     		str	r3, [sp]
- 200:MyHardWare/Src/usart.c **** 
- 581              		.loc 1 200 3 is_stmt 1 view .LVU172
- 582 0028 0B4C     		ldr	r4, .L31
- 583 002a 6946     		mov	r1, sp
-ARM GAS  /tmp/cc4p3ByD.s 			page 18
+ 518              		.loc 1 190 3 view .LVU156
+ 193:MyHardWare/Src/usart.c **** 
+ 519              		.loc 1 193 3 view .LVU157
+ 520 0004 0121     		movs	r1, #1
+ 521 0006 0846     		mov	r0, r1
+ 522 0008 FFF7FEFF 		bl	RCC_AHB1PeriphClockCmd
+ 523              	.LVL26:
+ 196:MyHardWare/Src/usart.c ****   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;   // 推挽输出
+ 524              		.loc 1 196 3 view .LVU158
+ 196:MyHardWare/Src/usart.c ****   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;   // 推挽输出
+ 525              		.loc 1 196 32 is_stmt 0 view .LVU159
+ 526 000c 0223     		movs	r3, #2
+ 527 000e 8DF80430 		strb	r3, [sp, #4]
+ 197:MyHardWare/Src/usart.c ****   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;     // 上拉输入
+ 528              		.loc 1 197 3 is_stmt 1 view .LVU160
+ 197:MyHardWare/Src/usart.c ****   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;     // 上拉输入
+ 529              		.loc 1 197 33 is_stmt 0 view .LVU161
+ARM GAS  /tmp/ccYmkDEK.s 			page 17
 
 
- 584 002c 2046     		mov	r0, r4
- 585 002e FFF7FEFF 		bl	GPIO_Init
- 586              	.LVL29:
- 203:MyHardWare/Src/usart.c ****   GPIO_Init(USART1_RX_PORT, &GPIO_InitStructure);
- 587              		.loc 1 203 3 view .LVU173
- 203:MyHardWare/Src/usart.c ****   GPIO_Init(USART1_RX_PORT, &GPIO_InitStructure);
- 588              		.loc 1 203 31 is_stmt 0 view .LVU174
- 589 0032 4FF48063 		mov	r3, #1024
- 590 0036 0093     		str	r3, [sp]
- 204:MyHardWare/Src/usart.c **** 
- 591              		.loc 1 204 3 is_stmt 1 view .LVU175
- 592 0038 6946     		mov	r1, sp
- 593 003a 2046     		mov	r0, r4
- 594 003c FFF7FEFF 		bl	GPIO_Init
- 595              	.LVL30:
- 207:MyHardWare/Src/usart.c ****   GPIO_PinAFConfig(USART1_RX_PORT, USART1_RX_PinSource, GPIO_AF_USART1);
- 596              		.loc 1 207 3 view .LVU176
- 597 0040 0722     		movs	r2, #7
- 598 0042 0921     		movs	r1, #9
- 599 0044 2046     		mov	r0, r4
- 600 0046 FFF7FEFF 		bl	GPIO_PinAFConfig
- 601              	.LVL31:
- 208:MyHardWare/Src/usart.c **** }
- 602              		.loc 1 208 3 view .LVU177
- 603 004a 0722     		movs	r2, #7
- 604 004c 0A21     		movs	r1, #10
- 605 004e 2046     		mov	r0, r4
- 606 0050 FFF7FEFF 		bl	GPIO_PinAFConfig
- 607              	.LVL32:
- 209:MyHardWare/Src/usart.c **** 
- 608              		.loc 1 209 1 is_stmt 0 view .LVU178
- 609 0054 02B0     		add	sp, sp, #8
- 610              	.LCFI12:
- 611              		.cfi_def_cfa_offset 8
- 612              		@ sp needed
- 613 0056 10BD     		pop	{r4, pc}
- 614              	.L32:
- 615              		.align	2
- 616              	.L31:
- 617 0058 00000240 		.word	1073872896
- 618              		.cfi_endproc
- 619              	.LFE130:
- 621              		.section	.text.Usart_Config,"ax",%progbits
- 622              		.align	1
- 623              		.global	Usart_Config
- 624              		.syntax unified
- 625              		.thumb
- 626              		.thumb_func
- 628              	Usart_Config:
- 629              	.LFB131:
- 215:MyHardWare/Src/usart.c ****   USART_InitTypeDef USART_InitStructure;
- 630              		.loc 1 215 25 is_stmt 1 view -0
- 631              		.cfi_startproc
- 632              		@ args = 0, pretend = 0, frame = 16
- 633              		@ frame_needed = 0, uses_anonymous_args = 0
- 634 0000 10B5     		push	{r4, lr}
- 635              	.LCFI13:
-ARM GAS  /tmp/cc4p3ByD.s 			page 19
+ 530 0012 0023     		movs	r3, #0
+ 531 0014 8DF80630 		strb	r3, [sp, #6]
+ 198:MyHardWare/Src/usart.c ****   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz; // 速度等级 2MHz
+ 532              		.loc 1 198 3 is_stmt 1 view .LVU162
+ 198:MyHardWare/Src/usart.c ****   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz; // 速度等级 2MHz
+ 533              		.loc 1 198 32 is_stmt 0 view .LVU163
+ 534 0018 0122     		movs	r2, #1
+ 535 001a 8DF80720 		strb	r2, [sp, #7]
+ 199:MyHardWare/Src/usart.c **** 
+ 536              		.loc 1 199 3 is_stmt 1 view .LVU164
+ 199:MyHardWare/Src/usart.c **** 
+ 537              		.loc 1 199 33 is_stmt 0 view .LVU165
+ 538 001e 8DF80530 		strb	r3, [sp, #5]
+ 202:MyHardWare/Src/usart.c ****   GPIO_Init(USART1_TX_PORT, &GPIO_InitStructure);
+ 539              		.loc 1 202 3 is_stmt 1 view .LVU166
+ 202:MyHardWare/Src/usart.c ****   GPIO_Init(USART1_TX_PORT, &GPIO_InitStructure);
+ 540              		.loc 1 202 31 is_stmt 0 view .LVU167
+ 541 0022 4FF40073 		mov	r3, #512
+ 542 0026 0093     		str	r3, [sp]
+ 203:MyHardWare/Src/usart.c **** 
+ 543              		.loc 1 203 3 is_stmt 1 view .LVU168
+ 544 0028 0B4C     		ldr	r4, .L27
+ 545 002a 6946     		mov	r1, sp
+ 546 002c 2046     		mov	r0, r4
+ 547 002e FFF7FEFF 		bl	GPIO_Init
+ 548              	.LVL27:
+ 206:MyHardWare/Src/usart.c ****   GPIO_Init(USART1_RX_PORT, &GPIO_InitStructure);
+ 549              		.loc 1 206 3 view .LVU169
+ 206:MyHardWare/Src/usart.c ****   GPIO_Init(USART1_RX_PORT, &GPIO_InitStructure);
+ 550              		.loc 1 206 31 is_stmt 0 view .LVU170
+ 551 0032 4FF48063 		mov	r3, #1024
+ 552 0036 0093     		str	r3, [sp]
+ 207:MyHardWare/Src/usart.c **** 
+ 553              		.loc 1 207 3 is_stmt 1 view .LVU171
+ 554 0038 6946     		mov	r1, sp
+ 555 003a 2046     		mov	r0, r4
+ 556 003c FFF7FEFF 		bl	GPIO_Init
+ 557              	.LVL28:
+ 210:MyHardWare/Src/usart.c ****   GPIO_PinAFConfig(USART1_RX_PORT, USART1_RX_PinSource, GPIO_AF_USART1);
+ 558              		.loc 1 210 3 view .LVU172
+ 559 0040 0722     		movs	r2, #7
+ 560 0042 0921     		movs	r1, #9
+ 561 0044 2046     		mov	r0, r4
+ 562 0046 FFF7FEFF 		bl	GPIO_PinAFConfig
+ 563              	.LVL29:
+ 211:MyHardWare/Src/usart.c **** }
+ 564              		.loc 1 211 3 view .LVU173
+ 565 004a 0722     		movs	r2, #7
+ 566 004c 0A21     		movs	r1, #10
+ 567 004e 2046     		mov	r0, r4
+ 568 0050 FFF7FEFF 		bl	GPIO_PinAFConfig
+ 569              	.LVL30:
+ 212:MyHardWare/Src/usart.c **** 
+ 570              		.loc 1 212 1 is_stmt 0 view .LVU174
+ 571 0054 02B0     		add	sp, sp, #8
+ 572              	.LCFI11:
+ 573              		.cfi_def_cfa_offset 8
+ARM GAS  /tmp/ccYmkDEK.s 			page 18
 
 
- 636              		.cfi_def_cfa_offset 8
- 637              		.cfi_offset 4, -8
- 638              		.cfi_offset 14, -4
- 639 0002 84B0     		sub	sp, sp, #16
- 640              	.LCFI14:
- 641              		.cfi_def_cfa_offset 24
- 216:MyHardWare/Src/usart.c **** 
- 642              		.loc 1 216 3 view .LVU180
+ 574              		@ sp needed
+ 575 0056 10BD     		pop	{r4, pc}
+ 576              	.L28:
+ 577              		.align	2
+ 578              	.L27:
+ 579 0058 00000240 		.word	1073872896
+ 580              		.cfi_endproc
+ 581              	.LFE130:
+ 583              		.section	.text.Usart_Config,"ax",%progbits
+ 584              		.align	1
+ 585              		.global	Usart_Config
+ 586              		.syntax unified
+ 587              		.thumb
+ 588              		.thumb_func
+ 590              	Usart_Config:
+ 591              	.LFB131:
+ 218:MyHardWare/Src/usart.c ****   USART_InitTypeDef USART_InitStructure;
+ 592              		.loc 1 218 25 is_stmt 1 view -0
+ 593              		.cfi_startproc
+ 594              		@ args = 0, pretend = 0, frame = 16
+ 595              		@ frame_needed = 0, uses_anonymous_args = 0
+ 596 0000 10B5     		push	{r4, lr}
+ 597              	.LCFI12:
+ 598              		.cfi_def_cfa_offset 8
+ 599              		.cfi_offset 4, -8
+ 600              		.cfi_offset 14, -4
+ 601 0002 84B0     		sub	sp, sp, #16
+ 602              	.LCFI13:
+ 603              		.cfi_def_cfa_offset 24
  219:MyHardWare/Src/usart.c **** 
- 643              		.loc 1 219 3 view .LVU181
- 644 0004 0121     		movs	r1, #1
- 645 0006 1020     		movs	r0, #16
- 646 0008 FFF7FEFF 		bl	RCC_APB2PeriphClockCmd
- 647              	.LVL33:
+ 604              		.loc 1 219 3 view .LVU176
  222:MyHardWare/Src/usart.c **** 
- 648              		.loc 1 222 3 view .LVU182
- 649 000c FFF7FEFF 		bl	USART_GPIO_Config
- 650              	.LVL34:
- 225:MyHardWare/Src/usart.c ****   USART_InitStructure.USART_WordLength = USART_WordLength_8b; // 数据位 8 位
- 651              		.loc 1 225 3 view .LVU183
- 225:MyHardWare/Src/usart.c ****   USART_InitStructure.USART_WordLength = USART_WordLength_8b; // 数据位 8 位
- 652              		.loc 1 225 38 is_stmt 0 view .LVU184
- 653 0010 4FF4E133 		mov	r3, #115200
- 654 0014 0093     		str	r3, [sp]
- 226:MyHardWare/Src/usart.c ****   USART_InitStructure.USART_StopBits = USART_StopBits_1;      // 停止位 1 位
- 655              		.loc 1 226 3 is_stmt 1 view .LVU185
- 226:MyHardWare/Src/usart.c ****   USART_InitStructure.USART_StopBits = USART_StopBits_1;      // 停止位 1 位
- 656              		.loc 1 226 40 is_stmt 0 view .LVU186
- 657 0016 0023     		movs	r3, #0
- 658 0018 ADF80430 		strh	r3, [sp, #4]	@ movhi
- 227:MyHardWare/Src/usart.c ****   USART_InitStructure.USART_Parity = USART_Parity_No;         // 无校验
- 659              		.loc 1 227 3 is_stmt 1 view .LVU187
- 227:MyHardWare/Src/usart.c ****   USART_InitStructure.USART_Parity = USART_Parity_No;         // 无校验
- 660              		.loc 1 227 38 is_stmt 0 view .LVU188
- 661 001c ADF80630 		strh	r3, [sp, #6]	@ movhi
- 228:MyHardWare/Src/usart.c ****   USART_InitStructure.USART_Mode =
- 662              		.loc 1 228 3 is_stmt 1 view .LVU189
- 228:MyHardWare/Src/usart.c ****   USART_InitStructure.USART_Mode =
- 663              		.loc 1 228 36 is_stmt 0 view .LVU190
- 664 0020 ADF80830 		strh	r3, [sp, #8]	@ movhi
- 229:MyHardWare/Src/usart.c ****       USART_Mode_Rx | USART_Mode_Tx; // 发送和接收模式
- 665              		.loc 1 229 3 is_stmt 1 view .LVU191
- 229:MyHardWare/Src/usart.c ****       USART_Mode_Rx | USART_Mode_Tx; // 发送和接收模式
- 666              		.loc 1 229 34 is_stmt 0 view .LVU192
- 667 0024 0C22     		movs	r2, #12
- 668 0026 ADF80A20 		strh	r2, [sp, #10]	@ movhi
- 231:MyHardWare/Src/usart.c ****       USART_HardwareFlowControl_None; // 不使用硬件流控制
- 669              		.loc 1 231 3 is_stmt 1 view .LVU193
- 231:MyHardWare/Src/usart.c ****       USART_HardwareFlowControl_None; // 不使用硬件流控制
- 670              		.loc 1 231 49 is_stmt 0 view .LVU194
- 671 002a ADF80C30 		strh	r3, [sp, #12]	@ movhi
- 234:MyHardWare/Src/usart.c ****   USART_DMACmd(USART1, USART_DMAReq_Rx, ENABLE);
- 672              		.loc 1 234 3 is_stmt 1 view .LVU195
- 673 002e 0A4C     		ldr	r4, .L35
- 674 0030 0122     		movs	r2, #1
- 675 0032 8021     		movs	r1, #128
- 676 0034 2046     		mov	r0, r4
-ARM GAS  /tmp/cc4p3ByD.s 			page 20
+ 605              		.loc 1 222 3 view .LVU177
+ 606 0004 0121     		movs	r1, #1
+ 607 0006 1020     		movs	r0, #16
+ 608 0008 FFF7FEFF 		bl	RCC_APB2PeriphClockCmd
+ 609              	.LVL31:
+ 225:MyHardWare/Src/usart.c **** 
+ 610              		.loc 1 225 3 view .LVU178
+ 611 000c FFF7FEFF 		bl	USART_GPIO_Config
+ 612              	.LVL32:
+ 228:MyHardWare/Src/usart.c ****   USART_InitStructure.USART_WordLength = USART_WordLength_8b; // 数据位 8 位
+ 613              		.loc 1 228 3 view .LVU179
+ 228:MyHardWare/Src/usart.c ****   USART_InitStructure.USART_WordLength = USART_WordLength_8b; // 数据位 8 位
+ 614              		.loc 1 228 38 is_stmt 0 view .LVU180
+ 615 0010 4FF4E133 		mov	r3, #115200
+ 616 0014 0093     		str	r3, [sp]
+ 229:MyHardWare/Src/usart.c ****   USART_InitStructure.USART_StopBits = USART_StopBits_1;      // 停止位 1 位
+ 617              		.loc 1 229 3 is_stmt 1 view .LVU181
+ 229:MyHardWare/Src/usart.c ****   USART_InitStructure.USART_StopBits = USART_StopBits_1;      // 停止位 1 位
+ 618              		.loc 1 229 40 is_stmt 0 view .LVU182
+ 619 0016 0023     		movs	r3, #0
+ 620 0018 ADF80430 		strh	r3, [sp, #4]	@ movhi
+ 230:MyHardWare/Src/usart.c ****   USART_InitStructure.USART_Parity = USART_Parity_No;         // 无校验
+ 621              		.loc 1 230 3 is_stmt 1 view .LVU183
+ 230:MyHardWare/Src/usart.c ****   USART_InitStructure.USART_Parity = USART_Parity_No;         // 无校验
+ 622              		.loc 1 230 38 is_stmt 0 view .LVU184
+ARM GAS  /tmp/ccYmkDEK.s 			page 19
 
 
- 677 0036 FFF7FEFF 		bl	USART_DMACmd
- 678              	.LVL35:
- 235:MyHardWare/Src/usart.c **** 
- 679              		.loc 1 235 3 view .LVU196
- 680 003a 0122     		movs	r2, #1
- 681 003c 4021     		movs	r1, #64
- 682 003e 2046     		mov	r0, r4
- 683 0040 FFF7FEFF 		bl	USART_DMACmd
- 684              	.LVL36:
- 237:MyHardWare/Src/usart.c ****   USART_Cmd(USART1, ENABLE);                // 使能串口 1
- 685              		.loc 1 237 3 view .LVU197
- 686 0044 6946     		mov	r1, sp
- 687 0046 2046     		mov	r0, r4
- 688 0048 FFF7FEFF 		bl	USART_Init
- 689              	.LVL37:
- 238:MyHardWare/Src/usart.c **** }
- 690              		.loc 1 238 3 view .LVU198
- 691 004c 0121     		movs	r1, #1
- 692 004e 2046     		mov	r0, r4
- 693 0050 FFF7FEFF 		bl	USART_Cmd
- 694              	.LVL38:
- 239:MyHardWare/Src/usart.c **** 
- 695              		.loc 1 239 1 is_stmt 0 view .LVU199
- 696 0054 04B0     		add	sp, sp, #16
- 697              	.LCFI15:
- 698              		.cfi_def_cfa_offset 8
- 699              		@ sp needed
- 700 0056 10BD     		pop	{r4, pc}
- 701              	.L36:
- 702              		.align	2
- 703              	.L35:
- 704 0058 00100140 		.word	1073811456
- 705              		.cfi_endproc
- 706              	.LFE131:
- 708              		.section	.text.UART1_SendByte,"ax",%progbits
- 709              		.align	1
- 710              		.global	UART1_SendByte
- 711              		.syntax unified
- 712              		.thumb
- 713              		.thumb_func
- 715              	UART1_SendByte:
- 716              	.LVL39:
- 717              	.LFB133:
- 272:MyHardWare/Src/usart.c ****   /* 等待发送缓冲区为空 */
- 718              		.loc 1 272 35 is_stmt 1 view -0
- 719              		.cfi_startproc
- 720              		@ args = 0, pretend = 0, frame = 0
- 721              		@ frame_needed = 0, uses_anonymous_args = 0
- 272:MyHardWare/Src/usart.c ****   /* 等待发送缓冲区为空 */
- 722              		.loc 1 272 35 is_stmt 0 view .LVU201
- 723 0000 10B5     		push	{r4, lr}
- 724              	.LCFI16:
- 725              		.cfi_def_cfa_offset 8
- 726              		.cfi_offset 4, -8
- 727              		.cfi_offset 14, -4
- 728 0002 0446     		mov	r4, r0
- 274:MyHardWare/Src/usart.c ****     ;
-ARM GAS  /tmp/cc4p3ByD.s 			page 21
+ 623 001c ADF80630 		strh	r3, [sp, #6]	@ movhi
+ 231:MyHardWare/Src/usart.c ****   USART_InitStructure.USART_Mode =
+ 624              		.loc 1 231 3 is_stmt 1 view .LVU185
+ 231:MyHardWare/Src/usart.c ****   USART_InitStructure.USART_Mode =
+ 625              		.loc 1 231 36 is_stmt 0 view .LVU186
+ 626 0020 ADF80830 		strh	r3, [sp, #8]	@ movhi
+ 232:MyHardWare/Src/usart.c ****       USART_Mode_Rx | USART_Mode_Tx; // 发送和接收模式
+ 627              		.loc 1 232 3 is_stmt 1 view .LVU187
+ 232:MyHardWare/Src/usart.c ****       USART_Mode_Rx | USART_Mode_Tx; // 发送和接收模式
+ 628              		.loc 1 232 34 is_stmt 0 view .LVU188
+ 629 0024 0C22     		movs	r2, #12
+ 630 0026 ADF80A20 		strh	r2, [sp, #10]	@ movhi
+ 234:MyHardWare/Src/usart.c ****       USART_HardwareFlowControl_None; // 不使用硬件流控制
+ 631              		.loc 1 234 3 is_stmt 1 view .LVU189
+ 234:MyHardWare/Src/usart.c ****       USART_HardwareFlowControl_None; // 不使用硬件流控制
+ 632              		.loc 1 234 49 is_stmt 0 view .LVU190
+ 633 002a ADF80C30 		strh	r3, [sp, #12]	@ movhi
+ 237:MyHardWare/Src/usart.c ****   USART_DMACmd(USART1, USART_DMAReq_Rx, ENABLE);
+ 634              		.loc 1 237 3 is_stmt 1 view .LVU191
+ 635 002e 0A4C     		ldr	r4, .L31
+ 636 0030 0122     		movs	r2, #1
+ 637 0032 8021     		movs	r1, #128
+ 638 0034 2046     		mov	r0, r4
+ 639 0036 FFF7FEFF 		bl	USART_DMACmd
+ 640              	.LVL33:
+ 238:MyHardWare/Src/usart.c **** 
+ 641              		.loc 1 238 3 view .LVU192
+ 642 003a 0122     		movs	r2, #1
+ 643 003c 4021     		movs	r1, #64
+ 644 003e 2046     		mov	r0, r4
+ 645 0040 FFF7FEFF 		bl	USART_DMACmd
+ 646              	.LVL34:
+ 240:MyHardWare/Src/usart.c ****   USART_Cmd(USART1, ENABLE);                // 使能串口 1
+ 647              		.loc 1 240 3 view .LVU193
+ 648 0044 6946     		mov	r1, sp
+ 649 0046 2046     		mov	r0, r4
+ 650 0048 FFF7FEFF 		bl	USART_Init
+ 651              	.LVL35:
+ 241:MyHardWare/Src/usart.c **** }
+ 652              		.loc 1 241 3 view .LVU194
+ 653 004c 0121     		movs	r1, #1
+ 654 004e 2046     		mov	r0, r4
+ 655 0050 FFF7FEFF 		bl	USART_Cmd
+ 656              	.LVL36:
+ 242:MyHardWare/Src/usart.c **** 
+ 657              		.loc 1 242 1 is_stmt 0 view .LVU195
+ 658 0054 04B0     		add	sp, sp, #16
+ 659              	.LCFI14:
+ 660              		.cfi_def_cfa_offset 8
+ 661              		@ sp needed
+ 662 0056 10BD     		pop	{r4, pc}
+ 663              	.L32:
+ 664              		.align	2
+ 665              	.L31:
+ 666 0058 00100140 		.word	1073811456
+ 667              		.cfi_endproc
+ 668              	.LFE131:
+ARM GAS  /tmp/ccYmkDEK.s 			page 20
 
 
- 729              		.loc 1 274 3 is_stmt 1 view .LVU202
- 730              	.LVL40:
- 731              	.L38:
- 274:MyHardWare/Src/usart.c ****     ;
- 732              		.loc 1 274 54 discriminator 1 view .LVU203
- 274:MyHardWare/Src/usart.c ****     ;
- 733              		.loc 1 274 10 is_stmt 0 discriminator 1 view .LVU204
- 734 0004 8021     		movs	r1, #128
- 735 0006 0548     		ldr	r0, .L40
- 736 0008 FFF7FEFF 		bl	USART_GetFlagStatus
- 737              	.LVL41:
- 274:MyHardWare/Src/usart.c ****     ;
- 738              		.loc 1 274 54 discriminator 1 view .LVU205
- 739 000c 0028     		cmp	r0, #0
- 740 000e F9D0     		beq	.L38
- 278:MyHardWare/Src/usart.c **** }
- 741              		.loc 1 278 3 is_stmt 1 view .LVU206
- 742 0010 2146     		mov	r1, r4
- 743 0012 0248     		ldr	r0, .L40
- 744 0014 FFF7FEFF 		bl	USART_SendData
- 745              	.LVL42:
- 279:MyHardWare/Src/usart.c **** 
- 746              		.loc 1 279 1 is_stmt 0 view .LVU207
- 747 0018 10BD     		pop	{r4, pc}
- 748              	.LVL43:
- 749              	.L41:
- 279:MyHardWare/Src/usart.c **** 
- 750              		.loc 1 279 1 view .LVU208
- 751 001a 00BF     		.align	2
- 752              	.L40:
- 753 001c 00100140 		.word	1073811456
- 754              		.cfi_endproc
- 755              	.LFE133:
- 757              		.section	.text.UART1_SendData,"ax",%progbits
- 758              		.align	1
- 759              		.global	UART1_SendData
- 760              		.syntax unified
- 761              		.thumb
- 762              		.thumb_func
- 764              	UART1_SendData:
- 765              	.LVL44:
- 766              	.LFB134:
- 311:MyHardWare/Src/usart.c ****   for (uint16_t i = 0; i < size; i++) {
- 767              		.loc 1 311 54 is_stmt 1 view -0
- 768              		.cfi_startproc
- 769              		@ args = 0, pretend = 0, frame = 0
- 770              		@ frame_needed = 0, uses_anonymous_args = 0
- 311:MyHardWare/Src/usart.c ****   for (uint16_t i = 0; i < size; i++) {
- 771              		.loc 1 311 54 is_stmt 0 view .LVU210
- 772 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
- 773              	.LCFI17:
- 774              		.cfi_def_cfa_offset 24
- 775              		.cfi_offset 3, -24
- 776              		.cfi_offset 4, -20
- 777              		.cfi_offset 5, -16
- 778              		.cfi_offset 6, -12
- 779              		.cfi_offset 7, -8
-ARM GAS  /tmp/cc4p3ByD.s 			page 22
+ 670              		.section	.text.UART1_SendByte,"ax",%progbits
+ 671              		.align	1
+ 672              		.global	UART1_SendByte
+ 673              		.syntax unified
+ 674              		.thumb
+ 675              		.thumb_func
+ 677              	UART1_SendByte:
+ 678              	.LVL37:
+ 679              	.LFB133:
+ 275:MyHardWare/Src/usart.c ****   /* 等待发送缓冲区为空 */
+ 680              		.loc 1 275 35 is_stmt 1 view -0
+ 681              		.cfi_startproc
+ 682              		@ args = 0, pretend = 0, frame = 0
+ 683              		@ frame_needed = 0, uses_anonymous_args = 0
+ 275:MyHardWare/Src/usart.c ****   /* 等待发送缓冲区为空 */
+ 684              		.loc 1 275 35 is_stmt 0 view .LVU197
+ 685 0000 10B5     		push	{r4, lr}
+ 686              	.LCFI15:
+ 687              		.cfi_def_cfa_offset 8
+ 688              		.cfi_offset 4, -8
+ 689              		.cfi_offset 14, -4
+ 690 0002 0446     		mov	r4, r0
+ 277:MyHardWare/Src/usart.c ****     ;
+ 691              		.loc 1 277 3 is_stmt 1 view .LVU198
+ 692              	.LVL38:
+ 693              	.L34:
+ 277:MyHardWare/Src/usart.c ****     ;
+ 694              		.loc 1 277 54 discriminator 1 view .LVU199
+ 277:MyHardWare/Src/usart.c ****     ;
+ 695              		.loc 1 277 10 is_stmt 0 discriminator 1 view .LVU200
+ 696 0004 8021     		movs	r1, #128
+ 697 0006 0548     		ldr	r0, .L36
+ 698 0008 FFF7FEFF 		bl	USART_GetFlagStatus
+ 699              	.LVL39:
+ 277:MyHardWare/Src/usart.c ****     ;
+ 700              		.loc 1 277 54 discriminator 1 view .LVU201
+ 701 000c 0028     		cmp	r0, #0
+ 702 000e F9D0     		beq	.L34
+ 281:MyHardWare/Src/usart.c **** }
+ 703              		.loc 1 281 3 is_stmt 1 view .LVU202
+ 704 0010 2146     		mov	r1, r4
+ 705 0012 0248     		ldr	r0, .L36
+ 706 0014 FFF7FEFF 		bl	USART_SendData
+ 707              	.LVL40:
+ 282:MyHardWare/Src/usart.c **** 
+ 708              		.loc 1 282 1 is_stmt 0 view .LVU203
+ 709 0018 10BD     		pop	{r4, pc}
+ 710              	.LVL41:
+ 711              	.L37:
+ 282:MyHardWare/Src/usart.c **** 
+ 712              		.loc 1 282 1 view .LVU204
+ 713 001a 00BF     		.align	2
+ 714              	.L36:
+ 715 001c 00100140 		.word	1073811456
+ 716              		.cfi_endproc
+ 717              	.LFE133:
+ 719              		.section	.text.__io_putchar,"ax",%progbits
+ARM GAS  /tmp/ccYmkDEK.s 			page 21
 
 
- 780              		.cfi_offset 14, -4
- 781 0002 0746     		mov	r7, r0
- 782 0004 0E46     		mov	r6, r1
- 312:MyHardWare/Src/usart.c ****     uint16_t data = buffer[i]; // 获取当前 16 位数据
- 783              		.loc 1 312 3 is_stmt 1 view .LVU211
- 784              	.LBB2:
- 312:MyHardWare/Src/usart.c ****     uint16_t data = buffer[i]; // 获取当前 16 位数据
- 785              		.loc 1 312 8 view .LVU212
- 786              	.LVL45:
- 312:MyHardWare/Src/usart.c ****     uint16_t data = buffer[i]; // 获取当前 16 位数据
- 787              		.loc 1 312 17 is_stmt 0 view .LVU213
- 788 0006 0024     		movs	r4, #0
- 312:MyHardWare/Src/usart.c ****     uint16_t data = buffer[i]; // 获取当前 16 位数据
- 789              		.loc 1 312 3 view .LVU214
- 790 0008 17E0     		b	.L43
- 791              	.LVL46:
- 792              	.L46:
- 793              	.LBB3:
- 313:MyHardWare/Src/usart.c **** 
- 794              		.loc 1 313 5 is_stmt 1 view .LVU215
- 313:MyHardWare/Src/usart.c **** 
- 795              		.loc 1 313 14 is_stmt 0 view .LVU216
- 796 000a 37F81450 		ldrh	r5, [r7, r4, lsl #1]
- 797              	.LVL47:
- 316:MyHardWare/Src/usart.c ****     while (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET)
- 798              		.loc 1 316 5 is_stmt 1 view .LVU217
- 799 000e 290A     		lsrs	r1, r5, #8
- 800 0010 0B48     		ldr	r0, .L48
- 801 0012 FFF7FEFF 		bl	USART_SendData
- 802              	.LVL48:
- 317:MyHardWare/Src/usart.c ****       ; // 等待发送完成
- 803              		.loc 1 317 5 view .LVU218
- 804              	.L44:
- 317:MyHardWare/Src/usart.c ****       ; // 等待发送完成
- 805              		.loc 1 317 56 discriminator 1 view .LVU219
- 317:MyHardWare/Src/usart.c ****       ; // 等待发送完成
- 806              		.loc 1 317 12 is_stmt 0 discriminator 1 view .LVU220
- 807 0016 8021     		movs	r1, #128
- 808 0018 0948     		ldr	r0, .L48
- 809 001a FFF7FEFF 		bl	USART_GetFlagStatus
- 810              	.LVL49:
- 317:MyHardWare/Src/usart.c ****       ; // 等待发送完成
- 811              		.loc 1 317 56 discriminator 1 view .LVU221
- 812 001e 0028     		cmp	r0, #0
- 813 0020 F9D0     		beq	.L44
- 321:MyHardWare/Src/usart.c ****     while (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET)
- 814              		.loc 1 321 5 is_stmt 1 view .LVU222
- 815 0022 E9B2     		uxtb	r1, r5
- 816 0024 0648     		ldr	r0, .L48
- 817 0026 FFF7FEFF 		bl	USART_SendData
- 818              	.LVL50:
- 322:MyHardWare/Src/usart.c ****       ; // 等待发送完成
- 819              		.loc 1 322 5 view .LVU223
- 820              	.L45:
- 322:MyHardWare/Src/usart.c ****       ; // 等待发送完成
- 821              		.loc 1 322 56 discriminator 1 view .LVU224
- 322:MyHardWare/Src/usart.c ****       ; // 等待发送完成
-ARM GAS  /tmp/cc4p3ByD.s 			page 23
+ 720              		.align	1
+ 721              		.global	__io_putchar
+ 722              		.syntax unified
+ 723              		.thumb
+ 724              		.thumb_func
+ 726              	__io_putchar:
+ 727              	.LVL42:
+ 728              	.LFB134:
+ 291:MyHardWare/Src/usart.c ****   // 尝试将数据写入环形缓冲区
+ 729              		.loc 1 291 26 is_stmt 1 view -0
+ 730              		.cfi_startproc
+ 731              		@ args = 0, pretend = 0, frame = 0
+ 732              		@ frame_needed = 0, uses_anonymous_args = 0
+ 291:MyHardWare/Src/usart.c ****   // 尝试将数据写入环形缓冲区
+ 733              		.loc 1 291 26 is_stmt 0 view .LVU206
+ 734 0000 38B5     		push	{r3, r4, r5, lr}
+ 735              	.LCFI16:
+ 736              		.cfi_def_cfa_offset 16
+ 737              		.cfi_offset 3, -16
+ 738              		.cfi_offset 4, -12
+ 739              		.cfi_offset 5, -8
+ 740              		.cfi_offset 14, -4
+ 741 0002 0546     		mov	r5, r0
+ 293:MyHardWare/Src/usart.c ****   while (RingBuffer_Push(&tx_queue, (uint8_t)ch) == 0) {
+ 742              		.loc 1 293 3 is_stmt 1 view .LVU207
+ 743              	.LVL43:
+ 294:MyHardWare/Src/usart.c ****     // 缓冲区满，等待有空闲空间
+ 744              		.loc 1 294 3 view .LVU208
+ 293:MyHardWare/Src/usart.c ****   while (RingBuffer_Push(&tx_queue, (uint8_t)ch) == 0) {
+ 745              		.loc 1 293 12 is_stmt 0 view .LVU209
+ 746 0004 0024     		movs	r4, #0
+ 747              	.LVL44:
+ 748              	.L39:
+ 294:MyHardWare/Src/usart.c ****     // 缓冲区满，等待有空闲空间
+ 749              		.loc 1 294 50 is_stmt 1 view .LVU210
+ 294:MyHardWare/Src/usart.c ****     // 缓冲区满，等待有空闲空间
+ 750              		.loc 1 294 10 is_stmt 0 view .LVU211
+ 751 0006 E9B2     		uxtb	r1, r5
+ 752 0008 0D48     		ldr	r0, .L45
+ 753 000a FFF7FEFF 		bl	RingBuffer_Push
+ 754              	.LVL45:
+ 294:MyHardWare/Src/usart.c ****     // 缓冲区满，等待有空闲空间
+ 755              		.loc 1 294 50 discriminator 1 view .LVU212
+ 756 000e 48B9     		cbnz	r0, .L40
+ 296:MyHardWare/Src/usart.c ****     if ((count++) >= 1000) {
+ 757              		.loc 1 296 5 is_stmt 1 view .LVU213
+ 758 0010 0120     		movs	r0, #1
+ 759 0012 FFF7FEFF 		bl	delay_us
+ 760              	.LVL46:
+ 297:MyHardWare/Src/usart.c ****       break; // 等待超过 1ms，放弃发送
+ 761              		.loc 1 297 5 view .LVU214
+ 297:MyHardWare/Src/usart.c ****       break; // 等待超过 1ms，放弃发送
+ 762              		.loc 1 297 15 is_stmt 0 view .LVU215
+ 763 0016 631C     		adds	r3, r4, #1
+ 764 0018 9BB2     		uxth	r3, r3
+ 765              	.LVL47:
+ 297:MyHardWare/Src/usart.c ****       break; // 等待超过 1ms，放弃发送
+ARM GAS  /tmp/ccYmkDEK.s 			page 22
 
 
- 822              		.loc 1 322 12 is_stmt 0 discriminator 1 view .LVU225
- 823 002a 8021     		movs	r1, #128
- 824 002c 0448     		ldr	r0, .L48
- 825 002e FFF7FEFF 		bl	USART_GetFlagStatus
- 826              	.LVL51:
- 322:MyHardWare/Src/usart.c ****       ; // 等待发送完成
- 827              		.loc 1 322 56 discriminator 1 view .LVU226
- 828 0032 0028     		cmp	r0, #0
- 829 0034 F9D0     		beq	.L45
- 830              	.LBE3:
- 312:MyHardWare/Src/usart.c ****     uint16_t data = buffer[i]; // 获取当前 16 位数据
- 831              		.loc 1 312 35 is_stmt 1 discriminator 2 view .LVU227
- 832 0036 0134     		adds	r4, r4, #1
- 833              	.LVL52:
- 312:MyHardWare/Src/usart.c ****     uint16_t data = buffer[i]; // 获取当前 16 位数据
- 834              		.loc 1 312 35 is_stmt 0 discriminator 2 view .LVU228
- 835 0038 A4B2     		uxth	r4, r4
- 836              	.LVL53:
- 837              	.L43:
- 312:MyHardWare/Src/usart.c ****     uint16_t data = buffer[i]; // 获取当前 16 位数据
- 838              		.loc 1 312 26 is_stmt 1 discriminator 1 view .LVU229
- 839 003a B442     		cmp	r4, r6
- 840 003c E5D3     		bcc	.L46
- 841              	.LBE2:
- 325:MyHardWare/Src/usart.c **** 
- 842              		.loc 1 325 1 is_stmt 0 view .LVU230
- 843 003e F8BD     		pop	{r3, r4, r5, r6, r7, pc}
- 844              	.LVL54:
- 845              	.L49:
- 325:MyHardWare/Src/usart.c **** 
- 846              		.loc 1 325 1 view .LVU231
- 847              		.align	2
- 848              	.L48:
- 849 0040 00100140 		.word	1073811456
- 850              		.cfi_endproc
- 851              	.LFE134:
- 853              		.section	.text.UART1_DMA_Start_RX,"ax",%progbits
- 854              		.align	1
- 855              		.global	UART1_DMA_Start_RX
- 856              		.syntax unified
- 857              		.thumb
- 858              		.thumb_func
- 860              	UART1_DMA_Start_RX:
- 861              	.LFB135:
- 331:MyHardWare/Src/usart.c ****   DMA2_Stream5->M0AR = (uint32_t)rx_queue.buffer;
- 862              		.loc 1 331 31 is_stmt 1 view -0
- 863              		.cfi_startproc
- 864              		@ args = 0, pretend = 0, frame = 0
- 865              		@ frame_needed = 0, uses_anonymous_args = 0
- 866 0000 10B5     		push	{r4, lr}
- 867              	.LCFI18:
- 868              		.cfi_def_cfa_offset 8
- 869              		.cfi_offset 4, -8
- 870              		.cfi_offset 14, -4
- 332:MyHardWare/Src/usart.c ****   DMA2_Stream5->NDTR = rx_queue.size;
- 871              		.loc 1 332 3 view .LVU233
- 332:MyHardWare/Src/usart.c ****   DMA2_Stream5->NDTR = rx_queue.size;
-ARM GAS  /tmp/cc4p3ByD.s 			page 24
+ 766              		.loc 1 297 8 view .LVU216
+ 767 001a B4F57A7F 		cmp	r4, #1000
+ 768 001e 01D2     		bcs	.L40
+ 297:MyHardWare/Src/usart.c ****       break; // 等待超过 1ms，放弃发送
+ 769              		.loc 1 297 15 view .LVU217
+ 770 0020 1C46     		mov	r4, r3
+ 771 0022 F0E7     		b	.L39
+ 772              	.LVL48:
+ 773              	.L40:
+ 304:MyHardWare/Src/usart.c ****     USART_StartDMA_TX();
+ 774              		.loc 1 304 3 is_stmt 1 view .LVU218
+ 304:MyHardWare/Src/usart.c ****     USART_StartDMA_TX();
+ 775              		.loc 1 304 16 is_stmt 0 view .LVU219
+ 776 0024 064B     		ldr	r3, .L45
+ 777 0026 9B7A     		ldrb	r3, [r3, #10]	@ zero_extendqisi2
+ 304:MyHardWare/Src/usart.c ****     USART_StartDMA_TX();
+ 778              		.loc 1 304 6 view .LVU220
+ 779 0028 0BB1     		cbz	r3, .L44
+ 780              	.L42:
+ 308:MyHardWare/Src/usart.c **** }
+ 781              		.loc 1 308 3 is_stmt 1 view .LVU221
+ 309:MyHardWare/Src/usart.c **** 
+ 782              		.loc 1 309 1 is_stmt 0 view .LVU222
+ 783 002a 2846     		mov	r0, r5
+ 784 002c 38BD     		pop	{r3, r4, r5, pc}
+ 785              	.LVL49:
+ 786              	.L44:
+ 304:MyHardWare/Src/usart.c ****     USART_StartDMA_TX();
+ 787              		.loc 1 304 36 discriminator 1 view .LVU223
+ 788 002e 0448     		ldr	r0, .L45
+ 789 0030 FFF7FEFF 		bl	RingBuffer_IsEmpty
+ 790              	.LVL50:
+ 304:MyHardWare/Src/usart.c ****     USART_StartDMA_TX();
+ 791              		.loc 1 304 32 discriminator 1 view .LVU224
+ 792 0034 0028     		cmp	r0, #0
+ 793 0036 F8D1     		bne	.L42
+ 305:MyHardWare/Src/usart.c ****   }
+ 794              		.loc 1 305 5 is_stmt 1 view .LVU225
+ 795 0038 FFF7FEFF 		bl	USART_StartDMA_TX
+ 796              	.LVL51:
+ 797 003c F5E7     		b	.L42
+ 798              	.L46:
+ 799 003e 00BF     		.align	2
+ 800              	.L45:
+ 801 0040 00000000 		.word	tx_queue
+ 802              		.cfi_endproc
+ 803              	.LFE134:
+ 805              		.section	.text.UART1_SendData,"ax",%progbits
+ 806              		.align	1
+ 807              		.global	UART1_SendData
+ 808              		.syntax unified
+ 809              		.thumb
+ 810              		.thumb_func
+ 812              	UART1_SendData:
+ 813              	.LVL52:
+ 814              	.LFB135:
+ 317:MyHardWare/Src/usart.c ****   for (uint16_t i = 0; i < size; i++) {
+ARM GAS  /tmp/ccYmkDEK.s 			page 23
 
 
- 872              		.loc 1 332 42 is_stmt 0 view .LVU234
- 873 0002 074C     		ldr	r4, .L52
- 874 0004 2268     		ldr	r2, [r4]
- 332:MyHardWare/Src/usart.c ****   DMA2_Stream5->NDTR = rx_queue.size;
- 875              		.loc 1 332 22 view .LVU235
- 876 0006 074B     		ldr	r3, .L52+4
- 877 0008 C3F89420 		str	r2, [r3, #148]
- 333:MyHardWare/Src/usart.c ****   DMA_Cmd(DMA2_Stream5, ENABLE);
- 878              		.loc 1 333 3 is_stmt 1 view .LVU236
- 333:MyHardWare/Src/usart.c ****   DMA_Cmd(DMA2_Stream5, ENABLE);
- 879              		.loc 1 333 32 is_stmt 0 view .LVU237
- 880 000c A288     		ldrh	r2, [r4, #4]
- 333:MyHardWare/Src/usart.c ****   DMA_Cmd(DMA2_Stream5, ENABLE);
- 881              		.loc 1 333 22 view .LVU238
- 882 000e C3F88C20 		str	r2, [r3, #140]
- 334:MyHardWare/Src/usart.c ****   rx_queue.is_dma_enabled = 1;
- 883              		.loc 1 334 3 is_stmt 1 view .LVU239
- 884 0012 0121     		movs	r1, #1
- 885 0014 0448     		ldr	r0, .L52+8
- 886 0016 FFF7FEFF 		bl	DMA_Cmd
- 887              	.LVL55:
- 335:MyHardWare/Src/usart.c **** }
- 888              		.loc 1 335 3 view .LVU240
- 335:MyHardWare/Src/usart.c **** }
- 889              		.loc 1 335 27 is_stmt 0 view .LVU241
- 890 001a 0123     		movs	r3, #1
- 891 001c A372     		strb	r3, [r4, #10]
- 336:MyHardWare/Src/usart.c **** 
- 892              		.loc 1 336 1 view .LVU242
- 893 001e 10BD     		pop	{r4, pc}
- 894              	.L53:
+ 815              		.loc 1 317 54 view -0
+ 816              		.cfi_startproc
+ 817              		@ args = 0, pretend = 0, frame = 0
+ 818              		@ frame_needed = 0, uses_anonymous_args = 0
+ 317:MyHardWare/Src/usart.c ****   for (uint16_t i = 0; i < size; i++) {
+ 819              		.loc 1 317 54 is_stmt 0 view .LVU227
+ 820 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 821              	.LCFI17:
+ 822              		.cfi_def_cfa_offset 24
+ 823              		.cfi_offset 3, -24
+ 824              		.cfi_offset 4, -20
+ 825              		.cfi_offset 5, -16
+ 826              		.cfi_offset 6, -12
+ 827              		.cfi_offset 7, -8
+ 828              		.cfi_offset 14, -4
+ 829 0002 0746     		mov	r7, r0
+ 830 0004 0E46     		mov	r6, r1
+ 318:MyHardWare/Src/usart.c ****     uint16_t data = buffer[i]; // 获取当前 16 位数据
+ 831              		.loc 1 318 3 is_stmt 1 view .LVU228
+ 832              	.LBB2:
+ 318:MyHardWare/Src/usart.c ****     uint16_t data = buffer[i]; // 获取当前 16 位数据
+ 833              		.loc 1 318 8 view .LVU229
+ 834              	.LVL53:
+ 318:MyHardWare/Src/usart.c ****     uint16_t data = buffer[i]; // 获取当前 16 位数据
+ 835              		.loc 1 318 17 is_stmt 0 view .LVU230
+ 836 0006 0024     		movs	r4, #0
+ 318:MyHardWare/Src/usart.c ****     uint16_t data = buffer[i]; // 获取当前 16 位数据
+ 837              		.loc 1 318 3 view .LVU231
+ 838 0008 17E0     		b	.L48
+ 839              	.LVL54:
+ 840              	.L51:
+ 841              	.LBB3:
+ 319:MyHardWare/Src/usart.c **** 
+ 842              		.loc 1 319 5 is_stmt 1 view .LVU232
+ 319:MyHardWare/Src/usart.c **** 
+ 843              		.loc 1 319 14 is_stmt 0 view .LVU233
+ 844 000a 37F81450 		ldrh	r5, [r7, r4, lsl #1]
+ 845              	.LVL55:
+ 322:MyHardWare/Src/usart.c ****     while (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET)
+ 846              		.loc 1 322 5 is_stmt 1 view .LVU234
+ 847 000e 290A     		lsrs	r1, r5, #8
+ 848 0010 0B48     		ldr	r0, .L53
+ 849 0012 FFF7FEFF 		bl	USART_SendData
+ 850              	.LVL56:
+ 323:MyHardWare/Src/usart.c ****       ; // 等待发送完成
+ 851              		.loc 1 323 5 view .LVU235
+ 852              	.L49:
+ 323:MyHardWare/Src/usart.c ****       ; // 等待发送完成
+ 853              		.loc 1 323 56 discriminator 1 view .LVU236
+ 323:MyHardWare/Src/usart.c ****       ; // 等待发送完成
+ 854              		.loc 1 323 12 is_stmt 0 discriminator 1 view .LVU237
+ 855 0016 8021     		movs	r1, #128
+ 856 0018 0948     		ldr	r0, .L53
+ 857 001a FFF7FEFF 		bl	USART_GetFlagStatus
+ 858              	.LVL57:
+ 323:MyHardWare/Src/usart.c ****       ; // 等待发送完成
+ 859              		.loc 1 323 56 discriminator 1 view .LVU238
+ARM GAS  /tmp/ccYmkDEK.s 			page 24
+
+
+ 860 001e 0028     		cmp	r0, #0
+ 861 0020 F9D0     		beq	.L49
+ 327:MyHardWare/Src/usart.c ****     while (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET)
+ 862              		.loc 1 327 5 is_stmt 1 view .LVU239
+ 863 0022 E9B2     		uxtb	r1, r5
+ 864 0024 0648     		ldr	r0, .L53
+ 865 0026 FFF7FEFF 		bl	USART_SendData
+ 866              	.LVL58:
+ 328:MyHardWare/Src/usart.c ****       ; // 等待发送完成
+ 867              		.loc 1 328 5 view .LVU240
+ 868              	.L50:
+ 328:MyHardWare/Src/usart.c ****       ; // 等待发送完成
+ 869              		.loc 1 328 56 discriminator 1 view .LVU241
+ 328:MyHardWare/Src/usart.c ****       ; // 等待发送完成
+ 870              		.loc 1 328 12 is_stmt 0 discriminator 1 view .LVU242
+ 871 002a 8021     		movs	r1, #128
+ 872 002c 0448     		ldr	r0, .L53
+ 873 002e FFF7FEFF 		bl	USART_GetFlagStatus
+ 874              	.LVL59:
+ 328:MyHardWare/Src/usart.c ****       ; // 等待发送完成
+ 875              		.loc 1 328 56 discriminator 1 view .LVU243
+ 876 0032 0028     		cmp	r0, #0
+ 877 0034 F9D0     		beq	.L50
+ 878              	.LBE3:
+ 318:MyHardWare/Src/usart.c ****     uint16_t data = buffer[i]; // 获取当前 16 位数据
+ 879              		.loc 1 318 35 is_stmt 1 discriminator 2 view .LVU244
+ 880 0036 0134     		adds	r4, r4, #1
+ 881              	.LVL60:
+ 318:MyHardWare/Src/usart.c ****     uint16_t data = buffer[i]; // 获取当前 16 位数据
+ 882              		.loc 1 318 35 is_stmt 0 discriminator 2 view .LVU245
+ 883 0038 A4B2     		uxth	r4, r4
+ 884              	.LVL61:
+ 885              	.L48:
+ 318:MyHardWare/Src/usart.c ****     uint16_t data = buffer[i]; // 获取当前 16 位数据
+ 886              		.loc 1 318 26 is_stmt 1 discriminator 1 view .LVU246
+ 887 003a B442     		cmp	r4, r6
+ 888 003c E5D3     		bcc	.L51
+ 889              	.LBE2:
+ 331:MyHardWare/Src/usart.c **** 
+ 890              		.loc 1 331 1 is_stmt 0 view .LVU247
+ 891 003e F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 892              	.LVL62:
+ 893              	.L54:
+ 331:MyHardWare/Src/usart.c **** 
+ 894              		.loc 1 331 1 view .LVU248
  895              		.align	2
- 896              	.L52:
- 897 0020 00000000 		.word	rx_queue
- 898 0024 00640240 		.word	1073898496
- 899 0028 88640240 		.word	1073898632
- 900              		.cfi_endproc
- 901              	.LFE135:
- 903              		.section	.text.USART1_Init,"ax",%progbits
- 904              		.align	1
- 905              		.global	USART1_Init
- 906              		.syntax unified
- 907              		.thumb
- 908              		.thumb_func
- 910              	USART1_Init:
- 911              	.LFB132:
- 246:MyHardWare/Src/usart.c ****   // 初始化发送和接收环形缓冲区
- 912              		.loc 1 246 24 is_stmt 1 view -0
- 913              		.cfi_startproc
- 914              		@ args = 0, pretend = 0, frame = 0
- 915              		@ frame_needed = 0, uses_anonymous_args = 0
- 916 0000 08B5     		push	{r3, lr}
- 917              	.LCFI19:
- 918              		.cfi_def_cfa_offset 8
- 919              		.cfi_offset 3, -8
- 920              		.cfi_offset 14, -4
- 248:MyHardWare/Src/usart.c ****   RingBuffer_Init(&rx_queue, dma_rx_buffer, USART_DMA_RX_BUFFER_SIZE);
-ARM GAS  /tmp/cc4p3ByD.s 			page 25
+ 896              	.L53:
+ 897 0040 00100140 		.word	1073811456
+ 898              		.cfi_endproc
+ 899              	.LFE135:
+ 901              		.section	.text.UART1_DMA_Start_RX,"ax",%progbits
+ 902              		.align	1
+ 903              		.global	UART1_DMA_Start_RX
+ 904              		.syntax unified
+ 905              		.thumb
+ 906              		.thumb_func
+ 908              	UART1_DMA_Start_RX:
+ARM GAS  /tmp/ccYmkDEK.s 			page 25
 
 
- 921              		.loc 1 248 3 view .LVU244
- 922 0002 4FF48072 		mov	r2, #256
- 923 0006 0949     		ldr	r1, .L56
- 924 0008 0948     		ldr	r0, .L56+4
- 925 000a FFF7FEFF 		bl	RingBuffer_Init
- 926              	.LVL56:
- 249:MyHardWare/Src/usart.c **** 
- 927              		.loc 1 249 3 view .LVU245
- 928 000e 4FF48072 		mov	r2, #256
- 929 0012 0849     		ldr	r1, .L56+8
- 930 0014 0848     		ldr	r0, .L56+12
- 931 0016 FFF7FEFF 		bl	RingBuffer_Init
- 932              	.LVL57:
+ 909              	.LFB136:
+ 337:MyHardWare/Src/usart.c ****   DMA2_Stream2->M0AR = (uint32_t)rx_queue.buffer;
+ 910              		.loc 1 337 31 is_stmt 1 view -0
+ 911              		.cfi_startproc
+ 912              		@ args = 0, pretend = 0, frame = 0
+ 913              		@ frame_needed = 0, uses_anonymous_args = 0
+ 914 0000 10B5     		push	{r4, lr}
+ 915              	.LCFI18:
+ 916              		.cfi_def_cfa_offset 8
+ 917              		.cfi_offset 4, -8
+ 918              		.cfi_offset 14, -4
+ 338:MyHardWare/Src/usart.c ****   DMA2_Stream2->NDTR = rx_queue.size;
+ 919              		.loc 1 338 3 view .LVU250
+ 338:MyHardWare/Src/usart.c ****   DMA2_Stream2->NDTR = rx_queue.size;
+ 920              		.loc 1 338 42 is_stmt 0 view .LVU251
+ 921 0002 064C     		ldr	r4, .L57
+ 922 0004 2268     		ldr	r2, [r4]
+ 338:MyHardWare/Src/usart.c ****   DMA2_Stream2->NDTR = rx_queue.size;
+ 923              		.loc 1 338 22 view .LVU252
+ 924 0006 064B     		ldr	r3, .L57+4
+ 925 0008 DA64     		str	r2, [r3, #76]
+ 339:MyHardWare/Src/usart.c ****   DMA_Cmd(DMA2_Stream2, ENABLE);
+ 926              		.loc 1 339 3 is_stmt 1 view .LVU253
+ 339:MyHardWare/Src/usart.c ****   DMA_Cmd(DMA2_Stream2, ENABLE);
+ 927              		.loc 1 339 32 is_stmt 0 view .LVU254
+ 928 000a A288     		ldrh	r2, [r4, #4]
+ 339:MyHardWare/Src/usart.c ****   DMA_Cmd(DMA2_Stream2, ENABLE);
+ 929              		.loc 1 339 22 view .LVU255
+ 930 000c 5A64     		str	r2, [r3, #68]
+ 340:MyHardWare/Src/usart.c ****   rx_queue.is_dma_enabled = 1;
+ 931              		.loc 1 340 3 is_stmt 1 view .LVU256
+ 932 000e 0121     		movs	r1, #1
+ 933 0010 0448     		ldr	r0, .L57+8
+ 934 0012 FFF7FEFF 		bl	DMA_Cmd
+ 935              	.LVL63:
+ 341:MyHardWare/Src/usart.c **** }
+ 936              		.loc 1 341 3 view .LVU257
+ 341:MyHardWare/Src/usart.c **** }
+ 937              		.loc 1 341 27 is_stmt 0 view .LVU258
+ 938 0016 0123     		movs	r3, #1
+ 939 0018 A372     		strb	r3, [r4, #10]
+ 342:MyHardWare/Src/usart.c **** 
+ 940              		.loc 1 342 1 view .LVU259
+ 941 001a 10BD     		pop	{r4, pc}
+ 942              	.L58:
+ 943              		.align	2
+ 944              	.L57:
+ 945 001c 00000000 		.word	rx_queue
+ 946 0020 00640240 		.word	1073898496
+ 947 0024 40640240 		.word	1073898560
+ 948              		.cfi_endproc
+ 949              	.LFE136:
+ 951              		.section	.text.USART1_Init,"ax",%progbits
+ 952              		.align	1
+ 953              		.global	USART1_Init
+ 954              		.syntax unified
+ 955              		.thumb
+ARM GAS  /tmp/ccYmkDEK.s 			page 26
+
+
+ 956              		.thumb_func
+ 958              	USART1_Init:
+ 959              	.LFB132:
+ 249:MyHardWare/Src/usart.c ****   // 初始化发送和接收环形缓冲区
+ 960              		.loc 1 249 24 is_stmt 1 view -0
+ 961              		.cfi_startproc
+ 962              		@ args = 0, pretend = 0, frame = 0
+ 963              		@ frame_needed = 0, uses_anonymous_args = 0
+ 964 0000 08B5     		push	{r3, lr}
+ 965              	.LCFI19:
+ 966              		.cfi_def_cfa_offset 8
+ 967              		.cfi_offset 3, -8
+ 968              		.cfi_offset 14, -4
+ 251:MyHardWare/Src/usart.c ****   RingBuffer_Init(&rx_queue, dma_rx_buffer, USART_DMA_RX_BUFFER_SIZE);
+ 969              		.loc 1 251 3 view .LVU261
+ 970 0002 4FF48072 		mov	r2, #256
+ 971 0006 0949     		ldr	r1, .L61
+ 972 0008 0948     		ldr	r0, .L61+4
+ 973 000a FFF7FEFF 		bl	RingBuffer_Init
+ 974              	.LVL64:
  252:MyHardWare/Src/usart.c **** 
- 933              		.loc 1 252 3 view .LVU246
- 934 001a FFF7FEFF 		bl	USART1_DMA_Init
- 935              	.LVL58:
+ 975              		.loc 1 252 3 view .LVU262
+ 976 000e 4FF48072 		mov	r2, #256
+ 977 0012 0849     		ldr	r1, .L61+8
+ 978 0014 0848     		ldr	r0, .L61+12
+ 979 0016 FFF7FEFF 		bl	RingBuffer_Init
+ 980              	.LVL65:
  255:MyHardWare/Src/usart.c **** 
- 936              		.loc 1 255 3 view .LVU247
- 937 001e FFF7FEFF 		bl	Usart_Config
- 938              	.LVL59:
+ 981              		.loc 1 255 3 view .LVU263
+ 982 001a FFF7FEFF 		bl	USART1_DMA_Init
+ 983              	.LVL66:
  258:MyHardWare/Src/usart.c **** 
- 939              		.loc 1 258 3 view .LVU248
- 940 0022 FFF7FEFF 		bl	TIM7_Config
- 941              	.LVL60:
+ 984              		.loc 1 258 3 view .LVU264
+ 985 001e FFF7FEFF 		bl	Usart_Config
+ 986              	.LVL67:
  261:MyHardWare/Src/usart.c **** 
- 942              		.loc 1 261 3 view .LVU249
- 943 0026 FFF7FEFF 		bl	UART1_DMA_Start_RX
- 944              	.LVL61:
- 265:MyHardWare/Src/usart.c **** 
- 945              		.loc 1 265 1 is_stmt 0 view .LVU250
- 946 002a 08BD     		pop	{r3, pc}
- 947              	.L57:
- 948              		.align	2
- 949              	.L56:
- 950 002c 00000000 		.word	dma_tx_buffer
- 951 0030 00000000 		.word	tx_queue
- 952 0034 00000000 		.word	dma_rx_buffer
- 953 0038 00000000 		.word	rx_queue
- 954              		.cfi_endproc
- 955              	.LFE132:
- 957              		.section	.text.TIM7_IRQHandler,"ax",%progbits
- 958              		.align	1
- 959              		.global	TIM7_IRQHandler
- 960              		.syntax unified
- 961              		.thumb
- 962              		.thumb_func
- 964              	TIM7_IRQHandler:
- 965              	.LFB137:
- 370:MyHardWare/Src/usart.c **** /**
- 371:MyHardWare/Src/usart.c ****  * @brief  TIM7 中断服务函数，每 100us 进入一次
- 372:MyHardWare/Src/usart.c ****  *         检查发送环形缓冲队列是否有数据，有数据则启动 DMA 传输并关闭�
- 373:MyHardWare/Src/usart.c ****  *         避免频繁进入中断，降低 CPU 负载
- 374:MyHardWare/Src/usart.c ****  */
- 375:MyHardWare/Src/usart.c **** void TIM7_IRQHandler(void) {
- 966              		.loc 1 375 28 is_stmt 1 view -0
- 967              		.cfi_startproc
-ARM GAS  /tmp/cc4p3ByD.s 			page 26
+ 987              		.loc 1 261 3 view .LVU265
+ 988 0022 FFF7FEFF 		bl	TIM7_Config
+ 989              	.LVL68:
+ 264:MyHardWare/Src/usart.c **** 
+ 990              		.loc 1 264 3 view .LVU266
+ 991 0026 FFF7FEFF 		bl	UART1_DMA_Start_RX
+ 992              	.LVL69:
+ 268:MyHardWare/Src/usart.c **** 
+ 993              		.loc 1 268 1 is_stmt 0 view .LVU267
+ 994 002a 08BD     		pop	{r3, pc}
+ 995              	.L62:
+ 996              		.align	2
+ 997              	.L61:
+ 998 002c 00000000 		.word	dma_tx_buffer
+ 999 0030 00000000 		.word	tx_queue
+ 1000 0034 00000000 		.word	dma_rx_buffer
+ 1001 0038 00000000 		.word	rx_queue
+ 1002              		.cfi_endproc
+ 1003              	.LFE132:
+ 1005              		.section	.text.TIM7_IRQHandler,"ax",%progbits
+ 1006              		.align	1
+ARM GAS  /tmp/ccYmkDEK.s 			page 27
 
 
- 968              		@ args = 0, pretend = 0, frame = 0
- 969              		@ frame_needed = 0, uses_anonymous_args = 0
- 970 0000 08B5     		push	{r3, lr}
- 971              	.LCFI20:
- 972              		.cfi_def_cfa_offset 8
- 973              		.cfi_offset 3, -8
- 974              		.cfi_offset 14, -4
- 376:MyHardWare/Src/usart.c ****   if (TIM_GetITStatus(TIM7, TIM_IT_Update) != RESET) {
- 975              		.loc 1 376 3 view .LVU252
- 976              		.loc 1 376 7 is_stmt 0 view .LVU253
- 977 0002 0121     		movs	r1, #1
- 978 0004 0948     		ldr	r0, .L62
- 979 0006 FFF7FEFF 		bl	TIM_GetITStatus
- 980              	.LVL62:
- 981              		.loc 1 376 6 discriminator 1 view .LVU254
- 982 000a 00B9     		cbnz	r0, .L61
- 983              	.L58:
- 377:MyHardWare/Src/usart.c ****     TIM_ClearITPendingBit(TIM7, TIM_IT_Update);
- 378:MyHardWare/Src/usart.c **** 
- 379:MyHardWare/Src/usart.c ****     // 检查发送队列是否有数据
- 380:MyHardWare/Src/usart.c ****     if (!RingBuffer_IsEmpty(&tx_queue)) {
- 381:MyHardWare/Src/usart.c ****       // 有数据，启动 DMA 传输
- 382:MyHardWare/Src/usart.c ****       USART_StartDMA_TX();
- 383:MyHardWare/Src/usart.c **** 
- 384:MyHardWare/Src/usart.c ****       // 关闭 TIM7 中断，避免频繁进入中断
- 385:MyHardWare/Src/usart.c ****       // DMA 传输完成后会根据队列状态决定是否重新使能中断
- 386:MyHardWare/Src/usart.c ****       TIM7_DisableIRQ();
- 387:MyHardWare/Src/usart.c ****     }
- 388:MyHardWare/Src/usart.c ****   }
- 389:MyHardWare/Src/usart.c **** }
- 984              		.loc 1 389 1 view .LVU255
- 985 000c 08BD     		pop	{r3, pc}
- 986              	.L61:
- 377:MyHardWare/Src/usart.c ****     TIM_ClearITPendingBit(TIM7, TIM_IT_Update);
- 987              		.loc 1 377 5 is_stmt 1 view .LVU256
- 988 000e 0121     		movs	r1, #1
- 989 0010 0648     		ldr	r0, .L62
- 990 0012 FFF7FEFF 		bl	TIM_ClearITPendingBit
- 991              	.LVL63:
- 380:MyHardWare/Src/usart.c ****       // 有数据，启动 DMA 传输
- 992              		.loc 1 380 5 view .LVU257
- 380:MyHardWare/Src/usart.c ****       // 有数据，启动 DMA 传输
- 993              		.loc 1 380 10 is_stmt 0 view .LVU258
- 994 0016 0648     		ldr	r0, .L62+4
- 995 0018 FFF7FEFF 		bl	RingBuffer_IsEmpty
- 996              	.LVL64:
- 380:MyHardWare/Src/usart.c ****       // 有数据，启动 DMA 传输
- 997              		.loc 1 380 8 discriminator 1 view .LVU259
- 998 001c 0028     		cmp	r0, #0
- 999 001e F5D1     		bne	.L58
- 382:MyHardWare/Src/usart.c **** 
- 1000              		.loc 1 382 7 is_stmt 1 view .LVU260
- 1001 0020 FFF7FEFF 		bl	USART_StartDMA_TX
- 1002              	.LVL65:
- 386:MyHardWare/Src/usart.c ****     }
- 1003              		.loc 1 386 7 view .LVU261
- 1004 0024 FFF7FEFF 		bl	TIM7_DisableIRQ
-ARM GAS  /tmp/cc4p3ByD.s 			page 27
+ 1007              		.global	TIM7_IRQHandler
+ 1008              		.syntax unified
+ 1009              		.thumb
+ 1010              		.thumb_func
+ 1012              	TIM7_IRQHandler:
+ 1013              	.LFB138:
+ 376:MyHardWare/Src/usart.c **** /**
+ 377:MyHardWare/Src/usart.c ****  * @brief  TIM7 中断服务函数，每 100us 进入一次
+ 378:MyHardWare/Src/usart.c ****  *         检查发送环形缓冲队列是否有数据，有数据则启动 DMA 传输并关闭�
+ 379:MyHardWare/Src/usart.c ****  *         避免频繁进入中断，降低 CPU 负载
+ 380:MyHardWare/Src/usart.c ****  */
+ 381:MyHardWare/Src/usart.c **** void TIM7_IRQHandler(void) {
+ 1014              		.loc 1 381 28 is_stmt 1 view -0
+ 1015              		.cfi_startproc
+ 1016              		@ args = 0, pretend = 0, frame = 0
+ 1017              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1018 0000 08B5     		push	{r3, lr}
+ 1019              	.LCFI20:
+ 1020              		.cfi_def_cfa_offset 8
+ 1021              		.cfi_offset 3, -8
+ 1022              		.cfi_offset 14, -4
+ 382:MyHardWare/Src/usart.c ****   if (TIM_GetITStatus(TIM7, TIM_IT_Update) != RESET) {
+ 1023              		.loc 1 382 3 view .LVU269
+ 1024              		.loc 1 382 7 is_stmt 0 view .LVU270
+ 1025 0002 0121     		movs	r1, #1
+ 1026 0004 0948     		ldr	r0, .L67
+ 1027 0006 FFF7FEFF 		bl	TIM_GetITStatus
+ 1028              	.LVL70:
+ 1029              		.loc 1 382 6 discriminator 1 view .LVU271
+ 1030 000a 00B9     		cbnz	r0, .L66
+ 1031              	.L63:
+ 383:MyHardWare/Src/usart.c ****     TIM_ClearITPendingBit(TIM7, TIM_IT_Update);
+ 384:MyHardWare/Src/usart.c **** 
+ 385:MyHardWare/Src/usart.c ****     // 检查发送队列是否有数据
+ 386:MyHardWare/Src/usart.c ****     if (!RingBuffer_IsEmpty(&tx_queue)) {
+ 387:MyHardWare/Src/usart.c ****       // 有数据，启动 DMA 传输
+ 388:MyHardWare/Src/usart.c ****       USART_StartDMA_TX();
+ 389:MyHardWare/Src/usart.c **** 
+ 390:MyHardWare/Src/usart.c ****       // 关闭 TIM7 中断，避免频繁进入中断
+ 391:MyHardWare/Src/usart.c ****       // DMA 传输完成后会根据队列状态决定是否重新使能中断
+ 392:MyHardWare/Src/usart.c ****       TIM7_DisableIRQ();
+ 393:MyHardWare/Src/usart.c ****     }
+ 394:MyHardWare/Src/usart.c ****   }
+ 395:MyHardWare/Src/usart.c **** }
+ 1032              		.loc 1 395 1 view .LVU272
+ 1033 000c 08BD     		pop	{r3, pc}
+ 1034              	.L66:
+ 383:MyHardWare/Src/usart.c ****     TIM_ClearITPendingBit(TIM7, TIM_IT_Update);
+ 1035              		.loc 1 383 5 is_stmt 1 view .LVU273
+ 1036 000e 0121     		movs	r1, #1
+ 1037 0010 0648     		ldr	r0, .L67
+ 1038 0012 FFF7FEFF 		bl	TIM_ClearITPendingBit
+ 1039              	.LVL71:
+ 386:MyHardWare/Src/usart.c ****       // 有数据，启动 DMA 传输
+ 1040              		.loc 1 386 5 view .LVU274
+ 386:MyHardWare/Src/usart.c ****       // 有数据，启动 DMA 传输
+ 1041              		.loc 1 386 10 is_stmt 0 view .LVU275
+ARM GAS  /tmp/ccYmkDEK.s 			page 28
 
 
- 1005              	.LVL66:
- 1006              		.loc 1 389 1 is_stmt 0 view .LVU262
- 1007 0028 F0E7     		b	.L58
- 1008              	.L63:
- 1009 002a 00BF     		.align	2
- 1010              	.L62:
- 1011 002c 00140040 		.word	1073746944
- 1012 0030 00000000 		.word	tx_queue
- 1013              		.cfi_endproc
- 1014              	.LFE137:
- 1016              		.section	.text.DMA2_Stream2_IRQHandler,"ax",%progbits
- 1017              		.align	1
- 1018              		.global	DMA2_Stream2_IRQHandler
- 1019              		.syntax unified
- 1020              		.thumb
- 1021              		.thumb_func
- 1023              	DMA2_Stream2_IRQHandler:
- 1024              	.LFB138:
- 390:MyHardWare/Src/usart.c **** 
- 391:MyHardWare/Src/usart.c **** /**
- 392:MyHardWare/Src/usart.c ****  * @brief  DMA2 Stream5 中断服务函数（USART1 RX）
- 393:MyHardWare/Src/usart.c ****  *         处理 DMA 接收完成中断，重新启动 DMA 接收
- 394:MyHardWare/Src/usart.c ****  */
- 395:MyHardWare/Src/usart.c **** void DMA2_Stream2_IRQHandler(void) {
- 1025              		.loc 1 395 36 is_stmt 1 view -0
- 1026              		.cfi_startproc
- 1027              		@ args = 0, pretend = 0, frame = 0
- 1028              		@ frame_needed = 0, uses_anonymous_args = 0
- 1029 0000 08B5     		push	{r3, lr}
- 1030              	.LCFI21:
- 1031              		.cfi_def_cfa_offset 8
- 1032              		.cfi_offset 3, -8
- 1033              		.cfi_offset 14, -4
- 396:MyHardWare/Src/usart.c ****   if (DMA_GetITStatus(DMA2_Stream2, DMA_IT_TCIF2) != RESET) {
- 1034              		.loc 1 396 3 view .LVU264
- 1035              		.loc 1 396 7 is_stmt 0 view .LVU265
- 1036 0002 0A49     		ldr	r1, .L68
- 1037 0004 0A48     		ldr	r0, .L68+4
- 1038 0006 FFF7FEFF 		bl	DMA_GetITStatus
- 1039              	.LVL67:
- 1040              		.loc 1 396 6 discriminator 1 view .LVU266
- 1041 000a 00B9     		cbnz	r0, .L67
- 1042              	.L64:
- 397:MyHardWare/Src/usart.c ****     DMA_ClearITPendingBit(DMA2_Stream2, DMA_IT_TCIF2);
- 398:MyHardWare/Src/usart.c ****     dma_rx_transfer_complete = 1;
- 399:MyHardWare/Src/usart.c ****     DMA_Cmd(DMA2_Stream5, DISABLE);
- 400:MyHardWare/Src/usart.c ****     UART1_DMA_Start_RX();
- 401:MyHardWare/Src/usart.c ****   }
- 402:MyHardWare/Src/usart.c **** }
- 1043              		.loc 1 402 1 view .LVU267
- 1044 000c 08BD     		pop	{r3, pc}
- 1045              	.L67:
- 397:MyHardWare/Src/usart.c ****     DMA_ClearITPendingBit(DMA2_Stream2, DMA_IT_TCIF2);
- 1046              		.loc 1 397 5 is_stmt 1 view .LVU268
- 1047 000e 0749     		ldr	r1, .L68
- 1048 0010 0748     		ldr	r0, .L68+4
- 1049 0012 FFF7FEFF 		bl	DMA_ClearITPendingBit
-ARM GAS  /tmp/cc4p3ByD.s 			page 28
+ 1042 0016 0648     		ldr	r0, .L67+4
+ 1043 0018 FFF7FEFF 		bl	RingBuffer_IsEmpty
+ 1044              	.LVL72:
+ 386:MyHardWare/Src/usart.c ****       // 有数据，启动 DMA 传输
+ 1045              		.loc 1 386 8 discriminator 1 view .LVU276
+ 1046 001c 0028     		cmp	r0, #0
+ 1047 001e F5D1     		bne	.L63
+ 388:MyHardWare/Src/usart.c **** 
+ 1048              		.loc 1 388 7 is_stmt 1 view .LVU277
+ 1049 0020 FFF7FEFF 		bl	USART_StartDMA_TX
+ 1050              	.LVL73:
+ 392:MyHardWare/Src/usart.c ****     }
+ 1051              		.loc 1 392 7 view .LVU278
+ 1052 0024 FFF7FEFF 		bl	TIM7_DisableIRQ
+ 1053              	.LVL74:
+ 1054              		.loc 1 395 1 is_stmt 0 view .LVU279
+ 1055 0028 F0E7     		b	.L63
+ 1056              	.L68:
+ 1057 002a 00BF     		.align	2
+ 1058              	.L67:
+ 1059 002c 00140040 		.word	1073746944
+ 1060 0030 00000000 		.word	tx_queue
+ 1061              		.cfi_endproc
+ 1062              	.LFE138:
+ 1064              		.section	.text.DMA2_Stream2_IRQHandler,"ax",%progbits
+ 1065              		.align	1
+ 1066              		.global	DMA2_Stream2_IRQHandler
+ 1067              		.syntax unified
+ 1068              		.thumb
+ 1069              		.thumb_func
+ 1071              	DMA2_Stream2_IRQHandler:
+ 1072              	.LFB139:
+ 396:MyHardWare/Src/usart.c **** 
+ 397:MyHardWare/Src/usart.c **** /**
+ 398:MyHardWare/Src/usart.c ****  * @brief  DMA2 Stream5 中断服务函数（USART1 RX）
+ 399:MyHardWare/Src/usart.c ****  *         处理 DMA 接收完成中断，重新启动 DMA 接收
+ 400:MyHardWare/Src/usart.c ****  */
+ 401:MyHardWare/Src/usart.c **** void DMA2_Stream2_IRQHandler(void) {
+ 1073              		.loc 1 401 36 is_stmt 1 view -0
+ 1074              		.cfi_startproc
+ 1075              		@ args = 0, pretend = 0, frame = 0
+ 1076              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1077 0000 08B5     		push	{r3, lr}
+ 1078              	.LCFI21:
+ 1079              		.cfi_def_cfa_offset 8
+ 1080              		.cfi_offset 3, -8
+ 1081              		.cfi_offset 14, -4
+ 402:MyHardWare/Src/usart.c ****   if (DMA_GetITStatus(DMA2_Stream2, DMA_IT_TCIF2) != RESET) {
+ 1082              		.loc 1 402 3 view .LVU281
+ 1083              		.loc 1 402 7 is_stmt 0 view .LVU282
+ 1084 0002 0A49     		ldr	r1, .L73
+ 1085 0004 0A48     		ldr	r0, .L73+4
+ 1086 0006 FFF7FEFF 		bl	DMA_GetITStatus
+ 1087              	.LVL75:
+ 1088              		.loc 1 402 6 discriminator 1 view .LVU283
+ 1089 000a 00B9     		cbnz	r0, .L72
+ 1090              	.L69:
+ARM GAS  /tmp/ccYmkDEK.s 			page 29
 
 
- 1050              	.LVL68:
- 398:MyHardWare/Src/usart.c ****     DMA_Cmd(DMA2_Stream5, DISABLE);
- 1051              		.loc 1 398 5 view .LVU269
- 398:MyHardWare/Src/usart.c ****     DMA_Cmd(DMA2_Stream5, DISABLE);
- 1052              		.loc 1 398 30 is_stmt 0 view .LVU270
- 1053 0016 074B     		ldr	r3, .L68+8
- 1054 0018 0122     		movs	r2, #1
- 1055 001a 1A70     		strb	r2, [r3]
- 399:MyHardWare/Src/usart.c ****     UART1_DMA_Start_RX();
- 1056              		.loc 1 399 5 is_stmt 1 view .LVU271
- 1057 001c 0021     		movs	r1, #0
- 1058 001e 0648     		ldr	r0, .L68+12
- 1059 0020 FFF7FEFF 		bl	DMA_Cmd
- 1060              	.LVL69:
- 400:MyHardWare/Src/usart.c ****   }
- 1061              		.loc 1 400 5 view .LVU272
- 1062 0024 FFF7FEFF 		bl	UART1_DMA_Start_RX
- 1063              	.LVL70:
- 1064              		.loc 1 402 1 is_stmt 0 view .LVU273
- 1065 0028 F0E7     		b	.L64
- 1066              	.L69:
- 1067 002a 00BF     		.align	2
- 1068              	.L68:
- 1069 002c 00802010 		.word	270565376
- 1070 0030 40640240 		.word	1073898560
- 1071 0034 00000000 		.word	dma_rx_transfer_complete
- 1072 0038 88640240 		.word	1073898632
- 1073              		.cfi_endproc
- 1074              	.LFE138:
- 1076              		.section	.text.DMA2_Stream7_IRQHandler,"ax",%progbits
- 1077              		.align	1
- 1078              		.global	DMA2_Stream7_IRQHandler
- 1079              		.syntax unified
- 1080              		.thumb
- 1081              		.thumb_func
- 1083              	DMA2_Stream7_IRQHandler:
- 1084              	.LFB139:
- 403:MyHardWare/Src/usart.c **** 
- 404:MyHardWare/Src/usart.c **** /**
- 405:MyHardWare/Src/usart.c ****  * @brief  DMA2 Stream7 中断服务函数（USART1 TX）
- 406:MyHardWare/Src/usart.c ****  *         处理 DMA 发送完成中断，更新读指针，根据队列状态决定是否继续�
- 407:MyHardWare/Src/usart.c ****  */
- 408:MyHardWare/Src/usart.c **** 
- 409:MyHardWare/Src/usart.c **** void DMA2_Stream7_IRQHandler(void) {
- 1085              		.loc 1 409 36 is_stmt 1 view -0
- 1086              		.cfi_startproc
- 1087              		@ args = 0, pretend = 0, frame = 0
- 1088              		@ frame_needed = 0, uses_anonymous_args = 0
- 1089 0000 10B5     		push	{r4, lr}
- 1090              	.LCFI22:
- 1091              		.cfi_def_cfa_offset 8
- 1092              		.cfi_offset 4, -8
- 1093              		.cfi_offset 14, -4
- 410:MyHardWare/Src/usart.c ****   if (DMA_GetITStatus(DMA2_Stream7, DMA_IT_TCIF7) != RESET) {
- 1094              		.loc 1 410 3 view .LVU275
- 1095              		.loc 1 410 7 is_stmt 0 view .LVU276
- 1096 0002 1549     		ldr	r1, .L75
-ARM GAS  /tmp/cc4p3ByD.s 			page 29
-
-
- 1097 0004 1548     		ldr	r0, .L75+4
- 1098 0006 FFF7FEFF 		bl	DMA_GetITStatus
- 1099              	.LVL71:
- 1100              		.loc 1 410 6 discriminator 1 view .LVU277
- 1101 000a 00B9     		cbnz	r0, .L74
- 1102              	.L70:
- 411:MyHardWare/Src/usart.c ****     DMA_ClearITPendingBit(DMA2_Stream7, DMA_IT_TCIF7);
- 412:MyHardWare/Src/usart.c ****     dma_tx_transfer_complete = 1;
- 413:MyHardWare/Src/usart.c ****     DMA_Cmd(DMA2_Stream7, DISABLE);
+ 403:MyHardWare/Src/usart.c ****     DMA_ClearITPendingBit(DMA2_Stream2, DMA_IT_TCIF2);
+ 404:MyHardWare/Src/usart.c ****     dma_rx_transfer_complete = 1;
+ 405:MyHardWare/Src/usart.c ****     DMA_Cmd(DMA2_Stream5, DISABLE);
+ 406:MyHardWare/Src/usart.c ****     UART1_DMA_Start_RX();
+ 407:MyHardWare/Src/usart.c ****   }
+ 408:MyHardWare/Src/usart.c **** }
+ 1091              		.loc 1 408 1 view .LVU284
+ 1092 000c 08BD     		pop	{r3, pc}
+ 1093              	.L72:
+ 403:MyHardWare/Src/usart.c ****     DMA_ClearITPendingBit(DMA2_Stream2, DMA_IT_TCIF2);
+ 1094              		.loc 1 403 5 is_stmt 1 view .LVU285
+ 1095 000e 0749     		ldr	r1, .L73
+ 1096 0010 0748     		ldr	r0, .L73+4
+ 1097 0012 FFF7FEFF 		bl	DMA_ClearITPendingBit
+ 1098              	.LVL76:
+ 404:MyHardWare/Src/usart.c ****     DMA_Cmd(DMA2_Stream5, DISABLE);
+ 1099              		.loc 1 404 5 view .LVU286
+ 404:MyHardWare/Src/usart.c ****     DMA_Cmd(DMA2_Stream5, DISABLE);
+ 1100              		.loc 1 404 30 is_stmt 0 view .LVU287
+ 1101 0016 074B     		ldr	r3, .L73+8
+ 1102 0018 0122     		movs	r2, #1
+ 1103 001a 1A70     		strb	r2, [r3]
+ 405:MyHardWare/Src/usart.c ****     UART1_DMA_Start_RX();
+ 1104              		.loc 1 405 5 is_stmt 1 view .LVU288
+ 1105 001c 0021     		movs	r1, #0
+ 1106 001e 0648     		ldr	r0, .L73+12
+ 1107 0020 FFF7FEFF 		bl	DMA_Cmd
+ 1108              	.LVL77:
+ 406:MyHardWare/Src/usart.c ****   }
+ 1109              		.loc 1 406 5 view .LVU289
+ 1110 0024 FFF7FEFF 		bl	UART1_DMA_Start_RX
+ 1111              	.LVL78:
+ 1112              		.loc 1 408 1 is_stmt 0 view .LVU290
+ 1113 0028 F0E7     		b	.L69
+ 1114              	.L74:
+ 1115 002a 00BF     		.align	2
+ 1116              	.L73:
+ 1117 002c 00802010 		.word	270565376
+ 1118 0030 40640240 		.word	1073898560
+ 1119 0034 00000000 		.word	dma_rx_transfer_complete
+ 1120 0038 88640240 		.word	1073898632
+ 1121              		.cfi_endproc
+ 1122              	.LFE139:
+ 1124              		.section	.text.DMA2_Stream7_IRQHandler,"ax",%progbits
+ 1125              		.align	1
+ 1126              		.global	DMA2_Stream7_IRQHandler
+ 1127              		.syntax unified
+ 1128              		.thumb
+ 1129              		.thumb_func
+ 1131              	DMA2_Stream7_IRQHandler:
+ 1132              	.LFB140:
+ 409:MyHardWare/Src/usart.c **** 
+ 410:MyHardWare/Src/usart.c **** /**
+ 411:MyHardWare/Src/usart.c ****  * @brief  DMA2 Stream7 中断服务函数（USART1 TX）
+ 412:MyHardWare/Src/usart.c ****  *         处理 DMA 发送完成中断，更新读指针，根据队列状态决定是否继续�
+ 413:MyHardWare/Src/usart.c ****  */
  414:MyHardWare/Src/usart.c **** 
- 415:MyHardWare/Src/usart.c ****     // 计算已传输的数据长度 = 初始值 - 剩余值
- 416:MyHardWare/Src/usart.c ****     // DMA 传输完成后 NDTR 应该为 0，但为了保险起见还是计算一下
- 417:MyHardWare/Src/usart.c ****     uint16_t transferred = last_dma_tx_count - DMA2_Stream7->NDTR;
- 418:MyHardWare/Src/usart.c **** 
- 419:MyHardWare/Src/usart.c ****     // 跳过已读取的数据（移动 tail 指针）
- 420:MyHardWare/Src/usart.c ****     // 注意：这里只是移动逻辑指针，不会清除数据
- 421:MyHardWare/Src/usart.c ****     RingBuffer_SkipRead(&tx_queue, transferred);
- 422:MyHardWare/Src/usart.c ****     tx_queue.is_dma_enabled = 0;
+ARM GAS  /tmp/ccYmkDEK.s 			page 30
+
+
+ 415:MyHardWare/Src/usart.c **** void DMA2_Stream7_IRQHandler(void) {
+ 1133              		.loc 1 415 36 is_stmt 1 view -0
+ 1134              		.cfi_startproc
+ 1135              		@ args = 0, pretend = 0, frame = 0
+ 1136              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1137 0000 10B5     		push	{r4, lr}
+ 1138              	.LCFI22:
+ 1139              		.cfi_def_cfa_offset 8
+ 1140              		.cfi_offset 4, -8
+ 1141              		.cfi_offset 14, -4
+ 416:MyHardWare/Src/usart.c ****   if (DMA_GetITStatus(DMA2_Stream7, DMA_IT_TCIF7) != RESET) {
+ 1142              		.loc 1 416 3 view .LVU292
+ 1143              		.loc 1 416 7 is_stmt 0 view .LVU293
+ 1144 0002 1449     		ldr	r1, .L79
+ 1145 0004 1448     		ldr	r0, .L79+4
+ 1146 0006 FFF7FEFF 		bl	DMA_GetITStatus
+ 1147              	.LVL79:
+ 1148              		.loc 1 416 6 discriminator 1 view .LVU294
+ 1149 000a 00B9     		cbnz	r0, .L78
+ 1150              	.L75:
+ 417:MyHardWare/Src/usart.c ****     DMA_ClearITPendingBit(DMA2_Stream7, DMA_IT_TCIF7);
+ 418:MyHardWare/Src/usart.c ****     dma_tx_transfer_complete = 1;
+ 419:MyHardWare/Src/usart.c ****     DMA_Cmd(DMA2_Stream7, DISABLE);
+ 420:MyHardWare/Src/usart.c **** 
+ 421:MyHardWare/Src/usart.c ****     // 计算已传输的数据长度 = 初始值 - 剩余值
+ 422:MyHardWare/Src/usart.c ****     // DMA 传输完成后 NDTR 应该为 0，但为了保险起见还是计算一下
+ 423:MyHardWare/Src/usart.c ****     uint16_t transferred = last_dma_tx_count - DMA2_Stream7->NDTR;
+ 424:MyHardWare/Src/usart.c **** 
+ 425:MyHardWare/Src/usart.c ****     // 跳过已读取的数据（移动 tail 指针）
+ 426:MyHardWare/Src/usart.c ****     // 注意：这里只是移动逻辑指针，不会清除数据
+ 427:MyHardWare/Src/usart.c ****     RingBuffer_SkipRead(&tx_queue, transferred);
+ 428:MyHardWare/Src/usart.c ****     tx_queue.is_dma_enabled = 0;
+ 429:MyHardWare/Src/usart.c **** 
+ 430:MyHardWare/Src/usart.c ****     // 关键：重新检查队列状态，而不是简单地判断是否为空
+ 431:MyHardWare/Src/usart.c ****     // 因为在 DMA 传输期间，printf 可能又写入了新数据
+ 432:MyHardWare/Src/usart.c ****     if (!RingBuffer_IsEmpty(&tx_queue)) {
+ 433:MyHardWare/Src/usart.c ****       // 队列还有数据，立即启动下一段 DMA 传输
+ 434:MyHardWare/Src/usart.c ****       // 这会自动处理以下情况：
+ 435:MyHardWare/Src/usart.c ****       // 1. 之前是分段传输的第二段（tail 已回绕到 0）
+ 436:MyHardWare/Src/usart.c ****       // 2. DMA 传输期间 printf 新写入的数据
+ 437:MyHardWare/Src/usart.c ****       USART_StartDMA_TX();
+ 438:MyHardWare/Src/usart.c ****     }
+ 439:MyHardWare/Src/usart.c ****   }
+ 440:MyHardWare/Src/usart.c **** }
+ 1151              		.loc 1 440 1 view .LVU295
+ 1152 000c 10BD     		pop	{r4, pc}
+ 1153              	.L78:
+ 1154              	.LBB4:
+ 417:MyHardWare/Src/usart.c ****     DMA_ClearITPendingBit(DMA2_Stream7, DMA_IT_TCIF7);
+ 1155              		.loc 1 417 5 is_stmt 1 view .LVU296
+ 1156 000e 124C     		ldr	r4, .L79+4
+ 1157 0010 1049     		ldr	r1, .L79
+ 1158 0012 2046     		mov	r0, r4
+ 1159 0014 FFF7FEFF 		bl	DMA_ClearITPendingBit
+ 1160              	.LVL80:
+ 418:MyHardWare/Src/usart.c ****     DMA_Cmd(DMA2_Stream7, DISABLE);
+ 1161              		.loc 1 418 5 view .LVU297
+ARM GAS  /tmp/ccYmkDEK.s 			page 31
+
+
+ 418:MyHardWare/Src/usart.c ****     DMA_Cmd(DMA2_Stream7, DISABLE);
+ 1162              		.loc 1 418 30 is_stmt 0 view .LVU298
+ 1163 0018 104B     		ldr	r3, .L79+8
+ 1164 001a 0122     		movs	r2, #1
+ 1165 001c 1A70     		strb	r2, [r3]
+ 419:MyHardWare/Src/usart.c **** 
+ 1166              		.loc 1 419 5 is_stmt 1 view .LVU299
+ 1167 001e 0021     		movs	r1, #0
+ 1168 0020 2046     		mov	r0, r4
+ 1169 0022 FFF7FEFF 		bl	DMA_Cmd
+ 1170              	.LVL81:
  423:MyHardWare/Src/usart.c **** 
- 424:MyHardWare/Src/usart.c ****     // 关键：重新检查队列状态，而不是简单地判断是否为空
- 425:MyHardWare/Src/usart.c ****     // 因为在 DMA 传输期间，printf 可能又写入了新数据
- 426:MyHardWare/Src/usart.c ****     if (!RingBuffer_IsEmpty(&tx_queue)) {
- 427:MyHardWare/Src/usart.c ****       // 队列还有数据，立即启动下一段 DMA 传输
- 428:MyHardWare/Src/usart.c ****       // 这会自动处理以下情况：
- 429:MyHardWare/Src/usart.c ****       // 1. 之前是分段传输的第二段（tail 已回绕到 0）
- 430:MyHardWare/Src/usart.c ****       // 2. DMA 传输期间 printf 新写入的数据
- 431:MyHardWare/Src/usart.c ****       USART_StartDMA_TX();
- 432:MyHardWare/Src/usart.c ****     } else {
- 433:MyHardWare/Src/usart.c ****       // 队列已空，重新使能 TIM7 中断，等待下一次数据写入
- 434:MyHardWare/Src/usart.c ****       TIM7_EnableIRQ();
- 435:MyHardWare/Src/usart.c ****     }
- 436:MyHardWare/Src/usart.c ****   }
- 437:MyHardWare/Src/usart.c **** }
- 1103              		.loc 1 437 1 view .LVU278
- 1104 000c 10BD     		pop	{r4, pc}
- 1105              	.L74:
- 1106              	.LBB4:
- 411:MyHardWare/Src/usart.c ****     DMA_ClearITPendingBit(DMA2_Stream7, DMA_IT_TCIF7);
- 1107              		.loc 1 411 5 is_stmt 1 view .LVU279
- 1108 000e 134C     		ldr	r4, .L75+4
- 1109 0010 1149     		ldr	r1, .L75
- 1110 0012 2046     		mov	r0, r4
- 1111 0014 FFF7FEFF 		bl	DMA_ClearITPendingBit
- 1112              	.LVL72:
- 412:MyHardWare/Src/usart.c ****     DMA_Cmd(DMA2_Stream7, DISABLE);
- 1113              		.loc 1 412 5 view .LVU280
- 412:MyHardWare/Src/usart.c ****     DMA_Cmd(DMA2_Stream7, DISABLE);
- 1114              		.loc 1 412 30 is_stmt 0 view .LVU281
- 1115 0018 114B     		ldr	r3, .L75+8
- 1116 001a 0122     		movs	r2, #1
- 1117 001c 1A70     		strb	r2, [r3]
- 413:MyHardWare/Src/usart.c **** 
- 1118              		.loc 1 413 5 is_stmt 1 view .LVU282
- 1119 001e 0021     		movs	r1, #0
- 1120 0020 2046     		mov	r0, r4
- 1121 0022 FFF7FEFF 		bl	DMA_Cmd
- 1122              	.LVL73:
-ARM GAS  /tmp/cc4p3ByD.s 			page 30
+ 1171              		.loc 1 423 5 view .LVU300
+ 423:MyHardWare/Src/usart.c **** 
+ 1172              		.loc 1 423 46 is_stmt 0 view .LVU301
+ 1173 0026 0E4B     		ldr	r3, .L79+12
+ 1174 0028 1988     		ldrh	r1, [r3]
+ 423:MyHardWare/Src/usart.c **** 
+ 1175              		.loc 1 423 60 view .LVU302
+ 1176 002a 0E4B     		ldr	r3, .L79+16
+ 1177 002c D3F8BC30 		ldr	r3, [r3, #188]
+ 423:MyHardWare/Src/usart.c **** 
+ 1178              		.loc 1 423 46 view .LVU303
+ 1179 0030 9BB2     		uxth	r3, r3
+ 423:MyHardWare/Src/usart.c **** 
+ 1180              		.loc 1 423 14 view .LVU304
+ 1181 0032 C91A     		subs	r1, r1, r3
+ 1182              	.LVL82:
+ 427:MyHardWare/Src/usart.c ****     tx_queue.is_dma_enabled = 0;
+ 1183              		.loc 1 427 5 is_stmt 1 view .LVU305
+ 1184 0034 0C4C     		ldr	r4, .L79+20
+ 1185 0036 89B2     		uxth	r1, r1
+ 427:MyHardWare/Src/usart.c ****     tx_queue.is_dma_enabled = 0;
+ 1186              		.loc 1 427 5 is_stmt 0 view .LVU306
+ 1187 0038 2046     		mov	r0, r4
+ 1188 003a FFF7FEFF 		bl	RingBuffer_SkipRead
+ 1189              	.LVL83:
+ 428:MyHardWare/Src/usart.c **** 
+ 1190              		.loc 1 428 5 is_stmt 1 view .LVU307
+ 428:MyHardWare/Src/usart.c **** 
+ 1191              		.loc 1 428 29 is_stmt 0 view .LVU308
+ 1192 003e 0023     		movs	r3, #0
+ 1193 0040 A372     		strb	r3, [r4, #10]
+ 432:MyHardWare/Src/usart.c ****       // 队列还有数据，立即启动下一段 DMA 传输
+ 1194              		.loc 1 432 5 is_stmt 1 view .LVU309
+ 432:MyHardWare/Src/usart.c ****       // 队列还有数据，立即启动下一段 DMA 传输
+ 1195              		.loc 1 432 10 is_stmt 0 view .LVU310
+ 1196 0042 2046     		mov	r0, r4
+ 1197 0044 FFF7FEFF 		bl	RingBuffer_IsEmpty
+ 1198              	.LVL84:
+ 432:MyHardWare/Src/usart.c ****       // 队列还有数据，立即启动下一段 DMA 传输
+ 1199              		.loc 1 432 8 discriminator 1 view .LVU311
+ 1200 0048 0028     		cmp	r0, #0
+ 1201 004a DFD1     		bne	.L75
+ 437:MyHardWare/Src/usart.c ****     }
+ 1202              		.loc 1 437 7 is_stmt 1 view .LVU312
+ 1203 004c FFF7FEFF 		bl	USART_StartDMA_TX
+ARM GAS  /tmp/ccYmkDEK.s 			page 32
 
 
- 417:MyHardWare/Src/usart.c **** 
- 1123              		.loc 1 417 5 view .LVU283
- 417:MyHardWare/Src/usart.c **** 
- 1124              		.loc 1 417 46 is_stmt 0 view .LVU284
- 1125 0026 0F4B     		ldr	r3, .L75+12
- 1126 0028 1988     		ldrh	r1, [r3]
- 417:MyHardWare/Src/usart.c **** 
- 1127              		.loc 1 417 60 view .LVU285
- 1128 002a 0F4B     		ldr	r3, .L75+16
- 1129 002c D3F8BC30 		ldr	r3, [r3, #188]
- 417:MyHardWare/Src/usart.c **** 
- 1130              		.loc 1 417 46 view .LVU286
- 1131 0030 9BB2     		uxth	r3, r3
- 417:MyHardWare/Src/usart.c **** 
- 1132              		.loc 1 417 14 view .LVU287
- 1133 0032 C91A     		subs	r1, r1, r3
- 1134              	.LVL74:
- 421:MyHardWare/Src/usart.c ****     tx_queue.is_dma_enabled = 0;
- 1135              		.loc 1 421 5 is_stmt 1 view .LVU288
- 1136 0034 0D4C     		ldr	r4, .L75+20
- 1137 0036 89B2     		uxth	r1, r1
- 421:MyHardWare/Src/usart.c ****     tx_queue.is_dma_enabled = 0;
- 1138              		.loc 1 421 5 is_stmt 0 view .LVU289
- 1139 0038 2046     		mov	r0, r4
- 1140 003a FFF7FEFF 		bl	RingBuffer_SkipRead
- 1141              	.LVL75:
- 422:MyHardWare/Src/usart.c **** 
- 1142              		.loc 1 422 5 is_stmt 1 view .LVU290
- 422:MyHardWare/Src/usart.c **** 
- 1143              		.loc 1 422 29 is_stmt 0 view .LVU291
- 1144 003e 0023     		movs	r3, #0
- 1145 0040 A372     		strb	r3, [r4, #10]
- 426:MyHardWare/Src/usart.c ****       // 队列还有数据，立即启动下一段 DMA 传输
- 1146              		.loc 1 426 5 is_stmt 1 view .LVU292
- 426:MyHardWare/Src/usart.c ****       // 队列还有数据，立即启动下一段 DMA 传输
- 1147              		.loc 1 426 10 is_stmt 0 view .LVU293
- 1148 0042 2046     		mov	r0, r4
- 1149 0044 FFF7FEFF 		bl	RingBuffer_IsEmpty
- 1150              	.LVL76:
- 426:MyHardWare/Src/usart.c ****       // 队列还有数据，立即启动下一段 DMA 传输
- 1151              		.loc 1 426 8 discriminator 1 view .LVU294
- 1152 0048 10B9     		cbnz	r0, .L72
- 431:MyHardWare/Src/usart.c ****     } else {
- 1153              		.loc 1 431 7 is_stmt 1 view .LVU295
- 1154 004a FFF7FEFF 		bl	USART_StartDMA_TX
- 1155              	.LVL77:
- 1156 004e DDE7     		b	.L70
- 1157              	.L72:
- 434:MyHardWare/Src/usart.c ****     }
- 1158              		.loc 1 434 7 view .LVU296
- 1159 0050 FFF7FEFF 		bl	TIM7_EnableIRQ
- 1160              	.LVL78:
- 1161              	.LBE4:
- 1162              		.loc 1 437 1 is_stmt 0 view .LVU297
- 1163 0054 DAE7     		b	.L70
- 1164              	.L76:
- 1165 0056 00BF     		.align	2
-ARM GAS  /tmp/cc4p3ByD.s 			page 31
+ 1204              	.LVL85:
+ 1205              	.LBE4:
+ 1206              		.loc 1 440 1 is_stmt 0 view .LVU313
+ 1207 0050 DCE7     		b	.L75
+ 1208              	.L80:
+ 1209 0052 00BF     		.align	2
+ 1210              	.L79:
+ 1211 0054 00800028 		.word	671121408
+ 1212 0058 B8640240 		.word	1073898680
+ 1213 005c 00000000 		.word	dma_tx_transfer_complete
+ 1214 0060 00000000 		.word	last_dma_tx_count
+ 1215 0064 00640240 		.word	1073898496
+ 1216 0068 00000000 		.word	tx_queue
+ 1217              		.cfi_endproc
+ 1218              	.LFE140:
+ 1220              		.section	.text.UART1_ReadAvailable_DMA,"ax",%progbits
+ 1221              		.align	1
+ 1222              		.global	UART1_ReadAvailable_DMA
+ 1223              		.syntax unified
+ 1224              		.thumb
+ 1225              		.thumb_func
+ 1227              	UART1_ReadAvailable_DMA:
+ 1228              	.LFB141:
+ 441:MyHardWare/Src/usart.c **** /**
+ 442:MyHardWare/Src/usart.c ****  * @brief  获取 UART1 可读取的数据长度（DMA 接收模式）
+ 443:MyHardWare/Src/usart.c ****  * @retval 环形缓冲区中可用的数据字节数
+ 444:MyHardWare/Src/usart.c ****  */
+ 445:MyHardWare/Src/usart.c **** uint16_t UART1_ReadAvailable_DMA(void) {
+ 1229              		.loc 1 445 40 is_stmt 1 view -0
+ 1230              		.cfi_startproc
+ 1231              		@ args = 0, pretend = 0, frame = 0
+ 1232              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1233 0000 08B5     		push	{r3, lr}
+ 1234              	.LCFI23:
+ 1235              		.cfi_def_cfa_offset 8
+ 1236              		.cfi_offset 3, -8
+ 1237              		.cfi_offset 14, -4
+ 446:MyHardWare/Src/usart.c ****   return RingBuffer_Available(&rx_queue);
+ 1238              		.loc 1 446 3 view .LVU315
+ 1239              		.loc 1 446 10 is_stmt 0 view .LVU316
+ 1240 0002 0248     		ldr	r0, .L83
+ 1241 0004 FFF7FEFF 		bl	RingBuffer_Available
+ 1242              	.LVL86:
+ 447:MyHardWare/Src/usart.c **** }
+ 1243              		.loc 1 447 1 view .LVU317
+ 1244 0008 08BD     		pop	{r3, pc}
+ 1245              	.L84:
+ 1246 000a 00BF     		.align	2
+ 1247              	.L83:
+ 1248 000c 00000000 		.word	rx_queue
+ 1249              		.cfi_endproc
+ 1250              	.LFE141:
+ 1252              		.section	.bss.last_dma_tx_count,"aw",%nobits
+ 1253              		.align	1
+ 1256              	last_dma_tx_count:
+ 1257 0000 0000     		.space	2
+ 1258              		.global	dma_rx_transfer_complete
+ARM GAS  /tmp/ccYmkDEK.s 			page 33
 
 
- 1166              	.L75:
- 1167 0058 00800028 		.word	671121408
- 1168 005c B8640240 		.word	1073898680
- 1169 0060 00000000 		.word	dma_tx_transfer_complete
- 1170 0064 00000000 		.word	last_dma_tx_count
- 1171 0068 00640240 		.word	1073898496
- 1172 006c 00000000 		.word	tx_queue
- 1173              		.cfi_endproc
- 1174              	.LFE139:
- 1176              		.section	.text.UART1_ReadAvailable_DMA,"ax",%progbits
- 1177              		.align	1
- 1178              		.global	UART1_ReadAvailable_DMA
- 1179              		.syntax unified
- 1180              		.thumb
- 1181              		.thumb_func
- 1183              	UART1_ReadAvailable_DMA:
- 1184              	.LFB140:
- 438:MyHardWare/Src/usart.c **** /**
- 439:MyHardWare/Src/usart.c ****  * @brief  获取 UART1 可读取的数据长度（DMA 接收模式）
- 440:MyHardWare/Src/usart.c ****  * @retval 环形缓冲区中可用的数据字节数
- 441:MyHardWare/Src/usart.c ****  */
- 442:MyHardWare/Src/usart.c **** uint16_t UART1_ReadAvailable_DMA(void) {
- 1185              		.loc 1 442 40 is_stmt 1 view -0
- 1186              		.cfi_startproc
- 1187              		@ args = 0, pretend = 0, frame = 0
- 1188              		@ frame_needed = 0, uses_anonymous_args = 0
- 1189 0000 08B5     		push	{r3, lr}
- 1190              	.LCFI23:
- 1191              		.cfi_def_cfa_offset 8
- 1192              		.cfi_offset 3, -8
- 1193              		.cfi_offset 14, -4
- 443:MyHardWare/Src/usart.c ****   return RingBuffer_Available(&rx_queue);
- 1194              		.loc 1 443 3 view .LVU299
- 1195              		.loc 1 443 10 is_stmt 0 view .LVU300
- 1196 0002 0248     		ldr	r0, .L79
- 1197 0004 FFF7FEFF 		bl	RingBuffer_Available
- 1198              	.LVL79:
- 444:MyHardWare/Src/usart.c **** }
- 1199              		.loc 1 444 1 view .LVU301
- 1200 0008 08BD     		pop	{r3, pc}
- 1201              	.L80:
- 1202 000a 00BF     		.align	2
- 1203              	.L79:
- 1204 000c 00000000 		.word	rx_queue
- 1205              		.cfi_endproc
- 1206              	.LFE140:
- 1208              		.section	.bss.last_dma_tx_count,"aw",%nobits
- 1209              		.align	1
- 1212              	last_dma_tx_count:
- 1213 0000 0000     		.space	2
- 1214              		.global	dma_rx_transfer_complete
- 1215              		.section	.bss.dma_rx_transfer_complete,"aw",%nobits
- 1218              	dma_rx_transfer_complete:
- 1219 0000 00       		.space	1
- 1220              		.global	dma_tx_transfer_complete
- 1221              		.section	.bss.dma_tx_transfer_complete,"aw",%nobits
- 1224              	dma_tx_transfer_complete:
-ARM GAS  /tmp/cc4p3ByD.s 			page 32
-
-
- 1225 0000 00       		.space	1
- 1226              		.global	rx_queue
- 1227              		.section	.bss.rx_queue,"aw",%nobits
- 1228              		.align	2
- 1231              	rx_queue:
- 1232 0000 00000000 		.space	12
- 1232      00000000 
- 1232      00000000 
- 1233              		.global	tx_queue
- 1234              		.section	.bss.tx_queue,"aw",%nobits
- 1235              		.align	2
- 1238              	tx_queue:
- 1239 0000 00000000 		.space	12
- 1239      00000000 
- 1239      00000000 
- 1240              		.section	.bss.dma_rx_buffer,"aw",%nobits
- 1241              		.align	2
- 1244              	dma_rx_buffer:
- 1245 0000 00000000 		.space	256
- 1245      00000000 
- 1245      00000000 
- 1245      00000000 
- 1245      00000000 
- 1246              		.section	.bss.dma_tx_buffer,"aw",%nobits
- 1247              		.align	2
- 1250              	dma_tx_buffer:
- 1251 0000 00000000 		.space	256
- 1251      00000000 
- 1251      00000000 
- 1251      00000000 
- 1251      00000000 
- 1252              		.text
- 1253              	.Letext0:
- 1254              		.file 2 "/usr/lib/gcc/arm-none-eabi/13.2.1/include/stdint.h"
- 1255              		.file 3 "MyHardWare/Inc/ring_buffer.h"
- 1256              		.file 4 "CMSIS/stm32f4xx.h"
- 1257              		.file 5 "Lib/StdPeriphs/inc/stm32f4xx_dma.h"
- 1258              		.file 6 "Lib/StdPeriphs/inc/stm32f4xx_gpio.h"
- 1259              		.file 7 "Lib/StdPeriphs/inc/stm32f4xx_tim.h"
- 1260              		.file 8 "Lib/StdPeriphs/inc/stm32f4xx_usart.h"
- 1261              		.file 9 "Lib/StdPeriphs/inc/misc.h"
- 1262              		.file 10 "MyHardWare/Inc/usart.h"
- 1263              		.file 11 "Lib/StdPeriphs/inc/stm32f4xx_rcc.h"
-ARM GAS  /tmp/cc4p3ByD.s 			page 33
+ 1259              		.section	.bss.dma_rx_transfer_complete,"aw",%nobits
+ 1262              	dma_rx_transfer_complete:
+ 1263 0000 00       		.space	1
+ 1264              		.global	dma_tx_transfer_complete
+ 1265              		.section	.bss.dma_tx_transfer_complete,"aw",%nobits
+ 1268              	dma_tx_transfer_complete:
+ 1269 0000 00       		.space	1
+ 1270              		.global	rx_queue
+ 1271              		.section	.bss.rx_queue,"aw",%nobits
+ 1272              		.align	2
+ 1275              	rx_queue:
+ 1276 0000 00000000 		.space	12
+ 1276      00000000 
+ 1276      00000000 
+ 1277              		.global	tx_queue
+ 1278              		.section	.bss.tx_queue,"aw",%nobits
+ 1279              		.align	2
+ 1282              	tx_queue:
+ 1283 0000 00000000 		.space	12
+ 1283      00000000 
+ 1283      00000000 
+ 1284              		.section	.bss.dma_rx_buffer,"aw",%nobits
+ 1285              		.align	2
+ 1288              	dma_rx_buffer:
+ 1289 0000 00000000 		.space	256
+ 1289      00000000 
+ 1289      00000000 
+ 1289      00000000 
+ 1289      00000000 
+ 1290              		.section	.bss.dma_tx_buffer,"aw",%nobits
+ 1291              		.align	2
+ 1294              	dma_tx_buffer:
+ 1295 0000 00000000 		.space	256
+ 1295      00000000 
+ 1295      00000000 
+ 1295      00000000 
+ 1295      00000000 
+ 1296              		.text
+ 1297              	.Letext0:
+ 1298              		.file 2 "/usr/lib/gcc/arm-none-eabi/13.2.1/include/stdint.h"
+ 1299              		.file 3 "MyHardWare/Inc/ring_buffer.h"
+ 1300              		.file 4 "CMSIS/stm32f4xx.h"
+ 1301              		.file 5 "Lib/StdPeriphs/inc/stm32f4xx_dma.h"
+ 1302              		.file 6 "Lib/StdPeriphs/inc/stm32f4xx_gpio.h"
+ 1303              		.file 7 "Lib/StdPeriphs/inc/stm32f4xx_tim.h"
+ 1304              		.file 8 "Lib/StdPeriphs/inc/stm32f4xx_usart.h"
+ 1305              		.file 9 "Lib/StdPeriphs/inc/misc.h"
+ 1306              		.file 10 "MyHardWare/Inc/usart.h"
+ 1307              		.file 11 "MyHardWare/Inc/delay.h"
+ 1308              		.file 12 "Lib/StdPeriphs/inc/stm32f4xx_rcc.h"
+ARM GAS  /tmp/ccYmkDEK.s 			page 34
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 usart.c
-     /tmp/cc4p3ByD.s:21     .text.USART1_DMA_Init:00000000 $t
-     /tmp/cc4p3ByD.s:26     .text.USART1_DMA_Init:00000000 USART1_DMA_Init
-     /tmp/cc4p3ByD.s:260    .text.USART1_DMA_Init:00000100 $d
-     /tmp/cc4p3ByD.s:267    .text.TIM7_Config:00000000 $t
-     /tmp/cc4p3ByD.s:272    .text.TIM7_Config:00000000 TIM7_Config
-     /tmp/cc4p3ByD.s:354    .text.TIM7_Config:00000060 $d
-     /tmp/cc4p3ByD.s:359    .text.USART_StartDMA_TX:00000000 $t
-     /tmp/cc4p3ByD.s:364    .text.USART_StartDMA_TX:00000000 USART_StartDMA_TX
-     /tmp/cc4p3ByD.s:452    .text.USART_StartDMA_TX:00000048 $d
-     /tmp/cc4p3ByD.s:1238   .bss.tx_queue:00000000 tx_queue
-     /tmp/cc4p3ByD.s:1212   .bss.last_dma_tx_count:00000000 last_dma_tx_count
-     /tmp/cc4p3ByD.s:460    .text.TIM7_DisableIRQ:00000000 $t
-     /tmp/cc4p3ByD.s:465    .text.TIM7_DisableIRQ:00000000 TIM7_DisableIRQ
-     /tmp/cc4p3ByD.s:493    .text.TIM7_DisableIRQ:00000018 $d
-     /tmp/cc4p3ByD.s:498    .text.TIM7_EnableIRQ:00000000 $t
-     /tmp/cc4p3ByD.s:503    .text.TIM7_EnableIRQ:00000000 TIM7_EnableIRQ
-     /tmp/cc4p3ByD.s:531    .text.TIM7_EnableIRQ:00000018 $d
-     /tmp/cc4p3ByD.s:536    .text.USART_GPIO_Config:00000000 $t
-     /tmp/cc4p3ByD.s:542    .text.USART_GPIO_Config:00000000 USART_GPIO_Config
-     /tmp/cc4p3ByD.s:617    .text.USART_GPIO_Config:00000058 $d
-     /tmp/cc4p3ByD.s:622    .text.Usart_Config:00000000 $t
-     /tmp/cc4p3ByD.s:628    .text.Usart_Config:00000000 Usart_Config
-     /tmp/cc4p3ByD.s:704    .text.Usart_Config:00000058 $d
-     /tmp/cc4p3ByD.s:709    .text.UART1_SendByte:00000000 $t
-     /tmp/cc4p3ByD.s:715    .text.UART1_SendByte:00000000 UART1_SendByte
-     /tmp/cc4p3ByD.s:753    .text.UART1_SendByte:0000001c $d
-     /tmp/cc4p3ByD.s:758    .text.UART1_SendData:00000000 $t
-     /tmp/cc4p3ByD.s:764    .text.UART1_SendData:00000000 UART1_SendData
-     /tmp/cc4p3ByD.s:849    .text.UART1_SendData:00000040 $d
-     /tmp/cc4p3ByD.s:854    .text.UART1_DMA_Start_RX:00000000 $t
-     /tmp/cc4p3ByD.s:860    .text.UART1_DMA_Start_RX:00000000 UART1_DMA_Start_RX
-     /tmp/cc4p3ByD.s:897    .text.UART1_DMA_Start_RX:00000020 $d
-     /tmp/cc4p3ByD.s:1231   .bss.rx_queue:00000000 rx_queue
-     /tmp/cc4p3ByD.s:904    .text.USART1_Init:00000000 $t
-     /tmp/cc4p3ByD.s:910    .text.USART1_Init:00000000 USART1_Init
-     /tmp/cc4p3ByD.s:950    .text.USART1_Init:0000002c $d
-     /tmp/cc4p3ByD.s:1250   .bss.dma_tx_buffer:00000000 dma_tx_buffer
-     /tmp/cc4p3ByD.s:1244   .bss.dma_rx_buffer:00000000 dma_rx_buffer
-     /tmp/cc4p3ByD.s:958    .text.TIM7_IRQHandler:00000000 $t
-     /tmp/cc4p3ByD.s:964    .text.TIM7_IRQHandler:00000000 TIM7_IRQHandler
-     /tmp/cc4p3ByD.s:1011   .text.TIM7_IRQHandler:0000002c $d
-     /tmp/cc4p3ByD.s:1017   .text.DMA2_Stream2_IRQHandler:00000000 $t
-     /tmp/cc4p3ByD.s:1023   .text.DMA2_Stream2_IRQHandler:00000000 DMA2_Stream2_IRQHandler
-     /tmp/cc4p3ByD.s:1069   .text.DMA2_Stream2_IRQHandler:0000002c $d
-     /tmp/cc4p3ByD.s:1218   .bss.dma_rx_transfer_complete:00000000 dma_rx_transfer_complete
-     /tmp/cc4p3ByD.s:1077   .text.DMA2_Stream7_IRQHandler:00000000 $t
-     /tmp/cc4p3ByD.s:1083   .text.DMA2_Stream7_IRQHandler:00000000 DMA2_Stream7_IRQHandler
-     /tmp/cc4p3ByD.s:1167   .text.DMA2_Stream7_IRQHandler:00000058 $d
-     /tmp/cc4p3ByD.s:1224   .bss.dma_tx_transfer_complete:00000000 dma_tx_transfer_complete
-     /tmp/cc4p3ByD.s:1177   .text.UART1_ReadAvailable_DMA:00000000 $t
-     /tmp/cc4p3ByD.s:1183   .text.UART1_ReadAvailable_DMA:00000000 UART1_ReadAvailable_DMA
-     /tmp/cc4p3ByD.s:1204   .text.UART1_ReadAvailable_DMA:0000000c $d
-     /tmp/cc4p3ByD.s:1209   .bss.last_dma_tx_count:00000000 $d
-     /tmp/cc4p3ByD.s:1219   .bss.dma_rx_transfer_complete:00000000 $d
-     /tmp/cc4p3ByD.s:1225   .bss.dma_tx_transfer_complete:00000000 $d
-ARM GAS  /tmp/cc4p3ByD.s 			page 34
+     /tmp/ccYmkDEK.s:21     .text.USART1_DMA_Init:00000000 $t
+     /tmp/ccYmkDEK.s:26     .text.USART1_DMA_Init:00000000 USART1_DMA_Init
+     /tmp/ccYmkDEK.s:260    .text.USART1_DMA_Init:00000100 $d
+     /tmp/ccYmkDEK.s:267    .text.TIM7_Config:00000000 $t
+     /tmp/ccYmkDEK.s:272    .text.TIM7_Config:00000000 TIM7_Config
+     /tmp/ccYmkDEK.s:354    .text.TIM7_Config:00000060 $d
+     /tmp/ccYmkDEK.s:359    .text.USART_StartDMA_TX:00000000 $t
+     /tmp/ccYmkDEK.s:364    .text.USART_StartDMA_TX:00000000 USART_StartDMA_TX
+     /tmp/ccYmkDEK.s:452    .text.USART_StartDMA_TX:00000048 $d
+     /tmp/ccYmkDEK.s:1282   .bss.tx_queue:00000000 tx_queue
+     /tmp/ccYmkDEK.s:1256   .bss.last_dma_tx_count:00000000 last_dma_tx_count
+     /tmp/ccYmkDEK.s:460    .text.TIM7_DisableIRQ:00000000 $t
+     /tmp/ccYmkDEK.s:465    .text.TIM7_DisableIRQ:00000000 TIM7_DisableIRQ
+     /tmp/ccYmkDEK.s:493    .text.TIM7_DisableIRQ:00000018 $d
+     /tmp/ccYmkDEK.s:498    .text.USART_GPIO_Config:00000000 $t
+     /tmp/ccYmkDEK.s:504    .text.USART_GPIO_Config:00000000 USART_GPIO_Config
+     /tmp/ccYmkDEK.s:579    .text.USART_GPIO_Config:00000058 $d
+     /tmp/ccYmkDEK.s:584    .text.Usart_Config:00000000 $t
+     /tmp/ccYmkDEK.s:590    .text.Usart_Config:00000000 Usart_Config
+     /tmp/ccYmkDEK.s:666    .text.Usart_Config:00000058 $d
+     /tmp/ccYmkDEK.s:671    .text.UART1_SendByte:00000000 $t
+     /tmp/ccYmkDEK.s:677    .text.UART1_SendByte:00000000 UART1_SendByte
+     /tmp/ccYmkDEK.s:715    .text.UART1_SendByte:0000001c $d
+     /tmp/ccYmkDEK.s:720    .text.__io_putchar:00000000 $t
+     /tmp/ccYmkDEK.s:726    .text.__io_putchar:00000000 __io_putchar
+     /tmp/ccYmkDEK.s:801    .text.__io_putchar:00000040 $d
+     /tmp/ccYmkDEK.s:806    .text.UART1_SendData:00000000 $t
+     /tmp/ccYmkDEK.s:812    .text.UART1_SendData:00000000 UART1_SendData
+     /tmp/ccYmkDEK.s:897    .text.UART1_SendData:00000040 $d
+     /tmp/ccYmkDEK.s:902    .text.UART1_DMA_Start_RX:00000000 $t
+     /tmp/ccYmkDEK.s:908    .text.UART1_DMA_Start_RX:00000000 UART1_DMA_Start_RX
+     /tmp/ccYmkDEK.s:945    .text.UART1_DMA_Start_RX:0000001c $d
+     /tmp/ccYmkDEK.s:1275   .bss.rx_queue:00000000 rx_queue
+     /tmp/ccYmkDEK.s:952    .text.USART1_Init:00000000 $t
+     /tmp/ccYmkDEK.s:958    .text.USART1_Init:00000000 USART1_Init
+     /tmp/ccYmkDEK.s:998    .text.USART1_Init:0000002c $d
+     /tmp/ccYmkDEK.s:1294   .bss.dma_tx_buffer:00000000 dma_tx_buffer
+     /tmp/ccYmkDEK.s:1288   .bss.dma_rx_buffer:00000000 dma_rx_buffer
+     /tmp/ccYmkDEK.s:1006   .text.TIM7_IRQHandler:00000000 $t
+     /tmp/ccYmkDEK.s:1012   .text.TIM7_IRQHandler:00000000 TIM7_IRQHandler
+     /tmp/ccYmkDEK.s:1059   .text.TIM7_IRQHandler:0000002c $d
+     /tmp/ccYmkDEK.s:1065   .text.DMA2_Stream2_IRQHandler:00000000 $t
+     /tmp/ccYmkDEK.s:1071   .text.DMA2_Stream2_IRQHandler:00000000 DMA2_Stream2_IRQHandler
+     /tmp/ccYmkDEK.s:1117   .text.DMA2_Stream2_IRQHandler:0000002c $d
+     /tmp/ccYmkDEK.s:1262   .bss.dma_rx_transfer_complete:00000000 dma_rx_transfer_complete
+     /tmp/ccYmkDEK.s:1125   .text.DMA2_Stream7_IRQHandler:00000000 $t
+     /tmp/ccYmkDEK.s:1131   .text.DMA2_Stream7_IRQHandler:00000000 DMA2_Stream7_IRQHandler
+     /tmp/ccYmkDEK.s:1211   .text.DMA2_Stream7_IRQHandler:00000054 $d
+     /tmp/ccYmkDEK.s:1268   .bss.dma_tx_transfer_complete:00000000 dma_tx_transfer_complete
+     /tmp/ccYmkDEK.s:1221   .text.UART1_ReadAvailable_DMA:00000000 $t
+     /tmp/ccYmkDEK.s:1227   .text.UART1_ReadAvailable_DMA:00000000 UART1_ReadAvailable_DMA
+     /tmp/ccYmkDEK.s:1248   .text.UART1_ReadAvailable_DMA:0000000c $d
+     /tmp/ccYmkDEK.s:1253   .bss.last_dma_tx_count:00000000 $d
+     /tmp/ccYmkDEK.s:1263   .bss.dma_rx_transfer_complete:00000000 $d
+     /tmp/ccYmkDEK.s:1269   .bss.dma_tx_transfer_complete:00000000 $d
+ARM GAS  /tmp/ccYmkDEK.s 			page 35
 
 
-     /tmp/cc4p3ByD.s:1228   .bss.rx_queue:00000000 $d
-     /tmp/cc4p3ByD.s:1235   .bss.tx_queue:00000000 $d
-     /tmp/cc4p3ByD.s:1241   .bss.dma_rx_buffer:00000000 $d
-     /tmp/cc4p3ByD.s:1247   .bss.dma_tx_buffer:00000000 $d
+     /tmp/ccYmkDEK.s:1272   .bss.rx_queue:00000000 $d
+     /tmp/ccYmkDEK.s:1279   .bss.tx_queue:00000000 $d
+     /tmp/ccYmkDEK.s:1285   .bss.dma_rx_buffer:00000000 $d
+     /tmp/ccYmkDEK.s:1291   .bss.dma_tx_buffer:00000000 $d
 
 UNDEFINED SYMBOLS
 RCC_AHB1PeriphClockCmd
@@ -1994,10 +2061,12 @@ USART_Init
 USART_Cmd
 USART_GetFlagStatus
 USART_SendData
+RingBuffer_Push
+delay_us
+RingBuffer_IsEmpty
 RingBuffer_Init
 TIM_GetITStatus
 TIM_ClearITPendingBit
-RingBuffer_IsEmpty
 DMA_GetITStatus
 DMA_ClearITPendingBit
 RingBuffer_SkipRead

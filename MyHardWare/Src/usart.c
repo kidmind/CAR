@@ -50,6 +50,7 @@ static void TIM7_Config(void);
 static void TIM7_EnableIRQ(void);
 static void TIM7_DisableIRQ(void);
 
+static void USART_StartDMA_TX(void);
 /**
  * @brief  USART1 DMA 初始化配置
  *         配置 DMA2 Stream7 用于 USART1 TX，DMA2 Stream2 用于 USART1 RX
@@ -79,7 +80,7 @@ static void USART1_DMA_Init(void) {
   while (DMA_GetCmdStatus(DMA2_Stream7) != DISABLE)
     ;
   DMA_InitStructure.DMA_Channel = DMA_Channel_4;
-  DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)&(USART1->DR);
+  DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t) & (USART1->DR);
   DMA_InitStructure.DMA_Memory0BaseAddr = 0;
   DMA_InitStructure.DMA_DIR = DMA_DIR_MemoryToPeripheral;
   DMA_InitStructure.DMA_BufferSize = 0;
@@ -100,7 +101,7 @@ static void USART1_DMA_Init(void) {
   while (DMA_GetCmdStatus(DMA2_Stream7) != DISABLE)
     ;
   DMA_InitStructure.DMA_Channel = DMA_Channel_4;
-  DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)&(USART1->DR);
+  DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t) & (USART1->DR);
   DMA_InitStructure.DMA_Memory0BaseAddr = 0;
   DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralToMemory;
   DMA_InitStructure.DMA_BufferSize = 0;
@@ -127,6 +128,10 @@ static void USART1_DMA_Init(void) {
   // DMA_Cmd(DMA2_Stream2, ENABLE);
 }
 
+//=============================================================================
+// NOTE:TIM7定时器是不需要的，在printf去看dma是否完成，为完成调用它即可
+//=============================================================================
+
 /**
  * @brief  TIM7 定时器配置，定时 100us
  *         STM32F407 系统时钟为 168MHz，APB1 时钟为 42MHz
@@ -134,53 +139,37 @@ static void USART1_DMA_Init(void) {
  * = 100us) period = 1 - 1, 则溢出时间 = 10kHz / 1 = 10kHz，即 100us
  *         用于定期检查环形缓冲队列，有数据时启动 DMA 传输
  */
+/*
 static void TIM7_Config(void) {
-  TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStruct;
-  NVIC_InitTypeDef NVIC_InitStructure;
+ TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStruct;
+ NVIC_InitTypeDef NVIC_InitStructure;
 
-  // 使能 TIM7 时钟
-  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM7, ENABLE);
+ // 使能 TIM7 时钟
+ RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM7, ENABLE);
 
-  // 配置 TIM7 时基参数
-  TIM_TimeBaseInitStruct.TIM_Prescaler =
-      420 - 1; // 预分频器，42MHz / 4200 = 10kHz
-  TIM_TimeBaseInitStruct.TIM_CounterMode = TIM_CounterMode_Up;
-  TIM_TimeBaseInitStruct.TIM_Period =
-      10 - 1; // 自动重装载值，10kHz / 1 = 10kHz (100us)
-  TIM_TimeBaseInitStruct.TIM_ClockDivision = TIM_CKD_DIV1;
-  TIM_TimeBaseInit(TIM7, &TIM_TimeBaseInitStruct);
+ // 配置 TIM7 时基参数
+ TIM_TimeBaseInitStruct.TIM_Prescaler =
+     420 - 1; // 预分频器，42MHz / 4200 = 10kHz
+ TIM_TimeBaseInitStruct.TIM_CounterMode = TIM_CounterMode_Up;
+ TIM_TimeBaseInitStruct.TIM_Period =
+     10 - 1; // 自动重装载值，10kHz / 1 = 10kHz (100us)
+ TIM_TimeBaseInitStruct.TIM_ClockDivision = TIM_CKD_DIV1;
+ TIM_TimeBaseInit(TIM7, &TIM_TimeBaseInitStruct);
 
-  // 清除更新中断标志，防止立即触发中断
-  TIM_ClearFlag(TIM7, TIM_FLAG_Update);
+ // 清除更新中断标志，防止立即触发中断
+ TIM_ClearFlag(TIM7, TIM_FLAG_Update);
 
-  // 使能更新中断
-  TIM_ITConfig(TIM7, TIM_IT_Update, ENABLE);
+ // 使能更新中断
+ TIM_ITConfig(TIM7, TIM_IT_Update, ENABLE);
 
-  // 配置 NVIC 中断优先级
-  NVIC_InitStructure.NVIC_IRQChannel = TIM7_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
+ // 配置 NVIC 中断优先级
+ NVIC_InitStructure.NVIC_IRQChannel = TIM7_IRQn;
+ NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+ NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2;
+ NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+ NVIC_Init(&NVIC_InitStructure);
 }
-/**
- * @brief  使能 TIM7 中断
- *         使能 TIM7 更新中断并开始计时
  */
-static void TIM7_EnableIRQ(void) {
-  TIM_ITConfig(TIM7, TIM_IT_Update, ENABLE);
-  TIM_Cmd(TIM7, ENABLE);
-}
-
-/**
- * @brief  禁用 TIM7 中断
- *         禁用 TIM7 更新中断并停止计时
- */
-static void TIM7_DisableIRQ(void) {
-  TIM_ITConfig(TIM7, TIM_IT_Update, DISABLE);
-  TIM_Cmd(TIM7, DISABLE);
-}
-
 /**
  * @brief  USART1 GPIO 引脚配置
  *         配置 PA9 为 TX，PA10 为 RX，复用模式，推挽输出，上拉输入
@@ -224,7 +213,7 @@ void Usart_Config(void) {
   USART_GPIO_Config();
 
   // 配置串口各项参数
-  USART_InitStructure.USART_BaudRate = USART1_BaudRate;       // 波特率 115200
+  USART_InitStructure.USART_BaudRate = USART1_BaudRate; // 波特率 115200
   USART_InitStructure.USART_WordLength = USART_WordLength_8b; // 数据位 8 位
   USART_InitStructure.USART_StopBits = USART_StopBits_1;      // 停止位 1 位
   USART_InitStructure.USART_Parity = USART_Parity_No;         // 无校验
@@ -256,14 +245,8 @@ void USART1_Init(void) {
   // 配置 USART1 串口参数和 GPIO
   Usart_Config();
 
-  // 配置 TIM7 定时器，100us 定时中断
-  TIM7_Config();
-
   // 启动 DMA 接收
   UART1_DMA_Start_RX();
-
-  // 使能 TIM7 中断，开始定期检查环形缓冲队列
-  // TIM7_EnableIRQ();
 }
 
 /**
@@ -301,8 +284,7 @@ int __io_putchar(int ch) {
 
   // 如果 DMA 未在工作，触发 TIM7 中断来启动 DMA 传输
   if (!tx_queue.is_dma_enabled && !RingBuffer_IsEmpty(&tx_queue)) {
-    // 手动触发一次 TIM7 中断检查
-    TIM7_EnableIRQ();
+    USART_StartDMA_TX();
   }
 
   return (ch);
@@ -373,26 +355,6 @@ static void USART_StartDMA_TX(void) {
   DMA_Cmd(DMA2_Stream7, ENABLE);
   tx_queue.is_dma_enabled = 1;
 }
-/**
- * @brief  TIM7 中断服务函数，每 100us 进入一次
- *         检查发送环形缓冲队列是否有数据，有数据则启动 DMA 传输并关闭中断
- *         避免频繁进入中断，降低 CPU 负载
- */
-void TIM7_IRQHandler(void) {
-  if (TIM_GetITStatus(TIM7, TIM_IT_Update) != RESET) {
-    TIM_ClearITPendingBit(TIM7, TIM_IT_Update);
-
-    // 检查发送队列是否有数据
-    if (!RingBuffer_IsEmpty(&tx_queue)) {
-      // 有数据，启动 DMA 传输
-      USART_StartDMA_TX();
-
-      // 关闭 TIM7 中断，避免频繁进入中断
-      // DMA 传输完成后会根据队列状态决定是否重新使能中断
-      TIM7_DisableIRQ();
-    }
-  }
-}
 
 /**
  * @brief  DMA2 Stream5 中断服务函数（USART1 RX）
@@ -435,9 +397,6 @@ void DMA2_Stream7_IRQHandler(void) {
       // 1. 之前是分段传输的第二段（tail 已回绕到 0）
       // 2. DMA 传输期间 printf 新写入的数据
       USART_StartDMA_TX();
-    } else {
-      // 队列已空，重新使能 TIM7 中断，等待下一次数据写入
-      TIM7_EnableIRQ();
     }
   }
 }

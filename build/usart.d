@@ -15,8 +15,8 @@ build/usart.o: MyHardWare/Src/usart.c MyHardWare/Inc/usart.h \
  Lib/StdPeriphs/inc/stm32f4xx_hash.h Lib/StdPeriphs/inc/stm32f4xx_rng.h \
  Lib/StdPeriphs/inc/stm32f4xx_can.h Lib/StdPeriphs/inc/stm32f4xx_dac.h \
  Lib/StdPeriphs/inc/stm32f4xx_dcmi.h Lib/StdPeriphs/inc/stm32f4xx_fsmc.h \
- MyHardWare/Inc/led.h MyHardWare/Inc/oled.h MyHardWare/Inc/myiic.h \
- MyHardWare/Inc/sys.h
+ MyHardWare/Inc/delay.h MyHardWare/Inc/led.h MyHardWare/Inc/oled.h \
+ MyHardWare/Inc/myiic.h MyHardWare/Inc/sys.h
 MyHardWare/Inc/usart.h:
 MyHardWare/Inc/ring_buffer.h:
 CMSIS/stm32f4xx.h:
@@ -52,6 +52,7 @@ Lib/StdPeriphs/inc/stm32f4xx_can.h:
 Lib/StdPeriphs/inc/stm32f4xx_dac.h:
 Lib/StdPeriphs/inc/stm32f4xx_dcmi.h:
 Lib/StdPeriphs/inc/stm32f4xx_fsmc.h:
+MyHardWare/Inc/delay.h:
 MyHardWare/Inc/led.h:
 MyHardWare/Inc/oled.h:
 MyHardWare/Inc/myiic.h:
