@@ -339,18 +339,18 @@ void Encoder_Update(void) {
     int32_t delta = current_count - instance->_data.last_count;
 
     // 检测是否发生溢出或下溢（ARR=200000）
-    if (delta > 100000) {
+    if (delta > 1000000) {
       // 计数器从 200000 回绕到 0，需要减去 200001
-      delta -= 200001;
-    } else if (delta < -100000) {
+      delta -= 2000001;
+    } else if (delta < -1000000) {
       // 计数器从 0 回绕到 200000，需要加上 200001
-      delta += 200001;
+      delta += 2000001;
     }
 
     // 更新数据结构
+    instance->_data.last_count = instance->_data.count;
     instance->_data.count = current_count;
     instance->_data.delta_count = delta;
-    instance->_data.last_count = current_count;
     instance->_data.total_count += delta;
 
     // 计算速度

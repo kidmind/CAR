@@ -34,8 +34,8 @@ void speed_control_task(void) {
 }
 
 void motor_test(void) {
-  Motor_SetSpeed(MOTOR_LEFT, 4000);  // 左电机正转，速度 4000
-  Motor_SetSpeed(MOTOR_RIGHT, 4000); // 右电机正转，速度 4000
+  Motor_SetSpeed(MOTOR_LEFT, 3250);  // 左电机正转，速度 4000
+  Motor_SetSpeed(MOTOR_RIGHT, 3250); // 右电机正转，速度 4000
   Motor_SetDirection(MOTOR_LEFT, MOTOR_DIR_FORWARD);
   Motor_SetDirection(MOTOR_RIGHT, MOTOR_DIR_FORWARD);
 
@@ -86,17 +86,17 @@ int main() {
   delay_init();
   Encoder_Data_t encoder_data;
   uint32_t count = 0;
-  // motor_test();
+  motor_test();
   while (1) {
     GPIO_ToggleBits(GPIOC, 13);
-    delay_ms(1);
+    delay_ms(100);
     printf("this is %d:\r\n", count);
     encoder_data = Encoder_GetData(ENCODER_RIGHT);
-    printf("Right Encoder - Count: %d, X: %.2f m/s\r\n", encoder_data.count,
-           encoder_data.total_distance);
+    printf("Right Encoder - Count: %d, speed: %.2f m/s\r\n", encoder_data.count,
+           encoder_data.speed_m_s);
     encoder_data = Encoder_GetData(ENCODER_LEFT);
-    printf("Left Encoder - Count: %d, X: %.2f m/s\r\n", encoder_data.count,
-           encoder_data.total_distance);
+    printf("Left Encoder - Count: %d, speed: %.2f m/s\r\n", encoder_data.count,
+           encoder_data.speed_m_s);
     printf("\r\n");
     count++;
   }

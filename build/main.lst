@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccJ3D96X.s 			page 1
+ARM GAS  C:\Users\asus\AppData\Local\Temp\cclk8osa.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccJ3D96X.s 			page 1
   21:USER/Src/main.c **** void my_console_logger(ulog_level_t severity, const char *msg) {
   34              		.loc 1 21 64 view -0
   35              		.cfi_startproc
-ARM GAS  /tmp/ccJ3D96X.s 			page 2
+ARM GAS  C:\Users\asus\AppData\Local\Temp\cclk8osa.s 			page 2
 
 
   36              		@ args = 0, pretend = 0, frame = 0
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccJ3D96X.s 			page 1
   85              		.cfi_startproc
   86              		@ args = 0, pretend = 0, frame = 0
   87              		@ frame_needed = 0, uses_anonymous_args = 0
-ARM GAS  /tmp/ccJ3D96X.s 			page 3
+ARM GAS  C:\Users\asus\AppData\Local\Temp\cclk8osa.s 			page 3
 
 
   88 0000 08B5     		push	{r3, lr}
@@ -168,17 +168,17 @@ ARM GAS  /tmp/ccJ3D96X.s 			page 1
  126              		.cfi_def_cfa_offset 8
  127              		.cfi_offset 3, -8
  128              		.cfi_offset 14, -4
-  37:USER/Src/main.c ****   Motor_SetSpeed(MOTOR_LEFT, 4000);  // 左电机正转，速度 4000
+  37:USER/Src/main.c ****   Motor_SetSpeed(MOTOR_LEFT, 3250);  // 左电机正转，速度 4000
  129              		.loc 1 37 3 view .LVU13
- 130 0002 4FF47A61 		mov	r1, #4000
+ 130 0002 40F6B241 		movw	r1, #3250
  131 0006 0120     		movs	r0, #1
  132 0008 FFF7FEFF 		bl	Motor_SetSpeed
  133              	.LVL7:
-  38:USER/Src/main.c ****   Motor_SetSpeed(MOTOR_RIGHT, 4000); // 右电机正转，速度 4000
+  38:USER/Src/main.c ****   Motor_SetSpeed(MOTOR_RIGHT, 3250); // 右电机正转，速度 4000
  134              		.loc 1 38 3 view .LVU14
- 135 000c 4FF47A61 		mov	r1, #4000
+ 135 000c 40F6B241 		movw	r1, #3250
  136 0010 0020     		movs	r0, #0
-ARM GAS  /tmp/ccJ3D96X.s 			page 4
+ARM GAS  C:\Users\asus\AppData\Local\Temp\cclk8osa.s 			page 4
 
 
  137 0012 FFF7FEFF 		bl	Motor_SetSpeed
@@ -228,24 +228,24 @@ ARM GAS  /tmp/ccJ3D96X.s 			page 1
  169              		.global	__aeabi_f2d
  170 001e 0000     		.align	2
  171              	.LC3:
- 172 0020 52696768 		.ascii	"Right Encoder - Count: %d, X: %.2f m/s\015\012\000"
+ 172 0020 52696768 		.ascii	"Right Encoder - Count: %d, speed: %.2f m/s\015\012\000"
  172      7420456E 
  172      636F6465 
  172      72202D20 
  172      436F756E 
- 173 0049 000000   		.align	2
+ 173 004d 000000   		.align	2
  174              	.LC4:
- 175 004c 4C656674 		.ascii	"Left Encoder - Count: %d, X: %.2f m/s\015\012\000"
+ 175 0050 4C656674 		.ascii	"Left Encoder - Count: %d, speed: %.2f m/s\015\012\000"
  175      20456E63 
  175      6F646572 
-ARM GAS  /tmp/ccJ3D96X.s 			page 5
+ARM GAS  C:\Users\asus\AppData\Local\Temp\cclk8osa.s 			page 5
 
 
  175      202D2043 
  175      6F756E74 
  176              		.align	2
  177              	.LC5:
- 178 0074 0D00     		.ascii	"\015\000"
+ 178 007c 0D00     		.ascii	"\015\000"
  179              		.section	.text.main,"ax",%progbits
  180              		.align	1
  181              		.global	main
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccJ3D96X.s 			page 1
   61:USER/Src/main.c ****     // 右轮: 关联ENCODER_RIGHT编码器和MOTOR_RIGHT电机
   62:USER/Src/main.c ****     Speed_PID_Init(&Speed_PID_Right, ENCODER_RIGHT, MOTOR_RIGHT,
   63:USER/Src/main.c ****                    SPEED_PID_KP_DEFAULT, SPEED_PID_KI_DEFAULT,
-ARM GAS  /tmp/ccJ3D96X.s 			page 6
+ARM GAS  C:\Users\asus\AppData\Local\Temp\cclk8osa.s 			page 6
 
 
   64:USER/Src/main.c ****                    SPEED_PID_KD_DEFAULT);
@@ -326,7 +326,7 @@ ARM GAS  /tmp/ccJ3D96X.s 			page 1
  216              	.LVL18:
   84:USER/Src/main.c ****   printf("hello world\r\n");
  217              		.loc 1 84 3 view .LVU27
- 218 0018 2148     		ldr	r0, .L14
+ 218 0018 2248     		ldr	r0, .L14
  219 001a FFF7FEFF 		bl	puts
  220              	.LVL19:
   85:USER/Src/main.c **** 
@@ -338,141 +338,146 @@ ARM GAS  /tmp/ccJ3D96X.s 			page 1
  224              		.loc 1 87 3 view .LVU29
   88:USER/Src/main.c ****   uint32_t count = 0;
  225              		.loc 1 88 3 view .LVU30
- 226              		.loc 1 88 12 is_stmt 0 view .LVU31
- 227 0022 0024     		movs	r4, #0
+  89:USER/Src/main.c ****   motor_test();
+ 226              		.loc 1 89 3 view .LVU31
+ 227 0022 FFF7FEFF 		bl	motor_test
  228              	.LVL21:
- 229              	.L12:
-  89:USER/Src/main.c ****   // motor_test();
+  88:USER/Src/main.c ****   uint32_t count = 0;
+ 229              		.loc 1 88 12 is_stmt 0 view .LVU32
+ 230 0026 0024     		movs	r4, #0
+ 231              	.LVL22:
+ 232              	.L12:
   90:USER/Src/main.c ****   while (1) {
- 230              		.loc 1 90 3 is_stmt 1 view .LVU32
+ 233              		.loc 1 90 3 is_stmt 1 view .LVU33
   91:USER/Src/main.c ****     GPIO_ToggleBits(GPIOC, 13);
- 231              		.loc 1 91 5 view .LVU33
- 232 0024 0D21     		movs	r1, #13
- 233 0026 1F48     		ldr	r0, .L14+4
- 234 0028 FFF7FEFF 		bl	GPIO_ToggleBits
- 235              	.LVL22:
+ 234              		.loc 1 91 5 view .LVU34
+ 235 0028 0D21     		movs	r1, #13
+ 236 002a 1F48     		ldr	r0, .L14+4
+ 237 002c FFF7FEFF 		bl	GPIO_ToggleBits
+ 238              	.LVL23:
   92:USER/Src/main.c ****     delay_ms(100);
- 236              		.loc 1 92 5 view .LVU34
- 237 002c 6420     		movs	r0, #100
- 238 002e FFF7FEFF 		bl	delay_ms
- 239              	.LVL23:
+ 239              		.loc 1 92 5 view .LVU35
+ 240 0030 6420     		movs	r0, #100
+ARM GAS  C:\Users\asus\AppData\Local\Temp\cclk8osa.s 			page 7
+
+
+ 241 0032 FFF7FEFF 		bl	delay_ms
+ 242              	.LVL24:
   93:USER/Src/main.c ****     printf("this is %d:\r\n", count);
- 240              		.loc 1 93 5 view .LVU35
-ARM GAS  /tmp/ccJ3D96X.s 			page 7
-
-
- 241 0032 2146     		mov	r1, r4
- 242 0034 1C48     		ldr	r0, .L14+8
- 243 0036 FFF7FEFF 		bl	printf
- 244              	.LVL24:
+ 243              		.loc 1 93 5 view .LVU36
+ 244 0036 2146     		mov	r1, r4
+ 245 0038 1C48     		ldr	r0, .L14+8
+ 246 003a FFF7FEFF 		bl	printf
+ 247              	.LVL25:
   94:USER/Src/main.c ****     encoder_data = Encoder_GetData(ENCODER_RIGHT);
- 245              		.loc 1 94 5 view .LVU36
- 246              		.loc 1 94 20 is_stmt 0 view .LVU37
- 247 003a 0021     		movs	r1, #0
- 248 003c 0FA8     		add	r0, sp, #60
- 249 003e FFF7FEFF 		bl	Encoder_GetData
- 250              	.LVL25:
-  95:USER/Src/main.c ****     printf("Right Encoder - Count: %d, X: %.2f m/s\r\n", encoder_data.count,
- 251              		.loc 1 95 5 is_stmt 1 view .LVU38
- 252 0042 1798     		ldr	r0, [sp, #92]	@ float
- 253 0044 FFF7FEFF 		bl	__aeabi_f2d
- 254              	.LVL26:
- 255 0048 0246     		mov	r2, r0
- 256 004a 0B46     		mov	r3, r1
- 257 004c 0F99     		ldr	r1, [sp, #60]
- 258 004e 1748     		ldr	r0, .L14+12
- 259 0050 FFF7FEFF 		bl	printf
- 260              	.LVL27:
-  96:USER/Src/main.c ****            encoder_data.total_distance);
+ 248              		.loc 1 94 5 view .LVU37
+ 249              		.loc 1 94 20 is_stmt 0 view .LVU38
+ 250 003e 0021     		movs	r1, #0
+ 251 0040 0FA8     		add	r0, sp, #60
+ 252 0042 FFF7FEFF 		bl	Encoder_GetData
+ 253              	.LVL26:
+  95:USER/Src/main.c ****     printf("Right Encoder - Count: %d, speed: %.2f m/s\r\n", encoder_data.count,
+ 254              		.loc 1 95 5 is_stmt 1 view .LVU39
+ 255 0046 1598     		ldr	r0, [sp, #84]	@ float
+ 256 0048 FFF7FEFF 		bl	__aeabi_f2d
+ 257              	.LVL27:
+ 258 004c 0246     		mov	r2, r0
+ 259 004e 0B46     		mov	r3, r1
+ 260 0050 0F99     		ldr	r1, [sp, #60]
+ 261 0052 1748     		ldr	r0, .L14+12
+ 262 0054 FFF7FEFF 		bl	printf
+ 263              	.LVL28:
+  96:USER/Src/main.c ****            encoder_data.speed_m_s);
   97:USER/Src/main.c ****     encoder_data = Encoder_GetData(ENCODER_LEFT);
- 261              		.loc 1 97 5 view .LVU39
- 262              		.loc 1 97 20 is_stmt 0 view .LVU40
- 263 0054 0121     		movs	r1, #1
- 264 0056 6846     		mov	r0, sp
- 265 0058 FFF7FEFF 		bl	Encoder_GetData
- 266              	.LVL28:
- 267 005c 0DF13C0C 		add	ip, sp, #60
- 268 0060 EE46     		mov	lr, sp
- 269 0062 BEE80F00 		ldmia	lr!, {r0, r1, r2, r3}
- 270 0066 ACE80F00 		stmia	ip!, {r0, r1, r2, r3}
- 271 006a BEE80F00 		ldmia	lr!, {r0, r1, r2, r3}
- 272 006e ACE80F00 		stmia	ip!, {r0, r1, r2, r3}
- 273 0072 BEE80F00 		ldmia	lr!, {r0, r1, r2, r3}
- 274 0076 ACE80F00 		stmia	ip!, {r0, r1, r2, r3}
- 275 007a DEF80030 		ldr	r3, [lr]
- 276 007e CCF80030 		str	r3, [ip]
-  98:USER/Src/main.c ****     printf("Left Encoder - Count: %d, X: %.2f m/s\r\n", encoder_data.count,
- 277              		.loc 1 98 5 is_stmt 1 view .LVU41
- 278 0082 1798     		ldr	r0, [sp, #92]	@ float
- 279 0084 FFF7FEFF 		bl	__aeabi_f2d
- 280              	.LVL29:
- 281 0088 0246     		mov	r2, r0
- 282 008a 0B46     		mov	r3, r1
- 283 008c 0F99     		ldr	r1, [sp, #60]
- 284 008e 0848     		ldr	r0, .L14+16
- 285 0090 FFF7FEFF 		bl	printf
- 286              	.LVL30:
-  99:USER/Src/main.c ****            encoder_data.total_distance);
+ 264              		.loc 1 97 5 view .LVU40
+ 265              		.loc 1 97 20 is_stmt 0 view .LVU41
+ 266 0058 0121     		movs	r1, #1
+ 267 005a 6846     		mov	r0, sp
+ 268 005c FFF7FEFF 		bl	Encoder_GetData
+ 269              	.LVL29:
+ 270 0060 0DF13C0C 		add	ip, sp, #60
+ 271 0064 EE46     		mov	lr, sp
+ 272 0066 BEE80F00 		ldmia	lr!, {r0, r1, r2, r3}
+ 273 006a ACE80F00 		stmia	ip!, {r0, r1, r2, r3}
+ 274 006e BEE80F00 		ldmia	lr!, {r0, r1, r2, r3}
+ 275 0072 ACE80F00 		stmia	ip!, {r0, r1, r2, r3}
+ 276 0076 BEE80F00 		ldmia	lr!, {r0, r1, r2, r3}
+ 277 007a ACE80F00 		stmia	ip!, {r0, r1, r2, r3}
+ 278 007e DEF80030 		ldr	r3, [lr]
+ 279 0082 CCF80030 		str	r3, [ip]
+  98:USER/Src/main.c ****     printf("Left Encoder - Count: %d, speed: %.2f m/s\r\n", encoder_data.count,
+ 280              		.loc 1 98 5 is_stmt 1 view .LVU42
+ 281 0086 1598     		ldr	r0, [sp, #84]	@ float
+ 282 0088 FFF7FEFF 		bl	__aeabi_f2d
+ 283              	.LVL30:
+ 284 008c 0246     		mov	r2, r0
+ 285 008e 0B46     		mov	r3, r1
+ 286 0090 0F99     		ldr	r1, [sp, #60]
+ 287 0092 0848     		ldr	r0, .L14+16
+ 288 0094 FFF7FEFF 		bl	printf
+ 289              	.LVL31:
+  99:USER/Src/main.c ****            encoder_data.speed_m_s);
  100:USER/Src/main.c ****     printf("\r\n");
- 287              		.loc 1 100 5 view .LVU42
- 288 0094 0748     		ldr	r0, .L14+20
- 289 0096 FFF7FEFF 		bl	puts
- 290              	.LVL31:
-ARM GAS  /tmp/ccJ3D96X.s 			page 8
+ARM GAS  C:\Users\asus\AppData\Local\Temp\cclk8osa.s 			page 8
 
 
+ 290              		.loc 1 100 5 view .LVU43
+ 291 0098 0748     		ldr	r0, .L14+20
+ 292 009a FFF7FEFF 		bl	puts
+ 293              	.LVL32:
  101:USER/Src/main.c ****     count++;
- 291              		.loc 1 101 5 discriminator 1 view .LVU43
- 292              		.loc 1 101 10 is_stmt 0 discriminator 1 view .LVU44
- 293 009a 0134     		adds	r4, r4, #1
- 294              	.LVL32:
+ 294              		.loc 1 101 5 discriminator 1 view .LVU44
+ 295              		.loc 1 101 10 is_stmt 0 discriminator 1 view .LVU45
+ 296 009e 0134     		adds	r4, r4, #1
+ 297              	.LVL33:
   90:USER/Src/main.c ****     GPIO_ToggleBits(GPIOC, 13);
- 295              		.loc 1 90 9 is_stmt 1 view .LVU45
- 296 009c C2E7     		b	.L12
- 297              	.L15:
- 298 009e 00BF     		.align	2
- 299              	.L14:
- 300 00a0 00000000 		.word	.LC1
- 301 00a4 00080240 		.word	1073874944
- 302 00a8 10000000 		.word	.LC2
- 303 00ac 20000000 		.word	.LC3
- 304 00b0 4C000000 		.word	.LC4
- 305 00b4 74000000 		.word	.LC5
- 306              		.cfi_endproc
- 307              	.LFE129:
- 309              		.text
- 310              	.Letext0:
- 311              		.file 2 "/usr/lib/gcc/arm-none-eabi/13.2.1/include/stdint.h"
- 312              		.file 3 "CMSIS/stm32f4xx.h"
- 313              		.file 4 "MyHardWare/Inc/encoder.h"
- 314              		.file 5 "MyHardWare/Inc/motor.h"
- 315              		.file 6 "MyHardWare/Inc/pid_speed.h"
- 316              		.file 7 "MyHardWare/Inc/ulog.h"
- 317              		.file 8 "MyHardWare/Inc/delay.h"
- 318              		.file 9 "Lib/StdPeriphs/inc/stm32f4xx_gpio.h"
- 319              		.file 10 "MyHardWare/Inc/usart.h"
- 320              		.file 11 "MyHardWare/Inc/led.h"
- 321              		.file 12 "/usr/include/newlib/stdio.h"
- 322              		.file 13 "MyHardWare/Inc/rtc.h"
- 323              		.file 14 "<built-in>"
-ARM GAS  /tmp/ccJ3D96X.s 			page 9
+ 298              		.loc 1 90 9 is_stmt 1 view .LVU46
+ 299 00a0 C2E7     		b	.L12
+ 300              	.L15:
+ 301 00a2 00BF     		.align	2
+ 302              	.L14:
+ 303 00a4 00000000 		.word	.LC1
+ 304 00a8 00080240 		.word	1073874944
+ 305 00ac 10000000 		.word	.LC2
+ 306 00b0 20000000 		.word	.LC3
+ 307 00b4 50000000 		.word	.LC4
+ 308 00b8 7C000000 		.word	.LC5
+ 309              		.cfi_endproc
+ 310              	.LFE129:
+ 312              		.text
+ 313              	.Letext0:
+ 314              		.file 2 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.2 Rel1/arm-none-eabi/include/ma
+ 315              		.file 3 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.2 Rel1/arm-none-eabi/include/sy
+ 316              		.file 4 "CMSIS/stm32f4xx.h"
+ 317              		.file 5 "MyHardWare/Inc/encoder.h"
+ 318              		.file 6 "MyHardWare/Inc/motor.h"
+ 319              		.file 7 "MyHardWare/Inc/pid_speed.h"
+ 320              		.file 8 "MyHardWare/Inc/ulog.h"
+ 321              		.file 9 "MyHardWare/Inc/delay.h"
+ 322              		.file 10 "Lib/StdPeriphs/inc/stm32f4xx_gpio.h"
+ 323              		.file 11 "MyHardWare/Inc/usart.h"
+ 324              		.file 12 "MyHardWare/Inc/led.h"
+ 325              		.file 13 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.2 Rel1/arm-none-eabi/include/s
+ 326              		.file 14 "MyHardWare/Inc/rtc.h"
+ 327              		.file 15 "<built-in>"
+ARM GAS  C:\Users\asus\AppData\Local\Temp\cclk8osa.s 			page 9
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 main.c
-     /tmp/ccJ3D96X.s:21     .rodata.my_console_logger.str1.4:00000000 $d
-     /tmp/ccJ3D96X.s:25     .text.my_console_logger:00000000 $t
-     /tmp/ccJ3D96X.s:31     .text.my_console_logger:00000000 my_console_logger
-     /tmp/ccJ3D96X.s:71     .text.my_console_logger:00000020 $d
-     /tmp/ccJ3D96X.s:76     .text.speed_control_task:00000000 $t
-     /tmp/ccJ3D96X.s:82     .text.speed_control_task:00000000 speed_control_task
-     /tmp/ccJ3D96X.s:106    .text.speed_control_task:00000010 $d
-     /tmp/ccJ3D96X.s:112    .text.motor_test:00000000 $t
-     /tmp/ccJ3D96X.s:118    .text.motor_test:00000000 motor_test
-     /tmp/ccJ3D96X.s:163    .rodata.main.str1.4:00000000 $d
-     /tmp/ccJ3D96X.s:180    .text.main:00000000 $t
-     /tmp/ccJ3D96X.s:186    .text.main:00000000 main
-     /tmp/ccJ3D96X.s:300    .text.main:000000a0 $d
+C:\Users\asus\AppData\Local\Temp\cclk8osa.s:21     .rodata.my_console_logger.str1.4:00000000 $d
+C:\Users\asus\AppData\Local\Temp\cclk8osa.s:25     .text.my_console_logger:00000000 $t
+C:\Users\asus\AppData\Local\Temp\cclk8osa.s:31     .text.my_console_logger:00000000 my_console_logger
+C:\Users\asus\AppData\Local\Temp\cclk8osa.s:71     .text.my_console_logger:00000020 $d
+C:\Users\asus\AppData\Local\Temp\cclk8osa.s:76     .text.speed_control_task:00000000 $t
+C:\Users\asus\AppData\Local\Temp\cclk8osa.s:82     .text.speed_control_task:00000000 speed_control_task
+C:\Users\asus\AppData\Local\Temp\cclk8osa.s:106    .text.speed_control_task:00000010 $d
+C:\Users\asus\AppData\Local\Temp\cclk8osa.s:112    .text.motor_test:00000000 $t
+C:\Users\asus\AppData\Local\Temp\cclk8osa.s:118    .text.motor_test:00000000 motor_test
+C:\Users\asus\AppData\Local\Temp\cclk8osa.s:163    .rodata.main.str1.4:00000000 $d
+C:\Users\asus\AppData\Local\Temp\cclk8osa.s:180    .text.main:00000000 $t
+C:\Users\asus\AppData\Local\Temp\cclk8osa.s:186    .text.main:00000000 main
+C:\Users\asus\AppData\Local\Temp\cclk8osa.s:303    .text.main:000000a4 $d
 
 UNDEFINED SYMBOLS
 RTC_GetNowTime

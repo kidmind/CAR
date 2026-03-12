@@ -62,7 +62,7 @@ typedef enum {
 #define GEAR_RATIO 1.0f       // 齿轮比（根据实际修改）
 
 // 测速相关参数
-#define ENCODER_SAMPLE_PERIOD_MS 1  // 采样周期 (ms)
+#define ENCODER_SAMPLE_PERIOD_MS 100  // 采样周期 (ms)
 #define ENCODER_SAMPLE_FREQ_HZ 1000 // 采样频率 (Hz) (Hz)
 
 // 速度计算相关

@@ -1,4 +1,4 @@
-ARM GAS  /tmp/cc6k5ZVQ.s 			page 1
+ARM GAS  C:\Users\asus\AppData\Local\Temp\ccFkgS0e.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/cc6k5ZVQ.s 			page 1
   50              		.loc 1 6 3 is_stmt 1 view .LVU5
   51              		.loc 1 6 33 is_stmt 0 view .LVU6
   52 0012 0023     		movs	r3, #0
-ARM GAS  /tmp/cc6k5ZVQ.s 			page 2
+ARM GAS  C:\Users\asus\AppData\Local\Temp\ccFkgS0e.s 			page 2
 
 
   53 0014 8DF80630 		strb	r3, [sp, #6]
@@ -93,18 +93,19 @@ ARM GAS  /tmp/cc6k5ZVQ.s 			page 1
   78              	.LFE123:
   80              		.text
   81              	.Letext0:
-  82              		.file 2 "/usr/lib/gcc/arm-none-eabi/13.2.1/include/stdint.h"
-  83              		.file 3 "CMSIS/stm32f4xx.h"
-  84              		.file 4 "Lib/StdPeriphs/inc/stm32f4xx_gpio.h"
-  85              		.file 5 "Lib/StdPeriphs/inc/stm32f4xx_rcc.h"
-ARM GAS  /tmp/cc6k5ZVQ.s 			page 3
+  82              		.file 2 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.2 Rel1/arm-none-eabi/include/ma
+  83              		.file 3 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.2 Rel1/arm-none-eabi/include/sy
+  84              		.file 4 "CMSIS/stm32f4xx.h"
+  85              		.file 5 "Lib/StdPeriphs/inc/stm32f4xx_gpio.h"
+  86              		.file 6 "Lib/StdPeriphs/inc/stm32f4xx_rcc.h"
+ARM GAS  C:\Users\asus\AppData\Local\Temp\ccFkgS0e.s 			page 3
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 Buzzer.c
-     /tmp/cc6k5ZVQ.s:21     .text.Buzzer_Init:00000000 $t
-     /tmp/cc6k5ZVQ.s:27     .text.Buzzer_Init:00000000 Buzzer_Init
-     /tmp/cc6k5ZVQ.s:76     .text.Buzzer_Init:00000030 $d
+C:\Users\asus\AppData\Local\Temp\ccFkgS0e.s:21     .text.Buzzer_Init:00000000 $t
+C:\Users\asus\AppData\Local\Temp\ccFkgS0e.s:27     .text.Buzzer_Init:00000000 Buzzer_Init
+C:\Users\asus\AppData\Local\Temp\ccFkgS0e.s:76     .text.Buzzer_Init:00000030 $d
 
 UNDEFINED SYMBOLS
 RCC_AHB1PeriphClockCmd
